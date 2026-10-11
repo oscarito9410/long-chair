@@ -9,7 +9,22 @@
       content="Long Chair is a calm session kit for long infusion and dialysis hours. This is a static design prototype with fictional sample data."
     />
     <meta name="theme-color" content="#F3EEE6" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Long Chair" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <title>Long Chair</title>
+    <script>
+      (function () {
+        var standalone =
+          window.matchMedia("(display-mode: standalone)").matches ||
+          window.navigator.standalone === true;
+        if (standalone) {
+          document.documentElement.classList.add("is-standalone");
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

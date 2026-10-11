@@ -32,19 +32,19 @@ Refreshing the page restores the sample profile. Choices live in memory for the 
 
 Open the app and move through the story, or jump with the hash:
 
-| Screen      | Hash                  | What you do                                                                                    |
-| ----------- | --------------------- | ---------------------------------------------------------------------------------------------- |
-| Welcome     | `#/welcome`           | The promise, paper notes of tastes, then get started or open the sample kit.                   |
-| Tastes      | `#/love`              | One question: what belongs in the room. `#/onboarding` lands here too.                         |
-| Length      | `#/chair`             | Turn the dial, or tap 1h, 2h, 3h, or 4h. Arrow keys move 30 minutes.                           |
-| Themes      | `#/themes`            | What should stay out of the room.                                                              |
-| Company     | `#/company`           | Tap one of four guides, then Choose that name. Skip leaves the guide as it was.                |
-| Building    | `#/building`          | Watch the five agent steps check off.                                                          |
-| Ready       | `#/ready`             | A postage-style card for this chair, then open the kit.                                        |
-| Session kit | `#/kit`               | A timeline whose durations add up to the chair. Each card is a cover, a title, and one reason. |
-| Piece       | `#/item/north-window` | Cover, creator, why it was kept, and a one-line theme check.                                   |
-| Companion   | `#/companion`         | Places open nearby sit under the headline. The guide is a short line below them.               |
-| Contrast    | `#/compare`           | An unfiltered title beside the piece Long Chair kept, each with one line.                      |
+| Screen      | Hash                  | What you do                                                                                      |
+| ----------- | --------------------- | ------------------------------------------------------------------------------------------------ |
+| Welcome     | `#/welcome`           | The promise, paper notes of tastes, then get started or open the sample kit.                     |
+| Tastes      | `#/love`              | One question: what belongs in the room. `#/onboarding` lands here too.                           |
+| Length      | `#/chair`             | Turn the dial, or tap 1h, 2h, 3h, or 4h. Arrow keys move 30 minutes.                             |
+| Themes      | `#/themes`            | What should stay out of the room.                                                                |
+| Company     | `#/company`           | Tap one of four guides, then Choose that name. Skip leaves the guide as it was.                  |
+| Building    | `#/building`          | Five agent steps. Done is a teal check, the current step says Now, and the rest are empty wells. |
+| Ready       | `#/ready`             | A postage-style card, a short fan of covers, then open the kit.                                  |
+| Session kit | `#/kit`               | A timeline whose durations add up to the chair. Each card is a cover, a title, and one reason.   |
+| Piece       | `#/item/north-window` | A bottom sheet over the kit: cover, creator, why it was kept, and a one-line theme check.        |
+| Companion   | `#/companion`         | The guide bubble is the header. Places open nearby sit under it.                                 |
+| Contrast    | `#/compare`           | An unfiltered title beside the piece Long Chair kept, each with one line.                        |
 
 After the kit exists, a floating glass tab bar switches among Kit, Companion, and Compare. The sample chair is 4 hours with Pebble as the guide. Most of the shelf is selected, Sunday Engines is not, and grief and the death of a parent are not held back, so both row states are visible. **See a sample kit** on the welcome screen opens that timeline immediately.
 
@@ -85,6 +85,21 @@ npm run dev
 ```
 
 The dev server is [http://127.0.0.1:4179](http://127.0.0.1:4179).
+
+### Install on a phone
+
+Long Chair is a progressive web app. The manifest uses the cream page color, `display: standalone`, and original maskable icons at 192 and 512, plus an Apple touch icon. Safari gets the `apple-mobile-web-app` tags.
+
+The service worker is part of the production build. It precaches the shell (HTML, CSS, JavaScript, fonts, and icons). The packed kit is computed in that JavaScript, and the app also writes the latest kit JSON into the Cache Storage entry `long-chair-kit`. After one online visit, the kit opens with no network.
+
+```bash
+npm run build
+npm run preview
+```
+
+Install from the browser's app menu, or on iPhone use Share, then Add to Home Screen. In standalone mode the page does not overscroll, controls do not highlight or select text, cards and pills press to 97 percent, and the top and the tab bar keep the safe area.
+
+The dev server does not register the worker. Use the preview build to try it offline.
 
 Other scripts:
 
