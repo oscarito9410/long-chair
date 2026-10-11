@@ -43,8 +43,6 @@ import {
   TARGET,
 } from "../../src/theme/palette";
 
-const tabClearance = 120;
-
 function keptItem(packed: PackedSession | undefined): CatalogItem | undefined {
   if (!packed) {
     return undefined;
@@ -68,7 +66,11 @@ export default function CompareScreen() {
   const brought = compareBroughtLabels();
 
   return (
-    <ScrollView contentContainerStyle={[styles.page, { paddingTop: insets.top + SPACE_16 }]}>
+    <ScrollView
+      style={styles.scroll}
+      contentInsetAdjustmentBehavior="automatic"
+      contentContainerStyle={[styles.page, { paddingTop: insets.top + SPACE_16 }]}
+    >
       <SampleBanner live={plan?.source === "live"} />
       <Text style={styles.hero}>{String(themes.length)}</Text>
       <Text style={styles.caption}>{compareCaption}</Text>
@@ -128,7 +130,8 @@ function KeptCard({
 }
 
 const styles = StyleSheet.create({
-  page: { paddingHorizontal: SPACE_24, gap: SPACE_16, paddingBottom: tabClearance },
+  scroll: { flex: 1, backgroundColor: "transparent" },
+  page: { paddingHorizontal: SPACE_24, gap: SPACE_16, paddingBottom: SPACE_24 },
   hero: { fontFamily: "Nunito_800ExtraBold", fontSize: FONT_HERO, color: palette.ink },
   caption: { fontFamily: "Nunito_600SemiBold", fontSize: FONT_SECONDARY, color: palette.inkSoft },
   title: { fontFamily: "Nunito_800ExtraBold", fontSize: FONT_TITLE, color: palette.ink },

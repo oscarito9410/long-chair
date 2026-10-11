@@ -25,8 +25,6 @@ import {
   TARGET,
 } from "../../src/theme/palette";
 
-const tabClearance = 120;
-
 export default function CompanionScreen() {
   const insets = useSafeAreaInsets();
   const { draft } = useSession();
@@ -36,7 +34,11 @@ export default function CompanionScreen() {
   const places = plan?.places ?? nearbyPlaces;
 
   return (
-    <ScrollView contentContainerStyle={[styles.page, { paddingTop: insets.top + SPACE_16 }]}>
+    <ScrollView
+      style={styles.scroll}
+      contentInsetAdjustmentBehavior="automatic"
+      contentContainerStyle={[styles.page, { paddingTop: insets.top + SPACE_16 }]}
+    >
       <SampleBanner live={plan?.source === "live"} />
       <View style={styles.header}>
         <CharacterMark variant={guide.variant} size={AVATAR} animate />
@@ -74,7 +76,8 @@ export default function CompanionScreen() {
 }
 
 const styles = StyleSheet.create({
-  page: { paddingHorizontal: SPACE_24, gap: SPACE_16, paddingBottom: tabClearance },
+  scroll: { flex: 1, backgroundColor: "transparent" },
+  page: { paddingHorizontal: SPACE_24, gap: SPACE_16, paddingBottom: SPACE_24 },
   header: { flexDirection: "row", gap: SPACE_16, alignItems: "center" },
   bubble: { flex: 1, borderRadius: RADIUS_CARD, padding: SPACE_16 },
   headerText: { fontFamily: "Nunito_800ExtraBold", fontSize: FONT_BODY, color: palette.ink },
