@@ -1,0 +1,371 @@
+@import "tailwindcss";
+
+/*
+  Paint tokens. Hex values live only in this file.
+  Tailwind utilities read them through @theme inline.
+*/
+:root {
+  --lc-page: #f3eee6;
+  --lc-ink: #1c1916;
+  --lc-ink-soft: #4a433c;
+  --lc-line: #d9d0c6;
+  --lc-apricot: #e7a784;
+  --lc-apricot-deep: #8f4e34;
+  --lc-seaglass: #7aaba3;
+  --lc-seaglass-deep: #245e56;
+  --lc-honey: #e4c06a;
+  --lc-honey-deep: #7a5e16;
+  --lc-wisteria: #c5b0d6;
+  --lc-wisteria-deep: #564472;
+  --lc-font-sans: "Nunito", ui-rounded, "SF Pro Rounded", system-ui, sans-serif;
+  --lc-font-hand: "Caveat", "Segoe Print", cursive;
+  --lc-radius-card: 28px;
+  --lc-radius-panel: 32px;
+  --lc-radius-pill: 999px;
+  --lc-content: 800px;
+  --lc-hero: clamp(3.5rem, 10vw, 5.75rem);
+  --lc-hand: 1.75rem;
+  --lc-icon: 24px;
+  --lc-well: 64px;
+  --lc-target: 48px;
+  --lc-space-4: 4px;
+  --lc-space-8: 8px;
+  --lc-space-16: 16px;
+  --lc-space-24: 24px;
+  --lc-space-32: 32px;
+  --lc-space-64: 64px;
+  --lc-tab-clearance: calc(var(--lc-space-64) + var(--lc-space-32) + var(--lc-space-16));
+  --lc-glass: rgba(243, 238, 230, 0.8);
+  --lc-glass-border: rgba(255, 255, 255, 0.72);
+  --lc-glass-highlight: rgba(255, 252, 248, 0.95);
+  --lc-glass-inner: rgba(255, 255, 255, 0.38);
+  --lc-glass-sheen: rgba(255, 252, 248, 0.55);
+  --lc-glass-shade: rgba(243, 238, 230, 0.22);
+  --lc-glass-saturate: 1.45;
+  --lc-shadow: rgba(28, 25, 22, 0.08);
+  --lc-blur: 22px;
+  --lc-focus-width: 2px;
+  --lc-z-bg: 0;
+  --lc-z-content: 1;
+  --lc-z-tab: 20;
+  --lc-wash-mix: 34%;
+  --lc-drift-a: 56s;
+  --lc-drift-b: 64s;
+  --lc-drift-c: 72s;
+}
+
+@theme inline {
+  --color-page: var(--lc-page);
+  --color-ink: var(--lc-ink);
+  --color-ink-soft: var(--lc-ink-soft);
+  --color-line: var(--lc-line);
+  --color-apricot: var(--lc-apricot);
+  --color-apricot-deep: var(--lc-apricot-deep);
+  --color-seaglass: var(--lc-seaglass);
+  --color-seaglass-deep: var(--lc-seaglass-deep);
+  --color-honey: var(--lc-honey);
+  --color-honey-deep: var(--lc-honey-deep);
+  --color-wisteria: var(--lc-wisteria);
+  --color-wisteria-deep: var(--lc-wisteria-deep);
+  --font-sans: var(--lc-font-sans);
+  --font-hand: var(--lc-font-hand);
+  --radius-card: var(--lc-radius-card);
+  --radius-panel: var(--lc-radius-panel);
+  --radius-pill: var(--lc-radius-pill);
+}
+
+html {
+  color-scheme: light;
+  background: var(--lc-page);
+  scroll-padding-bottom: var(--lc-tab-clearance);
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--lc-page);
+  color: var(--lc-ink);
+  font-family: var(--lc-font-sans);
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--lc-honey) 55%, var(--lc-page));
+  color: var(--lc-ink);
+}
+
+:focus-visible {
+  outline: var(--lc-focus-width) solid var(--lc-ink);
+  outline-offset: var(--lc-space-4);
+}
+
+legend {
+  padding: 0;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  background: var(--lc-line);
+  color: var(--lc-ink);
+}
+
+@utility glass {
+  background-color: var(--lc-glass);
+  background-image: linear-gradient(180deg, var(--lc-glass-sheen), var(--lc-glass-shade));
+  backdrop-filter: blur(var(--lc-blur)) saturate(var(--lc-glass-saturate));
+  -webkit-backdrop-filter: blur(var(--lc-blur)) saturate(var(--lc-glass-saturate));
+  border: 1px solid var(--lc-glass-border);
+  box-shadow:
+    inset 0 1px 0 var(--lc-glass-highlight),
+    inset 0 0 0 1px var(--lc-glass-inner),
+    0 16px 40px var(--lc-shadow);
+}
+
+@utility pastel-card {
+  border: 1px solid color-mix(in srgb, var(--lc-ink) 8%, transparent);
+  box-shadow: 0 12px 32px var(--lc-shadow);
+}
+
+@utility wash-apricot {
+  background-color: color-mix(in srgb, var(--lc-apricot) var(--lc-wash-mix), var(--lc-page));
+}
+
+@utility wash-seaglass {
+  background-color: color-mix(in srgb, var(--lc-seaglass) var(--lc-wash-mix), var(--lc-page));
+}
+
+@utility wash-honey {
+  background-color: color-mix(in srgb, var(--lc-honey) var(--lc-wash-mix), var(--lc-page));
+}
+
+@utility wash-wisteria {
+  background-color: color-mix(in srgb, var(--lc-wisteria) var(--lc-wash-mix), var(--lc-page));
+}
+
+.hero-figure {
+  margin: 0;
+  color: var(--lc-ink);
+  font-family: var(--lc-font-sans);
+  font-size: var(--lc-hero);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+}
+
+.hand {
+  margin: 0;
+  color: var(--lc-ink);
+  font-family: var(--lc-font-hand);
+  font-size: var(--lc-hand);
+  line-height: 1.1;
+}
+
+.specular {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: var(--lc-glass-highlight);
+  pointer-events: none;
+}
+
+.layer-bg {
+  position: fixed;
+  z-index: var(--lc-z-bg);
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.layer-content {
+  position: relative;
+  z-index: var(--lc-z-content);
+}
+
+.layer-tab {
+  position: fixed;
+  z-index: var(--lc-z-tab);
+  inset-inline: 0;
+  bottom: 0;
+}
+
+.page {
+  width: 100%;
+  max-width: var(--lc-content);
+  margin-inline: auto;
+  padding-top: var(--lc-space-32);
+  padding-inline: var(--lc-space-24);
+}
+
+.page-pad {
+  padding-bottom: var(--lc-space-64);
+}
+
+.page-pad-tabs {
+  padding-bottom: var(--lc-tab-clearance);
+}
+
+.tab-dock {
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--lc-space-24) max(var(--lc-space-16), env(safe-area-inset-bottom));
+  pointer-events: none;
+}
+
+.tab-dock > * {
+  pointer-events: auto;
+}
+
+.skip-link {
+  position: absolute;
+  z-index: var(--lc-z-tab);
+  top: var(--lc-space-16);
+  left: var(--lc-space-16);
+  transform: translateY(-200%);
+  border-radius: var(--lc-radius-pill);
+  background: var(--lc-page);
+  color: var(--lc-ink);
+  padding: var(--lc-space-8) var(--lc-space-16);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+.choice {
+  position: relative;
+}
+
+.choice:has(:focus-visible) {
+  outline: var(--lc-focus-width) solid var(--lc-ink);
+  outline-offset: var(--lc-space-4);
+}
+
+.clip-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.clip-input:focus {
+  outline: none;
+}
+
+.well {
+  display: inline-flex;
+  width: var(--lc-well);
+  height: var(--lc-well);
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--lc-radius-pill);
+  color: var(--lc-page);
+}
+
+.blob {
+  position: absolute;
+  width: 46vw;
+  height: 46vw;
+  min-width: 280px;
+  min-height: 280px;
+  border-radius: var(--lc-radius-pill);
+  opacity: 0.5;
+  filter: blur(48px);
+}
+
+.blob-apricot {
+  top: -12%;
+  left: -16%;
+  background: var(--lc-apricot);
+  animation: drift-a var(--lc-drift-a) ease-in-out infinite;
+}
+
+.blob-seaglass {
+  top: 18%;
+  right: -18%;
+  background: var(--lc-seaglass);
+  animation: drift-b var(--lc-drift-b) ease-in-out infinite;
+}
+
+.blob-honey {
+  bottom: -20%;
+  left: 8%;
+  background: var(--lc-honey);
+  animation: drift-c var(--lc-drift-c) ease-in-out infinite;
+}
+
+.blob-wisteria {
+  right: 4%;
+  bottom: 8%;
+  width: 34vw;
+  height: 34vw;
+  background: var(--lc-wisteria);
+  animation: drift-b var(--lc-drift-a) ease-in-out infinite reverse;
+}
+
+@keyframes drift-a {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(6%, 4%, 0) scale(1.06);
+  }
+}
+
+@keyframes drift-b {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-5%, 6%, 0) scale(1.05);
+  }
+}
+
+@keyframes drift-c {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(4%, -5%, 0) scale(1.08);
+  }
+}
+
+.screen-enter {
+  animation: rise 0.45s ease;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(var(--lc-space-8));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    background-color: var(--lc-page);
+  }
+}
