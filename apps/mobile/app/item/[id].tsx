@@ -1,5 +1,5 @@
 import { formatHoursMinutes, itemById, itemThemeCheck, matchingSeedNames } from "@long-chair/core";
-import { router, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -8,6 +8,8 @@ import { IconWell } from "../../src/components/chrome/IconWell";
 import { PillButton } from "../../src/components/chrome/PillButton";
 import { GlassSurface } from "../../src/components/glass/GlassSurface";
 import { backToKit, closeLabel, missingPiece } from "../../src/copy/phrases";
+import { closeSheet } from "../../src/navigation/present-sheet";
+import { itemIdFromParams } from "../../src/navigation/safe-route";
 import { kindHue, kindIcon, kindLabel } from "../../src/presentation";
 import { useSession } from "../../src/state/session";
 import {
@@ -25,8 +27,8 @@ import {
 const POSTER = 180;
 
 export default function ItemRoute() {
-  const params = useLocalSearchParams<{ id: string }>();
-  const itemId = typeof params.id === "string" ? params.id : "";
+  const params = useLocalSearchParams<{ id?: string | string[] }>();
+  const itemId = itemIdFromParams(params.id);
   if (Platform.OS === "ios") {
     return <ItemBody itemId={itemId} />;
   }
@@ -37,7 +39,7 @@ export default function ItemRoute() {
         accessibilityLabel={closeLabel}
         style={styles.scrim}
         onPress={() => {
-          router.back();
+          closeSheet();
         }}
       />
       <GlassSurface style={styles.sheet} tint={palette.card}>
@@ -63,7 +65,7 @@ function ItemBody({ itemId }: { itemId: string }) {
         <PillButton
           label={backToKit}
           onPress={() => {
-            router.back();
+            closeSheet();
           }}
         />
       </View>
@@ -78,7 +80,7 @@ function ItemBody({ itemId }: { itemId: string }) {
         tint={palette.apricot}
         icon="x"
         onPress={() => {
-          router.back();
+          closeSheet();
         }}
       />
       <CoverArt

@@ -101,6 +101,14 @@ export const leftOutLabel = "Left out";
 
 export const nowLabel = "Now";
 
+export const recoveryTitle = "This screen stopped";
+
+export const recoveryBody = "Nothing was sent. Try this screen again, or return to the welcome.";
+
+export const tryAgainLabel = "Try again";
+
+export const backToWelcome = "Back to welcome";
+
 export const backLabel = "Back";
 
 export const closeLabel = "Close";

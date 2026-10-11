@@ -17,11 +17,15 @@ export function playHaptic(weight: HapticWeight): void {
   if (Platform.OS === "web") {
     return;
   }
-  if (weight === "tick") {
-    void Haptics.selectionAsync();
-    return;
+  try {
+    if (weight === "tick") {
+      void Haptics.selectionAsync();
+      return;
+    }
+    void Haptics.impactAsync(impact[weight]);
+  } catch {
+    // A simulator without a haptics engine rejects the call. Keep the gesture.
   }
-  void Haptics.impactAsync(impact[weight]);
 }
 
 export function fireHaptic(weight: HapticWeight): void {

@@ -11,6 +11,11 @@ describe("chair dial", () => {
     expect(snapMinutes(400)).toBe(DIAL_MAX);
   });
 
+  it("keeps the dial math on the UI thread", () => {
+    expect(snapMinutes.toString()).toContain("worklet");
+    expect(minutesFromPoint.toString()).toContain("worklet");
+  });
+
   it("reads the right-hand side of the dial as a short session", () => {
     const minutes = minutesFromPoint(CENTER + 80, CENTER, CENTER, CENTER);
     expect(minutes).toBeGreaterThanOrEqual(DIAL_MIN);

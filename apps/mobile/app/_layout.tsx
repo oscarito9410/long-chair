@@ -15,6 +15,8 @@ import { StudioBackground } from "../src/components/background/StudioBackground"
 import { SessionProvider } from "../src/state/session";
 import { palette } from "../src/theme/palette";
 
+export { ErrorBoundary } from "../src/components/chrome/RecoveryScreen";
+
 void SplashScreen.preventAutoHideAsync();
 
 const SHEET_HALF = 0.5;
@@ -73,7 +75,8 @@ export default function RootLayout() {
                 options={{
                   presentation: Platform.OS === "ios" ? "formSheet" : "modal",
                   sheetGrabberVisible: true,
-                  sheetAllowedDetents: "fitToContents",
+                  // fitToContents against a flex:1 scaffold never settles and throws.
+                  sheetAllowedDetents: [0.68, 1],
                   contentStyle: { backgroundColor: palette.page },
                 }}
               />
@@ -81,7 +84,8 @@ export default function RootLayout() {
                 name="item/[id]"
                 options={{
                   presentation: Platform.OS === "ios" ? "formSheet" : "transparentModal",
-                  animation: "slide_from_bottom",
+                  // iOS rejects a custom slide animation on a form sheet.
+                  animation: Platform.OS === "ios" ? "default" : "slide_from_bottom",
                   sheetGrabberVisible: true,
                   sheetAllowedDetents: [SHEET_HALF, 1],
                   contentStyle: { backgroundColor: palette.page },

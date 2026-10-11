@@ -12,6 +12,7 @@ import {
   welcomeLede,
   welcomeTitle,
 } from "../src/copy/phrases";
+import { openSettings } from "../src/navigation/present-sheet";
 import { FONT_BODY, FONT_SECONDARY, FONT_TITLE, palette, SPACE_16 } from "../src/theme/palette";
 import { screenTints } from "../src/theme/screen-tints";
 
@@ -52,7 +53,7 @@ export default function WelcomeScreen() {
         tint={palette.seaglass}
         icon="gear"
         onPress={() => {
-          router.push("/settings");
+          openSettings();
         }}
       />
     </ScreenScaffold>

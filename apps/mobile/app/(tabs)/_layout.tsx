@@ -3,6 +3,8 @@ import { NativeTabs } from "expo-router/unstable-native-tabs";
 import { tabs } from "../../src/copy/phrases";
 import { palette } from "../../src/theme/palette";
 
+export { ErrorBoundary } from "../../src/components/chrome/RecoveryScreen";
+
 const label = {
   default: { color: palette.inkSoft },
   selected: { color: palette.ink },

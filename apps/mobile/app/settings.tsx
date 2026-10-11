@@ -1,5 +1,4 @@
 import { notMedicalAdvice, sampleShelfNote } from "@long-chair/core";
-import { router } from "expo-router";
 import { StyleSheet, Text } from "react-native";
 
 import { GlassSurface } from "../src/components/glass/GlassSurface";
@@ -12,6 +11,7 @@ import {
   settingsLede,
   settingsTitle,
 } from "../src/copy/phrases";
+import { closeSheet, showKit } from "../src/navigation/present-sheet";
 import { useSession } from "../src/state/session";
 import { FONT_BODY, palette, RADIUS_CARD, SPACE_16 } from "../src/theme/palette";
 import { screenTints } from "../src/theme/screen-tints";
@@ -24,14 +24,14 @@ export default function SettingsScreen() {
       lede={settingsLede}
       tint={screenTints.settings}
       onBack={() => {
-        router.back();
+        closeSheet();
       }}
       footerNote={notMedicalAdvice}
       primary={seeSample}
       primaryHaptic="press"
       onPrimary={() => {
         reset();
-        router.push("/(tabs)/kit");
+        showKit();
       }}
     >
       <Note text={sampleShelfNote} tint={palette.honey} />

@@ -6,6 +6,20 @@ import type { StyleProp, ViewStyle } from "react-native";
 
 import { BLUR_REGULAR, glassWash, palette, RADIUS_CARD } from "../../theme/palette";
 
+let liquidGlass: boolean | null = null;
+
+function liquidGlassAvailable(): boolean {
+  if (liquidGlass !== null) {
+    return liquidGlass;
+  }
+  try {
+    liquidGlass = isLiquidGlassAvailable();
+  } catch {
+    liquidGlass = false;
+  }
+  return liquidGlass;
+}
+
 export function GlassSurface({
   children,
   style,
@@ -19,7 +33,7 @@ export function GlassSurface({
   selected?: boolean;
   interactive?: boolean;
 }) {
-  if (isLiquidGlassAvailable()) {
+  if (liquidGlassAvailable()) {
     return (
       <GlassView
         glassEffectStyle="clear"

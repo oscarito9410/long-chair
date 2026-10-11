@@ -14,6 +14,7 @@ import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
+import { announceMessage } from "../src/a11y/announce";
 import { CharacterMark } from "../src/components/art/CharacterMark";
 import { IconWell } from "../src/components/chrome/IconWell";
 import { ScreenScaffold } from "../src/components/chrome/ScreenScaffold";
@@ -25,8 +26,10 @@ import {
   FONT_BODY,
   FONT_HERO,
   FONT_SECONDARY,
+  FONT_TITLE,
   palette,
   SPACE_16,
+  SPACE_8,
   WELL,
 } from "../src/theme/palette";
 import { screenTints } from "../src/theme/screen-tints";
@@ -38,6 +41,7 @@ export default function BuildingScreen() {
   const [shown, setShown] = useState(0);
   const visible = reduced ? steps.length : shown;
   const complete = visible >= steps.length;
+  const titles = useMemo(() => steps.map((step) => step.title), [steps]);
 
   useEffect(() => {
     if (reduced) {
@@ -51,10 +55,14 @@ export default function BuildingScreen() {
     };
   }, [reduced, steps.length]);
 
+  useEffect(() => {
+    announceMessage(buildingLiveText(titles, visible));
+  }, [titles, visible]);
+
   return (
     <ScreenScaffold
       title={buildingTitle}
-      lede={formatHoursMinutes(draft.durationMinutes)}
+      hideHeading
       tint={screenTints.building}
       step={onboardingStepIndex.building}
       onBack={() => {
@@ -67,13 +75,7 @@ export default function BuildingScreen() {
         router.push("/ready");
       }}
     >
-      <Text style={styles.caption}>{buildingCaption}</Text>
-      <Text accessibilityLiveRegion="polite" style={styles.live}>
-        {buildingLiveText(
-          steps.map((step) => step.title),
-          visible,
-        )}
-      </Text>
+      <SessionHeader minutes={draft.durationMinutes} />
       <View style={styles.center}>
         <CharacterMark
           variant={guideById(draft.companionId).variant}
@@ -92,9 +94,21 @@ export default function BuildingScreen() {
   );
 }
 
+function SessionHeader({ minutes }: { minutes: number }) {
+  return (
+    <View style={styles.header}>
+      <Text style={styles.figure}>{formatHoursMinutes(minutes)}</Text>
+      <Text style={styles.caption}>{buildingCaption}</Text>
+      <Text accessibilityRole="header" style={styles.title}>
+        {buildingTitle}
+      </Text>
+    </View>
+  );
+}
+
 function StepLine({ title, state }: { title: string; state: "pending" | "active" | "done" }) {
   return (
-    <View style={styles.step}>
+    <View accessible accessibilityLabel={stepAccessLabel(title, state)} style={styles.step}>
       {state === "pending" ? <View style={styles.empty} /> : null}
       {state === "done" ? <IconWell hue="seaglass" name="check" /> : null}
       {state === "active" ? (
@@ -107,9 +121,37 @@ function StepLine({ title, state }: { title: string; state: "pending" | "active"
   );
 }
 
+function stepAccessLabel(title: string, state: "pending" | "active" | "done"): string {
+  if (state === "done") {
+    return `${title}. Done.`;
+  }
+  if (state === "active") {
+    return `Now. ${title}.`;
+  }
+  return `${title}. Waiting.`;
+}
+
 const styles = StyleSheet.create({
-  caption: { fontFamily: "Nunito_600SemiBold", fontSize: FONT_BODY, color: palette.inkSoft },
-  live: { fontFamily: "Nunito_800ExtraBold", fontSize: FONT_HERO, color: palette.ink },
+  header: { gap: SPACE_8 },
+  figure: {
+    fontFamily: "Nunito_800ExtraBold",
+    fontSize: FONT_HERO,
+    lineHeight: 40,
+    letterSpacing: -1.6,
+    color: palette.ink,
+  },
+  caption: {
+    fontFamily: "Nunito_700Bold",
+    fontSize: FONT_BODY,
+    color: palette.inkSoft,
+  },
+  title: {
+    fontFamily: "Nunito_800ExtraBold",
+    fontSize: FONT_TITLE,
+    lineHeight: 38,
+    color: palette.ink,
+    marginTop: SPACE_8,
+  },
   center: { alignItems: "center" },
   step: { flexDirection: "row", alignItems: "center", gap: SPACE_16 },
   empty: {

@@ -32,6 +32,7 @@ import {
   settingsLabel,
   trySampleAgain,
 } from "../../src/copy/phrases";
+import { openItem, openSettings } from "../../src/navigation/present-sheet";
 import { kindHue, kindIcon, kindLabel } from "../../src/presentation";
 import { useSession } from "../../src/state/session";
 import { usePlan } from "../../src/state/use-plan";
@@ -107,7 +108,7 @@ export default function KitScreen() {
         tint={palette.seaglass}
         icon="gear"
         onPress={() => {
-          router.push("/settings");
+          openSettings();
         }}
       />
     </ScrollView>
@@ -165,7 +166,7 @@ function KitCard({
     <PressableScale
       haptic="tick"
       onPress={() => {
-        router.push(`/item/${item.id}`);
+        openItem(item.id);
       }}
       style={styles.stretch}
     >
