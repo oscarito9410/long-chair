@@ -17,6 +17,7 @@ export const iconNames = [
   "cup",
   "chair",
   "pause",
+  "x",
 ] as const;
 
 export type IconName = (typeof iconNames)[number];

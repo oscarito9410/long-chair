@@ -1,7 +1,11 @@
 export type Route =
   | { name: "welcome" }
-  | { name: "onboarding" }
+  | { name: "love" }
+  | { name: "chair" }
+  | { name: "themes" }
+  | { name: "company" }
   | { name: "building" }
+  | { name: "ready" }
   | { name: "kit" }
   | { name: "companion" }
   | { name: "compare" }
@@ -17,9 +21,18 @@ export function parseRoute(hash: string): Route {
     case "/":
       return { name: "welcome" };
     case "/onboarding":
-      return { name: "onboarding" };
+    case "/love":
+      return { name: "love" };
+    case "/chair":
+      return { name: "chair" };
+    case "/themes":
+      return { name: "themes" };
+    case "/company":
+      return { name: "company" };
     case "/building":
       return { name: "building" };
+    case "/ready":
+      return { name: "ready" };
     case "/kit":
       return { name: "kit" };
     case "/companion":

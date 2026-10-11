@@ -18,12 +18,13 @@ export function App() {
 
   useEffect(() => {
     document.title = `${documentTitle(route)} · Long Chair`;
+    document.querySelector(".page")?.scrollTo(0, 0);
     window.scrollTo(0, 0);
   }, [route]);
 
   return (
     <SessionProvider>
-      <AppShell route={route} showTabs={showsTabBar(route)} showDots={route.name !== "building"}>
+      <AppShell route={route} showTabs={showsTabBar(route)} showDots>
         <div key={routeKey(route)} className="screen-enter">
           <ScreenOutlet route={route} />
         </div>

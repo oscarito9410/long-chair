@@ -14,8 +14,13 @@ When the real integration starts, map Qloo search hits and insight rows onto the
 
 ```
 src/components/   Presentational UI. One component per file.
-src/content/      How a kind or a place maps to a hue and an icon.
-src/data/         Sample records and the draft / catalog types.
+  art/            Character, CoverArt, Stamp.
+  chrome/         Shell, tab bar, question frame, screen intro.
+  glass/          GlassSurface and the action button and link.
+  kit/            Timeline, pause, places, topics, agent steps.
+  ui/             Dial, option rows, icon, wells, chips, empty state.
+src/content/      How a kind, a taste, or a theme maps to a character.
+src/data/         Sample records, guides, and the draft / catalog types.
 src/hooks/        React hooks only.
 src/lib/          Pure functions: packing, formatting, matching.
 src/routing/      Hash parsing and path builders.
@@ -54,15 +59,16 @@ Do not write a hex, rgb, or hsl value in a component. The favicon and the `theme
 
 Four hues, plus ink and the page. Every chromatic surface uses one of the four.
 
-| Token          | Role                                                    |
-| -------------- | ------------------------------------------------------- |
-| apricot        | Warmth, film, listening                                 |
-| seaglass       | The path forward, episodes, podcasts, the solid action  |
-| honey          | Food and a pause. Not podcasts                          |
-| wisteria       | Reading, and themes held back                           |
-| ink / ink-soft | Text. ink-soft is secondary copy and must stay ≥ 4.5:1  |
-| page           | The paper behind everything                             |
-| line           | Disabled controls, quiet borders, unselected tile edges |
+| Token          | Role                                                   |
+| -------------- | ------------------------------------------------------ |
+| apricot        | Warmth, film, listening                                |
+| seaglass       | The path forward, episodes, podcasts                   |
+| honey          | Food and a pause. Not podcasts                         |
+| wisteria       | Reading, and themes held back                          |
+| ink / ink-soft | Text. ink-soft is secondary copy and must stay ≥ 4.5:1 |
+| page           | The warm paper behind everything                       |
+| card           | White-ish rows, covers, and the stamp                  |
+| line           | Disabled controls, quiet borders, unselected row edges |
 
 Washes are `color-mix` of a hue into the page (`wash-apricot`, `wash-seaglass`, `wash-honey`, `wash-wisteria`). Deep hues (`*-deep`) are only for icon wells and for text that sits on them in the page color. Two content kinds may share a hue. Do not invent a fifth hue for a new card.
 
@@ -72,67 +78,103 @@ Spacing is the scale 4, 8, 16, 24, 32, 64. In Tailwind that is `1`, `2`, `4`, `6
 
 Body copy is `text-lg` (18px) or larger. Secondary copy is `text-base` (16px) or larger. Do not use `text-sm` or `text-xs`. The tab label may be `text-base` under `sm` so the word "Companion" fits a phone, and `text-lg` from `sm` up. Card titles may stay at `text-2xl`. Secondary ink (`text-ink-soft`) has to clear 4.5:1 on the page and on every wash. Measure before darkening `--lc-ink-soft`. It already clears that bar on the current washes.
 
-Radii: `rounded-card` for pastel cards and selection tiles, `rounded-panel` for sheets, `rounded-tag` for chips and status labels, `rounded-full` only for real actions (buttons and links), the tab bar, and icon wells. Do not put a pill, a shadow, or a fill behind a label that is not an action. The sample line is flat text inside the hero. The column is `--lc-content` (800px), applied by the `.page` class.
+Radii: `rounded-card` for rows and covers, `rounded-panel` for the detail sheet, `rounded-tag` for chips and stickers, `rounded-full` only for real actions (the black primary pill, the quiet text link still uses the pill hit area), the tab bar, and icon wells. Do not put a pill, a shadow, or a fill behind a label that is not an action. The sample line is flat text. The column is `--lc-content` (800px), applied by the `.page` class. Question screens narrow further to `--lc-question` (440px).
 
-Nunito is the UI font. Caveat (the `.hand` class) is at most one decorative line per screen, such as the welcome tagline. Privacy notes, footnotes, and instructions use Nunito.
+Nunito is the UI font. Caveat (the `.hand` class) is only the decorative welcome stickers, which are `aria-hidden`. Privacy notes, footnotes, instructions, and every other line use Nunito. Do not set `.hand` on a sentence a person needs to read to use the app.
+
+The layout is mobile-first. Design and capture at a 390×844 phone, and let the same column widen toward the tablet. Kit cards become a row beside the cover from 800px.
+
+### One question per screen
+
+Onboarding is four hash screens, not one form: `#/love`, `#/chair`, `#/themes`, `#/company`. Each uses `QuestionFrame`: a centered bold `h1`, a short subline, one job in the body, then a full-width black primary pill and a quiet text link under it ("Skip for now" or "You can change this anytime"). The quiet link is still a real control (`GlassLink` tone `quiet`) at the 48px target and the 16px type floor. Continue on tastes stays disabled until one title is selected. Skip advances without requiring a change.
+
+`#/onboarding` is an alias of `#/love`.
+
+### Characters
+
+`Character` draws an original blob mascot from a `CharacterVariant` (`shape` plus `hue`) in `src/data/character-kinds.ts`. Shapes are pebble, bean, drop, bun, arch, and sprout. Data files may import that type. They must not import a component.
+
+Use the character as the icon on an `OptionRow`, as the guide on `#/company` and the companion plan, and in empty and loading states (including the building screen). Sizes are `sm`, `md`, and `lg`. `animate` adds a bob and a blink. Both keyframes are collapsed by the global `prefers-reduced-motion` rule, which leaves the open-eye pose.
+
+Guides live in `src/data/guides.ts` (Pebble, Lumen, Nook, Brim). The draft stores `companionId`. Packing ignores it. Do not copy another product's characters, names, or lines.
+
+### Option rows
+
+`OptionRow` is the taste and theme control. A selected row shows a check, a 2px ink border, and a status word ("In the room" or "Left out"). An unselected row is the card color with the quiet line border. Both are toggle buttons with `aria-pressed`. Do not rely on color alone. The character sits on the right.
+
+### Dial
+
+`Dial` is the chair length, not a list of durations. It snaps to 1, 2, 3, or 4 hours. The center figure is the hour count, the word "hours", and "This chair". The control is a native range (`aria-label` "Hours in the chair", `aria-valuetext` including "This chair"). Focus draws the ink ring on `.dial`.
+
+### Stamp and cover art
+
+`CoverArt` paints a deterministic poster, square, or banner from a seed string. Pass `decorative` when the title is already in adjacent text. `Stamp` frames a square cover as a postage card with a perforated mask. The ready screen (`#/ready`) is the reward: "Your kit is ready", the stamp, and "Open my kit".
 
 ### Glass
 
-Frosted glass is only the hero (`GlassPanel` inside `ScreenIntro`) and the tab bar. `Specular` is the 1px highlight on those two. Text cards use `SolidPanel` (near-opaque page, no blur). Pastel cards use `pastel-card` plus one wash and are solid. Quiet actions use `.action-quiet`: an opaque page fill, an ink border, and a pill, because they are real actions.
+Glass is an accent, not the page. `GlassSurface` is the only glass primitive. Variants:
 
-`prefers-reduced-transparency: reduce` paints `.glass` and `.solid-panel` as opaque page with no blur. The same fallback applies when backdrop-filter is missing.
+| Variant | Where                           |
+| ------- | ------------------------------- |
+| bar     | The floating tab bar            |
+| badge   | A chip over cover art           |
+| chip    | A personality label on a guide  |
+| sheet   | The bottom sheet on item detail |
 
-### Selection tiles
+The recipe is `.glass-accent`: a mostly opaque card fill, blur, a sheen, a light border, and a soft shadow. Primary actions are solid ink with page-colored type (`bg-ink text-page`), not glass. Quiet actions use `.action-quiet`: transparent, ink-soft type, no border and no shadow.
 
-`SelectCard` is the onboarding tile. Selected tiles show a check in the icon well, a 2px ink border (`--lc-focus-width`), the hue wash, and a short status label ("In the room", "Left out", or "This chair"). Unselected tiles are page-colored with the quiet line border. Tastes and themes are toggle buttons with `aria-pressed`. Duration is a radio group with the same visual treatment. Do not rely on color alone.
+`prefers-reduced-transparency: reduce`, and a missing backdrop-filter, paint `.glass-accent` as opaque card with no blur and no sheen.
 
 ### Tab clearance
 
-Screens with the tab bar use `.page-pad-tabs`. The padding is `--lc-tab-clearance`: the bar height, plus the dock inset or `env(safe-area-inset-bottom)`, plus 24px. Screens without the bar use `.page-pad`, which also adds the safe-area inset. Do not let the last card, chip, or link sit under the bar.
+Screens with the tab bar use `.page-pad-tabs`. That column is its own scrollport, `100dvh` minus `--lc-tab-dock` (the bar plus the dock inset or `env(safe-area-inset-bottom)`), with 24px of padding inside the scroller. Content moves above the bar. It does not slide underneath it. Screens without the bar use `.page-pad` and scroll the document, including the safe-area inset. The phone tab stacks the icon over the label, so the bar token includes the extra stack height. Route changes reset scroll on `.page`.
+
+The current tab is a cream pill with a 2px ink border inside the glass bar (`aria-current="page"`). Do not communicate the current tab by color alone.
 
 ### Icon wells
 
-`IconWell` paints a circle in the deep step of the card's hue, with the icon in the page color. The well belongs to the card. Do not put a neutral gray circle behind an icon.
+`IconWell` paints a circle in the deep step of a hue, with the icon in the page color. Use it for a Lucide mark that is not a character (the compare cross and check, a pause, an agent step). `Icon` is the Lucide wrapper. Do not put a neutral gray circle behind an icon.
 
 ### Hero number
 
-Onboarding, Building, Kit, Companion, and Compare each have one `HeroNumber`: the figure that matters (chair length, time filled, themes held back, places open). The onboarding figure follows the duration the visitor picks. Welcome has no hero number; its `h1` is the promise. Do not add a second display-sized number on the same screen. Empty and unknown states omit it. The figure uses `.hero-figure`.
+Building, Kit, Companion, and Compare each have one `HeroNumber`: the figure that matters (chair length, time filled, themes held back, places open). The dial is the hero on the chair screen. Welcome has no hero number; its `h1` is the promise. Do not add a second display-sized number on the same screen. Empty and unknown states omit it. The figure uses `.hero-figure`.
 
 ### Motion
 
-Blobs drift slowly. Screen changes use `.screen-enter`. Both are covered by the global `prefers-reduced-motion: reduce` rule in `index.css`, which collapses animation and transition time. Do not add a motion effect that ignores that query.
+Blobs drift slowly, at low opacity. Characters bob and blink when `animate` is set. Screen changes use `.screen-enter`. The building steps check off on `motion.stepIntervalMs`. All of this is covered by the global `prefers-reduced-motion: reduce` rule in `index.css`, which collapses animation and transition time. Do not add a motion effect that ignores that query.
 
 ### Dot field
 
-`src/components/background/DotField.tsx` is the interactive background. `dot-model.ts` is the math, so the component only owns the canvas lifecycle.
+`src/components/background/DotField.tsx` is a quiet texture behind every screen, including building. `dot-model.ts` is the math, so the component only owns the canvas lifecycle.
 
 - A grid of small dots, lightly jittered, colored by cycling the four hue tokens read from CSS at runtime.
-- Dots near the pointer ease brighter, larger, and slightly toward the pointer, then ease home. The loop stops once they have settled, so an idle chair does not animate forever.
-- The building screen does not mount the field. The step list checks off on its own, and a dot row between those cards is noise. `mode="gather"` remains on `DotField` for a later loading state; nothing in the prototype turns it on.
+- Dots near the pointer ease slightly brighter and toward the pointer, then ease home. The loop stops once they have settled.
+- Alphas in `tokens.ts` stay low. The field is paper grain, not a spectacle.
+- `mode="gather"` remains on `DotField` for a later loading state; nothing in the prototype turns it on.
 - The canvas is sized with `devicePixelRatio`, capped by `motion.maxDevicePixelRatio`.
 - Drawing is scheduled with `requestAnimationFrame` and cancelled when the document is hidden.
 - `prefers-reduced-motion: reduce` draws the field once and does not follow the pointer or gather.
 
-Keep the field quiet. This screen sits beside a person for hours. Do not add trails, flashes, or a tight vortex.
+Keep the field quiet. This screen sits beside a person for hours. Do not add trails, flashes, a dark mesh, or a tight vortex.
 
 ## Components and data
 
 - Screens compose. They do not fetch, and they do not own palette values.
 - Sample data stays in `src/data/` behind the interfaces in `types.ts`. Components receive plain props or call a pure helper in `src/lib/`.
-- `packSession` is the duration fitter. Change packing rules there, not inside `KitScreen`.
-- Reuse `GlassPanel`, `SolidPanel`, `GlassButton`, `GlassLink`, `SelectCard`, `IconWell`, `HeroNumber`, `BecauseList`, `ThemeCheck`, and `AvoidedRow` instead of copying markup. Kit cards use `ThemeCheck` (a line, plus chips only when a theme was not cleared). Item detail and Compare keep the full `AvoidedRow`.
-- Session state is the draft in `SessionContext` (selected tastes, themes, and minutes). The packed kit is derived with `usePackedSession`. Do not store a second copy of the kit.
+- `packSession` is the duration fitter. Change packing rules there, not inside `KitScreen`. It reads tastes, themes, and minutes. It does not read `companionId`.
+- Reuse `QuestionFrame`, `Character`, `CoverArt`, `Dial`, `Stamp`, `GlassSurface`, `GlassButton`, `GlassLink`, `OptionRow`, `IconWell`, `HeroNumber`, `BecauseList`, `ThemeCheck`, and `AvoidedRow` instead of copying markup. Kit cards use `ThemeCheck` (a line, plus chips only when a theme was not cleared). Item detail and Compare keep the full `AvoidedRow`.
+- Session state is the draft in `SessionContext` (tastes, themes, minutes, companion). The packed kit is derived with `usePackedSession`. Do not store a second copy of the kit.
 - Do not thread the draft through props from `App`. Call `useSession` in the screen that needs it.
 
 ## Accessibility
 
-- One `h1` per screen, inside `ScreenIntro` or, for the empty routes, inside `EmptyState`.
+- One `h1` per screen, inside `QuestionFrame`, `ScreenIntro`, or `EmptyState`.
 - Interactive controls meet `--lc-target` (48px) in height. Cards that are links count as the target.
-- Icon wells and decorative SVGs are `aria-hidden`.
-- Tastes and themes are toggle buttons with `aria-pressed`. Duration choices are radios in one group. Both use `SelectCard`, not click-only divs.
-- The building sequence checks steps off one by one. `prefers-reduced-motion: reduce` shows every step already done. The sequence exposes the current step and a polite live region, and it offers a way to the kit before the timer finishes.
+- Characters, cover art used as decoration, icon wells, and stickers are `aria-hidden`.
+- Tastes and themes are toggle buttons with `aria-pressed`. Duration is the dial's range input, not a set of radios.
+- The building sequence checks steps off one by one. `prefers-reduced-motion: reduce` shows every step already done. The sequence exposes the current step and a polite live region, and it offers a way forward before the timer finishes.
 - Focus uses the visible `:focus-visible` ring. Do not remove outlines.
-- Ink on the page, and page-colored glyphs on deep wells, are the contrast pairs. Do not put ink-soft text on a deep hue. Do not fade text with opacity to mean "disabled". Disabled buttons use the `line` token.
+- Ink on the page, page-colored type on the black primary, and page-colored glyphs on deep wells are the contrast pairs. Do not put ink-soft text on a deep hue. Do not fade text with opacity to mean "disabled". Disabled buttons use the `line` token.
 
 ## Commands
 

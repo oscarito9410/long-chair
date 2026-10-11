@@ -1,14 +1,14 @@
-import { cn } from "../../lib/cn.ts";
-import { hueWashClass } from "../../tokens/hue-styles.ts";
 import type { Hue } from "../../tokens/tokens.ts";
+import { CoverArt } from "../art/CoverArt.tsx";
+import { GlassSurface } from "../glass/GlassSurface.tsx";
 import { BecauseList } from "../ui/BecauseList.tsx";
 import { ThemeCheck } from "../ui/ThemeCheck.tsx";
 import type { IconName } from "../ui/icon-names.ts";
 import { Icon } from "../ui/Icon.tsx";
-import { IconWell } from "../ui/IconWell.tsx";
 
 export type TimelineCardProps = {
   href: string;
+  seed: string;
   rangeLabel: string;
   kindLabel: string;
   title: string;
@@ -22,6 +22,7 @@ export type TimelineCardProps = {
 
 export function TimelineCard({
   href,
+  seed,
   rangeLabel,
   kindLabel,
   title,
@@ -33,23 +34,23 @@ export function TimelineCard({
   exceptions,
 }: TimelineCardProps) {
   return (
-    <a
-      href={href}
-      className={cn("pastel-card flex flex-col gap-4 rounded-card p-6", hueWashClass[hue])}
-    >
-      <p className="text-lg font-normal">{rangeLabel}</p>
-      <div className="flex items-start gap-4">
-        <IconWell hue={hue}>
+    <a href={href} className="kit-card">
+      <div className="cover-frame kit-cover">
+        <CoverArt seed={seed} title={title} hue={hue} frame="square" decorative />
+        <GlassSurface variant="badge" className="cover-badge flex items-center gap-2 px-4 py-2">
           <Icon name={icon} />
-        </IconWell>
-        <div className="min-w-0">
-          <p className="text-lg font-bold">{kindLabel}</p>
+          <span className="text-base font-bold">{kindLabel}</span>
+        </GlassSurface>
+      </div>
+      <div className="flex min-w-0 flex-1 flex-col gap-4">
+        <p className="text-lg font-normal">{rangeLabel}</p>
+        <div>
           <p className="text-2xl font-extrabold">{title}</p>
           <p className="text-lg">{maker}</p>
         </div>
+        <BecauseList names={because} />
+        <ThemeCheck count={themeCount} exceptions={exceptions} />
       </div>
-      <BecauseList names={because} />
-      <ThemeCheck count={themeCount} exceptions={exceptions} />
     </a>
   );
 }

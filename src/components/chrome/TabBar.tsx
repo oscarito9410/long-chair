@@ -1,9 +1,9 @@
 import { cn } from "../../lib/cn.ts";
 import type { Route } from "../../routing/parse-route.ts";
 import { paths } from "../../routing/paths.ts";
+import { GlassSurface } from "../glass/GlassSurface.tsx";
 import type { IconName } from "../ui/icon-names.ts";
 import { Icon } from "../ui/Icon.tsx";
-import { Specular } from "../glass/Specular.tsx";
 
 const tabs: readonly {
   href: string;
@@ -26,29 +26,26 @@ function tabIsCurrent(route: Route, name: (typeof tabs)[number]["name"]): boolea
 export function TabBar({ route }: { route: Route }) {
   return (
     <div className="layer-tab tab-dock">
-      <nav
-        className="glass relative flex w-full max-w-[var(--lc-content)] gap-2 overflow-hidden rounded-full p-2"
-        aria-label="Session"
-      >
-        <Specular />
-        {tabs.map((tab) => {
-          const current = tabIsCurrent(route, tab.name);
-          return (
-            <a
-              key={tab.name}
-              href={tab.href}
-              aria-current={current ? "page" : undefined}
-              className={cn(
-                "relative flex min-h-[var(--lc-target)] flex-1 flex-col items-center justify-center gap-1 rounded-full px-2 text-base font-bold sm:flex-row sm:gap-2 sm:text-lg",
-                current ? "wash-seaglass text-ink" : "text-ink",
-              )}
-            >
-              <Icon name={tab.icon} />
-              {tab.label}
-            </a>
-          );
-        })}
-      </nav>
+      <GlassSurface variant="bar" className="w-full max-w-[var(--lc-content)]">
+        <nav className="relative flex gap-2 p-2" aria-label="Session">
+          {tabs.map((tab) => {
+            const current = tabIsCurrent(route, tab.name);
+            return (
+              <a
+                key={tab.name}
+                href={tab.href}
+                aria-current={current ? "page" : undefined}
+                className={cn(
+                  "tab-link relative flex min-h-[var(--lc-target)] flex-1 flex-col items-center justify-center gap-1 rounded-full px-2 text-base font-bold sm:flex-row sm:gap-2 sm:text-lg",
+                )}
+              >
+                <Icon name={tab.icon} />
+                {tab.label}
+              </a>
+            );
+          })}
+        </nav>
+      </GlassSurface>
     </div>
   );
 }

@@ -1,28 +1,22 @@
-import { cn } from "../../lib/cn.ts";
-import { hueWashClass } from "../../tokens/hue-styles.ts";
-import type { Hue } from "../../tokens/tokens.ts";
-import type { IconName } from "../ui/icon-names.ts";
-import { Icon } from "../ui/Icon.tsx";
-import { IconWell } from "../ui/IconWell.tsx";
+import type { CharacterVariant } from "../../data/character-kinds.ts";
+import { Character } from "../art/Character.tsx";
 
 export function TopicCard({
   title,
   prompt,
-  hue,
-  icon,
+  character,
 }: {
   title: string;
   prompt: string;
-  hue: Hue;
-  icon: IconName;
+  character: CharacterVariant;
 }) {
   return (
-    <article className={cn("pastel-card flex flex-col gap-4 rounded-card p-6", hueWashClass[hue])}>
-      <IconWell hue={hue}>
-        <Icon name={icon} />
-      </IconWell>
-      <h3 className="text-2xl font-bold">{title}</h3>
-      <p className="text-lg leading-relaxed">{prompt}</p>
+    <article className="option-row cursor-default">
+      <div className="min-w-0">
+        <h3 className="text-2xl font-bold">{title}</h3>
+        <p className="mt-2 text-lg leading-relaxed">{prompt}</p>
+      </div>
+      <Character variant={character} />
     </article>
   );
 }

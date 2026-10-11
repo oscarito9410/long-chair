@@ -1,25 +1,17 @@
+import { Character } from "../components/art/Character.tsx";
 import { ScreenIntro } from "../components/chrome/ScreenIntro.tsx";
 import { PlaceCard } from "../components/kit/PlaceCard.tsx";
 import { TopicCard } from "../components/kit/TopicCard.tsx";
+import { GlassSurface } from "../components/glass/GlassSurface.tsx";
 import { SectionHeading } from "../components/ui/SectionHeading.tsx";
-import { SolidPanel } from "../components/ui/SolidPanel.tsx";
-import { kindMeta } from "../content/presentation.ts";
+import { tasteCharacter } from "../content/presentation.ts";
 import { companionSetting, companionTopics, nearbyPlaces } from "../data/companion.ts";
-import { tasteSeeds } from "../data/taste-seeds.ts";
-import type { IconName } from "../components/ui/icon-names.ts";
-import type { Hue } from "../tokens/tokens.ts";
+import { guideById } from "../data/guides.ts";
 import { useSession } from "../state/SessionContext.tsx";
-
-function topicAppearance(seedId: string): { hue: Hue; icon: IconName } {
-  const seed = tasteSeeds.find((entry) => entry.id === seedId);
-  if (!seed) {
-    return kindMeta.movie;
-  }
-  return kindMeta[seed.kind];
-}
 
 export function CompanionScreen() {
   const { draft } = useSession();
+  const guide = guideById(draft.companionId);
   const topics = companionTopics.filter((topic) => draft.seedIds.includes(topic.seedId));
 
   return (
@@ -28,13 +20,18 @@ export function CompanionScreen() {
         hero={String(nearbyPlaces.length)}
         caption={`open nearby ${companionSetting.when}`}
         title="For the person with you"
-        lede="Topics come from the same tastes. The places are a sample of what a location search would return."
+        lede={`${guide.name} is keeping you company. Topics come from the same tastes.`}
       />
-      <SolidPanel>
+      <div className="flex flex-col items-center gap-4 text-center">
+        <Character variant={guide.variant} size="lg" animate />
+        <GlassSurface variant="chip" className="px-4 py-2">
+          <span className="text-base font-bold">{guide.personality}</span>
+        </GlassSurface>
+        <p className="text-lg leading-relaxed">{guide.quote}</p>
         <p className="text-lg leading-relaxed">
           Near {companionSetting.placeName}. {companionSetting.disclaimer}
         </p>
-      </SolidPanel>
+      </div>
       <section className="flex flex-col gap-6">
         <SectionHeading>Open nearby</SectionHeading>
         <div className="flex flex-col gap-6">
@@ -51,18 +48,14 @@ export function CompanionScreen() {
           </p>
         ) : (
           <div className="flex flex-col gap-6">
-            {topics.map((topic) => {
-              const appearance = topicAppearance(topic.seedId);
-              return (
-                <TopicCard
-                  key={topic.id}
-                  title={topic.title}
-                  prompt={topic.prompt}
-                  hue={appearance.hue}
-                  icon={appearance.icon}
-                />
-              );
-            })}
+            {topics.map((topic) => (
+              <TopicCard
+                key={topic.id}
+                title={topic.title}
+                prompt={topic.prompt}
+                character={tasteCharacter(topic.seedId)}
+              />
+            ))}
           </div>
         )}
       </section>

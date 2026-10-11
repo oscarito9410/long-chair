@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
+import { Character } from "../components/art/Character.tsx";
 import { ScreenIntro } from "../components/chrome/ScreenIntro.tsx";
 import { GlassLink } from "../components/glass/GlassLink.tsx";
 import { StepRow, type StepState } from "../components/kit/StepRow.tsx";
+import { guideById } from "../data/guides.ts";
 import { buildAgentSteps } from "../lib/build-agent-steps.ts";
 import { formatHoursMinutes } from "../lib/format-duration.ts";
 import { paths } from "../routing/paths.ts";
@@ -64,6 +66,9 @@ export function BuildingScreen() {
       <p className="sr-only" aria-live="polite">
         {liveText}
       </p>
+      <div className="flex justify-center">
+        <Character variant={guideById(draft.companionId).variant} size="md" animate />
+      </div>
       <ol className="m-0 flex list-none flex-col gap-4 p-0">
         {steps.map((step, index) => (
           <StepRow
@@ -75,8 +80,8 @@ export function BuildingScreen() {
           />
         ))}
       </ol>
-      <GlassLink href={paths.kit} tone={complete ? "solid" : "quiet"} className="w-full">
-        {complete ? "Open the session kit" : "Skip to the kit"}
+      <GlassLink href={paths.ready} tone={complete ? "solid" : "quiet"} className="w-full">
+        {complete ? "Your kit is ready" : "Skip for now"}
       </GlassLink>
     </div>
   );

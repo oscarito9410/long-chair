@@ -9,6 +9,7 @@ type SessionContextValue = {
   toggleSeed: (id: string) => void;
   toggleAvoid: (id: string) => void;
   setDuration: (minutes: number) => void;
+  setCompanion: (id: string) => void;
   reset: () => void;
 };
 
@@ -28,6 +29,9 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       },
       setDuration: (minutes) => {
         setDraft((current) => ({ ...current, durationMinutes: minutes }));
+      },
+      setCompanion: (id) => {
+        setDraft((current) => ({ ...current, companionId: id }));
       },
       reset: () => {
         setDraft(demoDraft);

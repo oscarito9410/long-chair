@@ -5,10 +5,18 @@ export function documentTitle(route: Route): string {
   switch (route.name) {
     case "welcome":
       return "Welcome";
-    case "onboarding":
-      return "Plan a session";
+    case "love":
+      return "What do you love?";
+    case "chair":
+      return "How long is your chair?";
+    case "themes":
+      return "What should stay out?";
+    case "company":
+      return "Who keeps you company?";
     case "building":
       return "Building the kit";
+    case "ready":
+      return "Your kit is ready";
     case "kit":
       return "Session kit";
     case "companion":

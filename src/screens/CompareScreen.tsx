@@ -1,20 +1,19 @@
+import { CoverArt } from "../components/art/CoverArt.tsx";
 import { ScreenIntro } from "../components/chrome/ScreenIntro.tsx";
-import { SectionHeading } from "../components/ui/SectionHeading.tsx";
-import { SolidPanel } from "../components/ui/SolidPanel.tsx";
-import { tagClass } from "../components/ui/tag-class.ts";
 import { AvoidedRow } from "../components/ui/AvoidedRow.tsx";
 import { BecauseList } from "../components/ui/BecauseList.tsx";
+import { Icon } from "../components/ui/Icon.tsx";
+import { IconWell } from "../components/ui/IconWell.tsx";
+import { SectionHeading } from "../components/ui/SectionHeading.tsx";
+import { tagClass } from "../components/ui/tag-class.ts";
 import { kindMeta } from "../content/presentation.ts";
 import { itemById } from "../data/catalog.ts";
 import { FALLBACK_COMPARE_ID, plainModelExample } from "../data/comparison.ts";
 import type { CatalogItem, PackedSession } from "../data/types.ts";
-import { avoidedLabels, matchingSeedNames, plainThemeLabels } from "../lib/match-taste.ts";
-import { cn } from "../lib/cn.ts";
-import { hueWashClass } from "../tokens/hue-styles.ts";
 import { usePackedSession } from "../hooks/use-packed-session.ts";
+import { cn } from "../lib/cn.ts";
+import { avoidedLabels, matchingSeedNames, plainThemeLabels } from "../lib/match-taste.ts";
 import { useSession } from "../state/SessionContext.tsx";
-import { Icon } from "../components/ui/Icon.tsx";
-import { IconWell } from "../components/ui/IconWell.tsx";
 
 function keptItem(packed: PackedSession): CatalogItem | undefined {
   for (const slot of packed.slots) {
@@ -42,9 +41,9 @@ export function CompareScreen() {
         lede="Asked for comfort during treatment, a general model often reaches for a famous illness story. Long Chair starts from taste and refuses those themes."
       />
       <div className="grid gap-6 md:grid-cols-2">
-        <article className="pastel-card flex flex-col gap-4 rounded-card p-6 wash-wisteria">
+        <article className="flex flex-col gap-4 rounded-card bg-card p-6 shadow-[0_12px_32px_var(--lc-shadow)]">
           <IconWell hue="wisteria">
-            <Icon name="aside" />
+            <Icon name="x" />
           </IconWell>
           <p className="text-lg font-bold">Often suggested, unfiltered</p>
           <h2 className="text-2xl font-bold">{plainModelExample.title}</h2>
@@ -66,14 +65,18 @@ export function CompareScreen() {
           </div>
         </article>
         {kept && keptMeta ? (
-          <article
-            className={cn(
-              "pastel-card flex flex-col gap-4 rounded-card p-6",
-              hueWashClass[keptMeta.hue],
-            )}
-          >
-            <IconWell hue={keptMeta.hue}>
-              <Icon name={keptMeta.icon} />
+          <article className="flex flex-col gap-4 rounded-card bg-card p-6 shadow-[0_12px_32px_var(--lc-shadow)]">
+            <div className="cover-frame">
+              <CoverArt
+                seed={kept.id}
+                title={kept.title}
+                hue={keptMeta.hue}
+                frame="banner"
+                decorative
+              />
+            </div>
+            <IconWell hue="seaglass">
+              <Icon name="check" />
             </IconWell>
             <p className="text-lg font-bold">Long Chair kept</p>
             <h2 className="text-2xl font-bold">{kept.title}</h2>
@@ -83,10 +86,10 @@ export function CompareScreen() {
             <AvoidedRow labels={avoidedLabels(kept, draft)} />
           </article>
         ) : (
-          <SolidPanel>
+          <div className="rounded-card bg-card p-6">
             <SectionHeading>Nothing kept yet</SectionHeading>
             <p className="mt-4 text-lg">Add a film you love and the contrast will fill in.</p>
-          </SolidPanel>
+          </div>
         )}
       </div>
       <p className="text-lg">

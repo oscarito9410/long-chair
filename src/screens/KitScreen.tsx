@@ -45,7 +45,7 @@ export function KitScreen() {
           action="Edit the session"
         />
       ) : (
-        <ol className="m-0 flex list-none flex-col gap-6 p-0">
+        <ol className="timeline">
           {packed.slots.map((slot) => {
             const item = itemById(slot.itemId);
             if (!item) {
@@ -56,6 +56,7 @@ export function KitScreen() {
               <li key={item.id}>
                 <TimelineCard
                   href={paths.item(item.id)}
+                  seed={item.id}
                   rangeLabel={formatRange(slot.startMinute, slot.endMinute)}
                   kindLabel={meta.label}
                   title={item.title}

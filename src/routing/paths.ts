@@ -1,7 +1,12 @@
 export const paths = {
   welcome: "#/welcome",
-  onboarding: "#/onboarding",
+  onboarding: "#/love",
+  love: "#/love",
+  chair: "#/chair",
+  themes: "#/themes",
+  company: "#/company",
   building: "#/building",
+  ready: "#/ready",
   kit: "#/kit",
   companion: "#/companion",
   compare: "#/compare",

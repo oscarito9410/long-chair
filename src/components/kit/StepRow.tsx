@@ -4,12 +4,6 @@ import { IconWell } from "../ui/IconWell.tsx";
 
 export type StepState = "pending" | "active" | "done";
 
-const stateClass: Record<StepState, string> = {
-  pending: "solid-panel",
-  active: "pastel-card wash-honey",
-  done: "pastel-card wash-seaglass",
-};
-
 const stateHue = {
   pending: "wisteria",
   active: "honey",
@@ -29,7 +23,11 @@ export function StepRow({
 }) {
   return (
     <li
-      className={cn("flex items-center gap-4 rounded-card p-6", stateClass[state])}
+      className={cn(
+        "option-row cursor-default",
+        state === "done" && "is-selected",
+        state === "active" && "wash-honey",
+      )}
       aria-current={state === "active" ? "step" : undefined}
     >
       <IconWell hue={stateHue[state]}>

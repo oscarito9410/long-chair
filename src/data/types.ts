@@ -42,6 +42,7 @@ export type SessionDraft = {
   seedIds: readonly string[];
   avoidIds: readonly string[];
   durationMinutes: number;
+  companionId: string;
 };
 
 export type PackedSlot = {

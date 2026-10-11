@@ -14,4 +14,5 @@ export const demoDraft: SessionDraft = {
   seedIds: tasteSeeds.map((seed) => seed.id).filter((id) => !heldAsideSeedIds.has(id)),
   avoidIds: avoidThemes.map((theme) => theme.id).filter((id) => !availableThemeIds.has(id)),
   durationMinutes: TYPICAL_CHAIR_MINUTES,
+  companionId: "pebble",
 };

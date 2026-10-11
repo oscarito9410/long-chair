@@ -12,8 +12,8 @@ This repository is a **static design prototype** for the [Qloo Agentic Hackathon
 
 **This prototype is:**
 
-- A clickable, tablet-first web UI with a phone layout.
-- A full pass through the product: welcome, onboarding, an illustrated agent sequence, a session kit, a piece detail, a companion plan, and a plain-model contrast.
+- A clickable, mobile-first web UI that still widens for a tablet.
+- A full pass through the product: welcome, one question at a time, an illustrated agent sequence, a stamp when the kit is ready, a session kit, a piece detail, a companion plan, and a plain-model contrast.
 - Driven by a typed sample shelf. Changing the session length or the tastes changes which pieces are packed into the kit.
 - Honest about being a sample. A flat line inside each hero says the data is fictional and nothing is sent.
 
@@ -33,15 +33,19 @@ Open the app and move through the story, or jump with the hash:
 
 | Screen      | Hash                  | What you do                                                                                            |
 | ----------- | --------------------- | ------------------------------------------------------------------------------------------------------ |
-| Welcome     | `#/welcome`           | The promise, then plan a session or open the sample kit.                                               |
-| Onboarding  | `#/onboarding`        | Choose tastes, a chair length (1–4 hours), and themes to leave out. The hero follows the length.       |
-| Building    | `#/building`          | Watch the five agent steps check off. The dot field stays off this screen.                             |
+| Welcome     | `#/welcome`           | The promise, paper notes of tastes, then get started or open the sample kit.                           |
+| Tastes      | `#/love`              | One question: what belongs in the room. `#/onboarding` lands here too.                                 |
+| Length      | `#/chair`             | A dial from 1 to 4 hours.                                                                              |
+| Themes      | `#/themes`            | What should stay out of the room.                                                                      |
+| Company     | `#/company`           | Pick a guide. The choice changes the tone, not the kit.                                                |
+| Building    | `#/building`          | Watch the five agent steps check off.                                                                  |
+| Ready       | `#/ready`             | A postage-style card for this chair, then open the kit.                                                |
 | Session kit | `#/kit`               | A timeline whose durations add up to the chair. Each card says why it is here and that it was checked. |
-| Piece       | `#/item/north-window` | Why that piece was kept, and the second check against the themes.                                      |
-| Companion   | `#/companion`         | Conversation starters from the same tastes, and fictional places shown as open nearby.                 |
+| Piece       | `#/item/north-window` | Cover, why that piece was kept, and the second check against the themes.                               |
+| Companion   | `#/companion`         | The guide, conversation starters from the same tastes, and fictional places shown as open nearby.      |
 | Contrast    | `#/compare`           | An unfiltered suggestion beside the piece Long Chair kept, with the excluded themes visible.           |
 
-After the kit exists, a glass tab bar switches among Kit, Companion, and Compare. The sample chair is 4 hours. Most of the shelf is selected, Sunday Engines is not, and grief and the death of a parent are not held back, so both tile states are visible. **See a sample kit** on the welcome screen opens that timeline immediately.
+After the kit exists, a floating glass tab bar switches among Kit, Companion, and Compare. The sample chair is 4 hours with Pebble as the guide. Most of the shelf is selected, Sunday Engines is not, and grief and the death of a parent are not held back, so both row states are visible. **See a sample kit** on the welcome screen opens that timeline immediately.
 
 The five illustrated steps are the agent this product will run once a key exists: resolve names, match taste, exclude themes, check every pick again, fit the clock.
 
@@ -50,13 +54,14 @@ The five illustrated steps are the agent this product will run once a key exists
 ```
 src/
   components/     UI. One component per file.
-    background/   Dot field and the soft blobs behind the hero.
-    chrome/       Shell, tab bar, and screen intro.
-    glass/        Frosted hero, and the action buttons and links.
+    art/          Characters, generated covers, and the stamp.
+    background/   A quiet dot field and soft blobs.
+    chrome/       Shell, tab bar, question frame, and screen intro.
+    glass/        Glass accents, and the action buttons and links.
     kit/          Timeline, pause, places, topics, agent steps.
-    ui/           Icon, well, hero number, chips, empty state.
-  content/        Hue and icon roles. Not sample records.
-  data/           Fictional shelf and the draft shape. No fetching.
+    ui/           Dial, option rows, icon, well, hero number, chips.
+  content/        Hue, icon, and character roles. Not sample records.
+  data/           Fictional shelf, guides, and the draft shape. No fetching.
   hooks/
   lib/            Packing, duration labels, taste matching.
   routing/        Hash routes.
@@ -95,9 +100,9 @@ There are no environment variables. The app does not read a `.env` file.
 
 ## Design
 
-The interface is meant to be readable at arm's length, in a chair, on a tablet. Body type is 18px or larger. A four-hue palette (apricot, sea glass, honey, wisteria) plus ink and a warm page color. Podcasts use sea glass, with episodes. Honey is food and a pause. Frosted glass is only the hero and the tab bar. Text cards are nearly opaque. Welcome leads with the promise and has no oversized number. The other primary screens keep one figure: the length of the chair, the time filled, the themes held back, or the places still open.
+The interface is meant to be readable at arm's length, in a chair, on a phone first. Body type is 18px or larger. A four-hue palette (apricot, sea glass, honey, wisteria) plus ink and a warm page color. Podcasts use sea glass, with episodes. Honey is food and a pause. Each onboarding question is its own screen, with a black primary pill and a quiet text link. Original blob characters mark choices, keep company, and sit in empty states. Glass is only the tab bar, badges on covers, personality chips, and the sheet on a piece. Welcome leads with the promise, scattered notes, and no oversized number. Building, the kit, the companion plan, and the contrast each keep one figure.
 
-The background is a canvas of dots. They brighten and ease toward a pointer, then settle. The building screen hides the field so the steps can check off one by one without a row of dots between them. The field pauses when the tab is hidden and draws once, still, when the visitor prefers reduced motion. Nunito carries the UI. Caveat is only the short welcome tagline. Both are open fonts (SIL Open Font License) loaded through Fontsource.
+The background is a faint canvas of dots. They ease toward a pointer, then settle. The field pauses when the tab is hidden and draws once, still, when the visitor prefers reduced motion. Nunito carries the UI. Caveat is only the welcome stickers. Both are open fonts (SIL Open Font License) loaded through Fontsource.
 
 `AGENTS.md` is the design-system and code guide for anyone changing the repo.
 

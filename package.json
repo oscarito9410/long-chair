@@ -16,6 +16,7 @@
   "dependencies": {
     "@fontsource/caveat": "^5.2.7",
     "@fontsource/nunito": "^5.2.7",
+    "lucide-react": "^1.55.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },
