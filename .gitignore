@@ -26,3 +26,9 @@ dist-ssr
 
 tmp
 uploads
+
+# Secrets and recorded Qloo responses. Never commit these.
+.env
+.env.*
+!.env.example
+.qloo-cache/

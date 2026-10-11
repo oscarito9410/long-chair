@@ -6,9 +6,27 @@ Long Chair is a static design prototype. Read this before editing. The product s
 
 A Vite + React + TypeScript UI with fictional sample data. Visitors can plan a chair, watch an illustrated agent sequence, and open the kit, the companion plan, and the plain-model contrast.
 
-Do not add a backend, a Qloo client, an LLM SDK, authentication, or a database unless a person explicitly asks to start the hackathon build. Do not invent live API responses. Do not commit API keys or real Qloo payloads. Hackathon rules forbid Qloo data in the public repo.
+The hackathon architecture is written and not yet implemented. Read `docs/architecture/ARCHITECTURE.md`, `docs/architecture/qloo-port.md`, `docs/adr/`, and `docs/plan/ROADMAP.md` before adding a server or a mobile app. Do not start either until a person asks for the implementation milestone. Until then, do not add a Qloo client, an LLM SDK, authentication, or a database to the Vite app, and do not scaffold `apps/mobile`.
 
-When the real integration starts, map Qloo search hits and insight rows onto the types in `src/data/types.ts`. Keep the screens on those types.
+The client decision is Expo with Expo Router and react-native-web: one codebase for iOS, Android, and the hosted demo. The Vite app is the design reference until that export replaces it. Liquid glass on iOS 26 goes through `expo-glass-effect`, with the opaque-card fallback on Android, web, and older iOS. The Qloo key never ships inside the binary.
+
+Do not invent live API responses. Do not commit API keys, `.env` files, `.qloo-cache/`, or real Qloo payloads. Hackathon rules forbid Qloo data in the public repo. Fictional fixtures that match the documented JSON shape are allowed. A recording of a real response is not a fixture.
+
+When implementation starts, map Qloo search hits and insight rows onto the types in `src/data/types.ts` inside the adapter. Keep the screens on those types.
+
+## Architecture rules
+
+These apply to the session API. The prototype UI stays presentational.
+
+- **Ports and adapters.** The pipeline calls `QlooPort`. `HttpQlooAdapter`, `FakeQlooAdapter`, and `RecordingAdapter` are the only Qloo I/O. Screens and the packer do not import `httpx` or know the host `hackathon.api.qloo.com`.
+- **One mapper.** Qloo JSON becomes `CatalogItem`, `TasteSeed`, and `NearbyPlace` in a single module. Adapters do not each invent a mapping.
+- **Contract tests.** The fake and live adapters share one suite. CI runs the fake entry. The live entry runs only on a machine that has a key, and it must not write a response into the repo.
+- **Validate, then send.** A bad Qloo parameter comes back as an empty success. Reject it in the adapter before the request.
+- **SOLID.** The port is the interface the pipeline depends on. Each adapter has one job. The checker, the packer, and the prose step are separate. A new adapter does not require a change to the pipeline. The packer still ignores `companionId`.
+- **DRY.** Parameter validation, the JSON models, and the mapper exist once. Do not copy the contract tests per adapter.
+- **Clean boundaries.** Domain types cross the API. Qloo documents stay inside the adapter. The optional model sees titles we already kept, not a chart and not the raw payload.
+- **Privacy.** No personal name, diagnosis, or medical record on the wire to Qloo or to a model. Exclusion themes are content tags, not a description of the visitor.
+- **Replay.** The judge demo after the key is deactivated reads the private cache. That cache is gitignored. A second copy lives in the team's password store, not on GitHub.
 
 ## Layout
 

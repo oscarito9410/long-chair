@@ -108,17 +108,16 @@ The background is a faint canvas of dots. They ease toward a pointer, then settl
 
 ## Roadmap to the hackathon build
 
-The judging build has to be a working Qloo integration, hosted so a judge can use it without cloning the repo, through the end of judging. This prototype is the design to hang that on.
+The judging build is a hosted web app plus a small API. This prototype is the UI it will use. The decision record is:
 
-1. **Qloo adapter.** A server-side client for `https://hackathon.api.qloo.com` with the `X-Api-Key` header. `QLOO_API_KEY` stays on the server, never in the client and never in git. When the key is absent, the server keeps serving this sample shelf and labels it as such.
-2. **Resolve.** `GET /search` turns the names a person types into entity ids. The onboarding chips become a search field. Still no names or medical data in the payload.
-3. **Recommend.** `GET /v2/insights` across `movie`, `tv_show`, `podcast`, `book`, and `artist`, with `signal.interests.entities` and `feature.explainability=true`. The why-chips should quote those signals.
-4. **Exclude.** `GET /v2/tags` resolves the themes into real tag ids. Insights then receives `filter.exclude.tags`. A checker reads each candidate's tags and description and asks again if something slips through. That second pass is already the shape of the "Checked again" panel.
-5. **Pack.** Keep the duration fitter in `src/lib/pack-session.ts`. It is pure and does not care whether a row came from the shelf or from insights.
-6. **Companion places.** `filter.type` for places, with `filter.location.query` and `filter.hours`, around a hospital the companion names. The sample center and the three cafés are placeholders.
-7. **Optional prose model.** An env var such as `LLM_API_KEY` may rewrite explanations and conversation starters. The product still has to make sense with that variable unset. Taste, exclusion, and timing stay Qloo's job, not the model's.
-8. **Host it.** This prototype can ship today as static `dist/` on Cloudflare Pages, Netlify, Vercel, or GitHub Pages. The live hackathon demo needs a small API beside it (Render, Fly, or a single Node host) so the key never reaches the browser. Cache the demo profiles on the server. Keys are turned off when the hackathon ends, and judges still need the demo through 16 November 2026.
-9. **Do not commit Qloo payloads.** Tests and the public repo keep using fictional fixtures. Record a two-minute walkthrough for the Devpost page. The product text stays in English.
+- [Architecture](docs/architecture/ARCHITECTURE.md): context, containers, the agent pipeline, sequences, the data model, and the API sketch.
+- [QlooPort](docs/architecture/qloo-port.md): one port, a live adapter, a fake adapter, and a recording adapter. Contract tests are shared. Fixtures are fictional.
+- [ADRs](docs/adr/): FastAPI, an optional prose model, hosting, the monorepo, and the client strategy.
+- [Roadmap](docs/plan/ROADMAP.md): gates from 11 October through submission on 30 October 2026, 21:45 America/Mexico_City.
+
+The client is one Expo app: iOS, Android, and a hosted web export from the same code. Judges get a URL they can finish in the browser, a TestFlight link once Apple approves the beta, and an APK. The API is Python and FastAPI. The Qloo key stays on the server. Until the key arrives, the pipeline runs on the fake adapter. After the key is turned off, judges hit a private replay cache that is not in this repository.
+
+Do not commit Qloo responses, keys, or a copy of the replay cache. The Devpost page needs a public repo, the MIT license in the About field, the hosted demo URL, and an English description. The product is not medical advice, and the request to Qloo carries titles and a neighborhood, not a name or a diagnosis.
 
 ## License
 
