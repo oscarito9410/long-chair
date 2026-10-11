@@ -811,6 +811,7 @@ button:disabled {
 }
 
 .guide-pick {
+  position: relative;
   display: flex;
   min-height: var(--lc-target);
   flex-direction: column;
@@ -828,8 +829,13 @@ button:disabled {
   border-color: var(--lc-ink);
 }
 
-.guide-mark {
+.guide-pick > .guide-mark {
+  position: absolute;
+  z-index: 2;
+  top: var(--lc-space-8);
+  right: var(--lc-space-8);
   display: flex;
+  width: var(--lc-icon);
   height: var(--lc-icon);
   align-items: center;
   justify-content: center;
