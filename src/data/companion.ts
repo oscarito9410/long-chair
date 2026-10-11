@@ -13,7 +13,7 @@ export const companionTopics: readonly CompanionTopic[] = [
     seedId: "paper-kite",
     title: "The repair, continued",
     prompt:
-      "North Window stays with a greenhouse and a summer of small fixes. If you had a week and a cracked pane, where would you start?",
+      "The Paper Kite is a slow repair. If you had a week and a cracked pane, where would you start?",
   },
   {
     id: "buoy",

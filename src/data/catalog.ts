@@ -156,7 +156,7 @@ export const catalog: readonly CatalogItem[] = [
     kind: "artist",
     title: "Mira Solano at Cedar Hall",
     maker: "A live recording",
-    minutes: 27,
+    minutes: 28,
     rank: 1,
     becauseOf: ["mira-solano"],
     avoidedThemeIds: avoided,
