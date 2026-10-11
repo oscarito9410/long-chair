@@ -18,6 +18,7 @@ import {
   TARGET,
 } from "../../theme/palette";
 import { AppIcon } from "./AppIcon";
+import type { IconName } from "./icon-names";
 import { PillButton } from "./PillButton";
 
 export function ScreenScaffold({
@@ -32,6 +33,9 @@ export function ScreenScaffold({
   primaryHaptic = "press",
   secondary,
   onSecondary,
+  linkLabel,
+  onLink,
+  linkIcon,
   footerNote,
   hideHeading = false,
   align = "left",
@@ -48,6 +52,9 @@ export function ScreenScaffold({
   primaryHaptic?: HapticWeight;
   secondary?: string;
   onSecondary?: () => void;
+  linkLabel?: string;
+  onLink?: () => void;
+  linkIcon?: IconName;
   footerNote?: string;
   hideHeading?: boolean;
   align?: "left" | "center";
@@ -78,6 +85,9 @@ export function ScreenScaffold({
         primaryHaptic={primaryHaptic}
         secondary={secondary}
         onSecondary={onSecondary}
+        linkLabel={linkLabel}
+        onLink={onLink}
+        linkIcon={linkIcon}
         footerNote={footerNote}
         bottom={Math.max(insets.bottom, SPACE_16)}
       />
@@ -113,6 +123,9 @@ function Dock({
   primaryHaptic,
   secondary,
   onSecondary,
+  linkLabel,
+  onLink,
+  linkIcon,
   footerNote,
   bottom,
 }: {
@@ -123,6 +136,9 @@ function Dock({
   primaryHaptic: HapticWeight;
   secondary?: string;
   onSecondary?: () => void;
+  linkLabel?: string;
+  onLink?: () => void;
+  linkIcon?: IconName;
   footerNote?: string;
   bottom: number;
 }) {
@@ -138,6 +154,14 @@ function Dock({
       ) : null}
       {secondary && onSecondary ? (
         <PillButton label={secondary} onPress={onSecondary} quiet tint={tint} />
+      ) : null}
+      {linkLabel && onLink ? (
+        <PressableScale accessibilityRole="button" haptic="tick" onPress={onLink}>
+          <View style={styles.linkRow}>
+            {linkIcon ? <AppIcon name={linkIcon} color={palette.inkSoft} size={18} /> : null}
+            <Text style={styles.link}>{linkLabel}</Text>
+          </View>
+        </PressableScale>
       ) : null}
       {footerNote ? <Text style={styles.note}>{footerNote}</Text> : null}
     </View>
@@ -181,6 +205,18 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontFamily: "Nunito_700Bold",
     fontSize: FONT_SECONDARY,
+    color: palette.inkSoft,
+  },
+  linkRow: {
+    minHeight: TARGET,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: SPACE_8,
+  },
+  link: {
+    fontFamily: "Nunito_700Bold",
+    fontSize: FONT_BODY,
     color: palette.inkSoft,
   },
   progress: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },

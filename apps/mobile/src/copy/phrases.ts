@@ -24,7 +24,7 @@ export const selectedInRoom = "In the room";
 
 export const selectedLeftOut = "Left out";
 
-export const chairTitle = "How long is the session?";
+export const chairTitle = "How long is the chair?";
 
 export const chairLede = "Drag the dial. You can change it anytime.";
 

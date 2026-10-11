@@ -9,6 +9,7 @@ export type Route =
   | { name: "kit" }
   | { name: "companion" }
   | { name: "compare" }
+  | { name: "settings" }
   | { name: "item"; itemId: string }
   | { name: "unknown" };
 
@@ -39,6 +40,8 @@ export function parseRoute(hash: string): Route {
       return { name: "companion" };
     case "/compare":
       return { name: "compare" };
+    case "/settings":
+      return { name: "settings" };
     default:
       break;
   }

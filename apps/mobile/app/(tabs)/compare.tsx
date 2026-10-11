@@ -7,14 +7,15 @@ import {
   plainThemeLabels,
 } from "@long-chair/core";
 import type { CatalogItem, PackedSession } from "@long-chair/core";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { memo } from "react";
+import { StyleSheet, Text, View } from "react-native";
 
 import { CoverArt } from "../../src/components/art/CoverArt";
 import { GlassChip } from "../../src/components/chrome/GlassChip";
 import { IconWell } from "../../src/components/chrome/IconWell";
 import { SampleBanner } from "../../src/components/chrome/SampleBanner";
-import { GlassSurface } from "../../src/components/glass/GlassSurface";
+import { TabPage } from "../../src/components/chrome/TabPage";
+import { WashCard } from "../../src/components/chrome/WashCard";
 import {
   addFilm,
   becauseYouLove,
@@ -38,7 +39,6 @@ import {
   palette,
   RADIUS_CARD,
   SPACE_16,
-  SPACE_24,
   SPACE_8,
   TARGET,
 } from "../../src/theme/palette";
@@ -57,7 +57,6 @@ function keptItem(packed: PackedSession | undefined): CatalogItem | undefined {
 }
 
 export default function CompareScreen() {
-  const insets = useSafeAreaInsets();
   const { draft } = useSession();
   const { plan } = usePlan(draft);
   const themes = plainThemeLabels(draft);
@@ -66,18 +65,14 @@ export default function CompareScreen() {
   const brought = compareBroughtLabels();
 
   return (
-    <ScrollView
-      style={styles.scroll}
-      contentInsetAdjustmentBehavior="automatic"
-      contentContainerStyle={[styles.page, { paddingTop: insets.top + SPACE_16 }]}
-    >
+    <TabPage>
       <SampleBanner live={plan?.source === "live"} />
       <Text style={styles.hero}>{String(themes.length)}</Text>
       <Text style={styles.caption}>{compareCaption}</Text>
       <Text accessibilityRole="header" style={styles.title}>
         {compareTitle}
       </Text>
-      <GlassSurface style={styles.card} tint={palette.wisteria}>
+      <WashCard style={styles.card} tint={palette.wisteria}>
         <View style={styles.meta}>
           <IconWell hue="wisteria" name="split" size={TARGET} />
           <Text style={styles.cardTitle}>{plainModelExample.title}</Text>
@@ -89,13 +84,13 @@ export default function CompareScreen() {
             <GlassChip key={label} label={label} tint={palette.honey} />
           ))}
         </View>
-      </GlassSurface>
+      </WashCard>
       <KeptCard item={kept} because={because} />
-    </ScrollView>
+    </TabPage>
   );
 }
 
-function KeptCard({
+const KeptCard = memo(function KeptCard({
   item,
   because,
 }: {
@@ -104,14 +99,14 @@ function KeptCard({
 }) {
   if (!item) {
     return (
-      <GlassSurface style={styles.card} tint={palette.seaglass}>
+      <WashCard style={styles.card} tint={palette.seaglass}>
         <Text style={styles.cardTitle}>{nothingKept}</Text>
         <Text style={styles.body}>{addFilm}</Text>
-      </GlassSurface>
+      </WashCard>
     );
   }
   return (
-    <GlassSurface style={styles.card} tint={hueFill[kindHue[item.kind]]}>
+    <WashCard style={styles.card} tint={hueFill[kindHue[item.kind]]}>
       <CoverArt
         seed={item.id}
         hue={kindHue[item.kind]}
@@ -125,13 +120,11 @@ function KeptCard({
       </View>
       <Text style={styles.cardTitle}>{item.title}</Text>
       <Text style={styles.body}>{because ? becauseYouLove(because) : keptForTaste}</Text>
-    </GlassSurface>
+    </WashCard>
   );
-}
+});
 
 const styles = StyleSheet.create({
-  scroll: { flex: 1, backgroundColor: "transparent" },
-  page: { paddingHorizontal: SPACE_24, gap: SPACE_16, paddingBottom: SPACE_24 },
   hero: { fontFamily: "Nunito_800ExtraBold", fontSize: FONT_HERO, color: palette.ink },
   caption: { fontFamily: "Nunito_600SemiBold", fontSize: FONT_SECONDARY, color: palette.inkSoft },
   title: { fontFamily: "Nunito_800ExtraBold", fontSize: FONT_TITLE, color: palette.ink },

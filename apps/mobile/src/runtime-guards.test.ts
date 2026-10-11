@@ -9,7 +9,7 @@ function source(path: string): string {
 }
 
 describe("building screen", () => {
-  const building = source("app/building.tsx");
+  const building = source("app/(onboarding)/building.tsx");
 
   it("announces progress instead of rendering the live paragraph", () => {
     expect(building).toContain("announceMessage(buildingLiveText");

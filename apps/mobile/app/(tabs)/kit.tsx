@@ -8,15 +8,16 @@ import {
 } from "@long-chair/core";
 import type { CatalogItem, PackedSession, SessionDraft } from "@long-chair/core";
 import { router } from "expo-router";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { memo } from "react";
+import { StyleSheet, Text, View } from "react-native";
 
 import { CoverArt } from "../../src/components/art/CoverArt";
 import { GlassChip } from "../../src/components/chrome/GlassChip";
 import { IconWell } from "../../src/components/chrome/IconWell";
 import { PillButton } from "../../src/components/chrome/PillButton";
 import { SampleBanner } from "../../src/components/chrome/SampleBanner";
-import { GlassSurface } from "../../src/components/glass/GlassSurface";
+import { TabPage } from "../../src/components/chrome/TabPage";
+import { WashCard } from "../../src/components/chrome/WashCard";
 import { PressableScale } from "../../src/motion/PressableScale";
 import { Shimmer } from "../../src/motion/Shimmer";
 import {
@@ -29,10 +30,9 @@ import {
   openMinutesLine,
   packingSample,
   planFailed,
-  settingsLabel,
   trySampleAgain,
 } from "../../src/copy/phrases";
-import { openItem, openSettings } from "../../src/navigation/present-sheet";
+import { openItem } from "../../src/navigation/present-sheet";
 import { kindHue, kindIcon, kindLabel } from "../../src/presentation";
 import { useSession } from "../../src/state/session";
 import { usePlan } from "../../src/state/use-plan";
@@ -46,24 +46,18 @@ import {
   palette,
   RADIUS_CARD,
   SPACE_16,
-  SPACE_24,
   SPACE_8,
   TARGET,
 } from "../../src/theme/palette";
 
 export default function KitScreen() {
-  const insets = useSafeAreaInsets();
   const { draft, reset } = useSession();
   const { plan, loading, error } = usePlan(draft);
   const themes = avoidThemes.filter((theme) => draft.avoidIds.includes(theme.id));
   const packed = plan?.packed;
 
   return (
-    <ScrollView
-      style={styles.scroll}
-      contentInsetAdjustmentBehavior="automatic"
-      contentContainerStyle={[styles.page, { paddingTop: insets.top + SPACE_16 }]}
-    >
+    <TabPage>
       <SampleBanner live={plan?.source === "live"} />
       <Text style={styles.hero}>{packed ? formatHoursMinutes(packed.filledMinutes) : ""}</Text>
       <Text style={styles.caption}>{filledCaption}</Text>
@@ -102,16 +96,7 @@ export default function KitScreen() {
           router.push("/love");
         }}
       />
-      <PillButton
-        label={settingsLabel}
-        quiet
-        tint={palette.seaglass}
-        icon="gear"
-        onPress={() => {
-          openSettings();
-        }}
-      />
-    </ScrollView>
+    </TabPage>
   );
 }
 
@@ -150,7 +135,7 @@ function KitRows({ packed, draft }: { packed: PackedSession; draft: SessionDraft
   );
 }
 
-function KitCard({
+const KitCard = memo(function KitCard({
   item,
   draft,
   start,
@@ -170,7 +155,7 @@ function KitCard({
       }}
       style={styles.stretch}
     >
-      <GlassSurface style={styles.card} tint={hueFill[kindHue[item.kind]]}>
+      <WashCard style={styles.card} tint={hueFill[kindHue[item.kind]]}>
         <CoverArt
           seed={item.id}
           hue={kindHue[item.kind]}
@@ -185,14 +170,12 @@ function KitCard({
         <Text style={styles.cardTitle}>{item.title}</Text>
         <Text style={styles.body}>{formatRange(start, end)}</Text>
         {because ? <Text style={styles.body}>{`Because you love ${because}.`}</Text> : null}
-      </GlassSurface>
+      </WashCard>
     </PressableScale>
   );
-}
+});
 
 const styles = StyleSheet.create({
-  scroll: { flex: 1, backgroundColor: "transparent" },
-  page: { paddingHorizontal: SPACE_24, gap: SPACE_16, paddingBottom: SPACE_24 },
   hero: { fontFamily: "Nunito_800ExtraBold", fontSize: FONT_HERO, color: palette.ink },
   caption: { fontFamily: "Nunito_600SemiBold", fontSize: FONT_SECONDARY, color: palette.inkSoft },
   title: { fontFamily: "Nunito_800ExtraBold", fontSize: FONT_TITLE, color: palette.ink },

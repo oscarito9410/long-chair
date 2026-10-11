@@ -31,7 +31,6 @@ export function PillButton({
   const labelColor = ink ? palette.page : palette.ink;
   const body = (
     <View style={[styles.row, ink && styles.ink, disabled && styles.disabled]}>
-      {ink ? <View style={styles.sheen} /> : null}
       {icon ? <AppIcon name={icon} color={labelColor} size={ICON} /> : null}
       <Text style={[styles.label, { color: labelColor }]}>{label}</Text>
     </View>
@@ -71,13 +70,5 @@ const styles = StyleSheet.create({
   },
   ink: { backgroundColor: palette.ink },
   disabled: { backgroundColor: palette.line },
-  sheen: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 18,
-    backgroundColor: palette.glassSheen,
-  },
   label: { fontFamily: "Nunito_800ExtraBold", fontSize: FONT_BODY },
 });

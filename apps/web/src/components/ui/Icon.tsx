@@ -14,6 +14,7 @@ import {
   MessageCircle,
   Music,
   Pause,
+  Settings,
   Shield,
   Soup,
   Tv,
@@ -42,6 +43,7 @@ const glyphs: Record<IconName, LucideIcon> = {
   chair: Armchair,
   pause: Pause,
   x: X,
+  gear: Settings,
 };
 
 const strokeWidth = {

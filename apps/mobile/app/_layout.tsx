@@ -35,7 +35,6 @@ export default function RootLayout() {
       void SplashScreen.hideAsync();
     }
   }, [ready]);
-
   useEffect(() => {
     let live = true;
     void bootSkia().finally(() => {
@@ -69,6 +68,7 @@ export default function RootLayout() {
               }}
             >
               <Stack.Screen name="index" />
+              <Stack.Screen name="(onboarding)" options={{ animation: "fade" }} />
               <Stack.Screen name="(tabs)" />
               <Stack.Screen
                 name="settings"

@@ -8,6 +8,7 @@ import { ItemDetailScreen } from "./ItemDetailScreen.tsx";
 import { KitScreen } from "./KitScreen.tsx";
 import { LoveScreen } from "./LoveScreen.tsx";
 import { ReadyScreen } from "./ReadyScreen.tsx";
+import { SettingsScreen } from "./SettingsScreen.tsx";
 import { ThemesScreen } from "./ThemesScreen.tsx";
 import { UnknownScreen } from "./UnknownScreen.tsx";
 import { WelcomeScreen } from "./WelcomeScreen.tsx";
@@ -43,6 +44,8 @@ export function ScreenOutlet({ route }: { route: Route }) {
       return <CompanionScreen />;
     case "compare":
       return <CompareScreen />;
+    case "settings":
+      return <SettingsScreen />;
     case "unknown":
       return <UnknownScreen />;
   }

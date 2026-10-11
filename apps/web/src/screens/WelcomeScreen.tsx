@@ -1,5 +1,6 @@
 import { notMedicalAdvice } from "@long-chair/core";
 import { GlassLink } from "../components/glass/GlassLink.tsx";
+import { Icon } from "../components/ui/Icon.tsx";
 import { SampleNote } from "../components/ui/SampleNote.tsx";
 import type { Hue } from "../tokens/tokens.ts";
 import { paths } from "../routing/paths.ts";
@@ -13,7 +14,10 @@ const notes: readonly { text: string; className: string; tint: Hue }[] = [
 
 export function WelcomeScreen() {
   return (
-    <div className="question" data-screen="welcome">
+    <div className="question welcome-screen" data-screen="welcome">
+      <a className="welcome-gear glass-surface glass-thin glass-disc" href={paths.settings} aria-label="Settings">
+        <Icon name="gear" />
+      </a>
       <SampleNote />
       <div className="welcome-stage">
         {notes.map((note) => (
@@ -49,13 +53,14 @@ export function WelcomeScreen() {
           />
         </svg>
       </div>
-      <div className="flex flex-col items-center gap-2">
+      <div className="welcome-dock">
         <GlassLink href={paths.love} className="w-full">
           Get started
         </GlassLink>
-        <GlassLink href={paths.kit} tone="quiet" className="w-full">
+        <a className="text-link" href={paths.kit}>
+          <Icon name="stack" />
           See a sample kit
-        </GlassLink>
+        </a>
         <p className="text-center text-base">{notMedicalAdvice}</p>
       </div>
     </div>

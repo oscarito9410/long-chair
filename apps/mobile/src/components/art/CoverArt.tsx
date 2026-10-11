@@ -1,4 +1,5 @@
 import type { ContentKind, Hue } from "@long-chair/core";
+import { memo } from "react";
 import Svg, { Circle, Ellipse, G, Polygon, Rect } from "react-native-svg";
 
 import { hueDeep, hueFill, palette } from "../../theme/palette";
@@ -7,7 +8,7 @@ import { coverSalt } from "./cover-salt";
 const posterWidth = 240;
 const posterHeight = 320;
 
-export function CoverArt({
+export const CoverArt = memo(function CoverArt({
   seed,
   hue,
   kind,
@@ -28,7 +29,7 @@ export function CoverArt({
       <Scene kind={kind} fill={fill} deep={deep} a={a} b={b} c={c} />
     </Svg>
   );
-}
+});
 
 function Scene({
   kind,

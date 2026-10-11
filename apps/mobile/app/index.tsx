@@ -1,20 +1,32 @@
 import { notMedicalAdvice, sampleShelfNote, stickerTilt } from "@long-chair/core";
 import { router } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
+import Animated, { Keyframe } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { GearButton } from "../src/components/chrome/GearButton";
 import { DoodleArrow, HandNote } from "../src/components/chrome/HandNote";
-import { PillButton } from "../src/components/chrome/PillButton";
 import { ScreenScaffold } from "../src/components/chrome/ScreenScaffold";
-import {
-  getStarted,
-  seeSample,
-  settingsLabel,
-  welcomeLede,
-  welcomeTitle,
-} from "../src/copy/phrases";
+import { getStarted, seeSample, welcomeLede, welcomeTitle } from "../src/copy/phrases";
+import { useReducedMotion } from "../src/motion/use-reduced-motion";
 import { openSettings } from "../src/navigation/present-sheet";
-import { FONT_BODY, FONT_SECONDARY, FONT_TITLE, palette, SPACE_16 } from "../src/theme/palette";
+import {
+  FONT_BODY,
+  FONT_SECONDARY,
+  FONT_TITLE,
+  palette,
+  SPACE_16,
+  SPACE_32,
+  SPACE_8,
+} from "../src/theme/palette";
 import { screenTints } from "../src/theme/screen-tints";
+
+const HERO_MS = 900;
+
+const heroIn = new Keyframe({
+  0: { opacity: 0, transform: [{ translateY: 14 }] },
+  100: { opacity: 1, transform: [{ translateY: 0 }] },
+}).duration(HERO_MS);
 
 const notes = [
   { text: "jazz on Sundays", hue: "honey" as const, tilt: stickerTilt.jazz },
@@ -24,39 +36,39 @@ const notes = [
 ];
 
 export default function WelcomeScreen() {
+  const insets = useSafeAreaInsets();
+  const reduced = useReducedMotion();
   return (
-    <ScreenScaffold
-      title={welcomeTitle}
-      tint={screenTints.welcome}
-      hideHeading
-      footerNote={notMedicalAdvice}
-      primary={getStarted}
-      primaryHaptic="firm"
-      onPrimary={() => {
-        router.push("/love");
-      }}
-    >
-      <Text style={styles.sample}>{sampleShelfNote}</Text>
-      <WelcomeStage />
-      <PillButton
-        label={seeSample}
-        quiet
-        tint={palette.honey}
-        icon="stack"
-        onPress={() => {
+    <View style={styles.screen}>
+      <ScreenScaffold
+        title={welcomeTitle}
+        tint={screenTints.welcome}
+        hideHeading
+        footerNote={notMedicalAdvice}
+        primary={getStarted}
+        primaryHaptic="firm"
+        onPrimary={() => {
+          router.push("/love");
+        }}
+        linkLabel={seeSample}
+        linkIcon="stack"
+        onLink={() => {
           router.push("/(tabs)/kit");
         }}
-      />
-      <PillButton
-        label={settingsLabel}
-        quiet
-        tint={palette.seaglass}
-        icon="gear"
-        onPress={() => {
-          openSettings();
-        }}
-      />
-    </ScreenScaffold>
+      >
+        <Text style={styles.sample}>{sampleShelfNote}</Text>
+        <Animated.View entering={reduced ? undefined : heroIn}>
+          <WelcomeStage />
+        </Animated.View>
+      </ScreenScaffold>
+      <View style={[styles.gear, { top: insets.top + SPACE_8 }]}>
+        <GearButton
+          onPress={() => {
+            openSettings();
+          }}
+        />
+      </View>
+    </View>
   );
 }
 
@@ -84,13 +96,15 @@ function WelcomeStage() {
 }
 
 const styles = StyleSheet.create({
+  screen: { flex: 1 },
+  gear: { position: "absolute", right: SPACE_16 },
   sample: {
     textAlign: "center",
     fontFamily: "Nunito_700Bold",
     fontSize: FONT_SECONDARY,
     color: palette.inkSoft,
   },
-  stage: { gap: SPACE_16, alignItems: "center" },
+  stage: { gap: SPACE_16, alignItems: "center", marginBottom: SPACE_32 },
   row: {
     width: "100%",
     flexDirection: "row",

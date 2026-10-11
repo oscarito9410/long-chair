@@ -1,12 +1,15 @@
 import { companionTopics, guideById, guideHeader, nearbyPlaces } from "@long-chair/core";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import type { CompanionTopic, NearbyPlace } from "@long-chair/core";
+import { memo } from "react";
+import { StyleSheet, Text, View } from "react-native";
 
 import { CharacterMark } from "../../src/components/art/CharacterMark";
 import { GlassChip } from "../../src/components/chrome/GlassChip";
 import { Aside } from "../../src/components/chrome/HandNote";
 import { IconWell } from "../../src/components/chrome/IconWell";
 import { SampleBanner } from "../../src/components/chrome/SampleBanner";
+import { TabPage } from "../../src/components/chrome/TabPage";
+import { WashCard } from "../../src/components/chrome/WashCard";
 import { GlassSurface } from "../../src/components/glass/GlassSurface";
 import { companionEmpty, nearbyTitle, placesNote, talkTitle } from "../../src/copy/phrases";
 import { placeHue, placeIcon, placeLabel, tasteCharacter } from "../../src/presentation";
@@ -20,13 +23,11 @@ import {
   palette,
   RADIUS_CARD,
   SPACE_16,
-  SPACE_24,
   SPACE_8,
   TARGET,
 } from "../../src/theme/palette";
 
 export default function CompanionScreen() {
-  const insets = useSafeAreaInsets();
   const { draft } = useSession();
   const { plan } = usePlan(draft);
   const guide = guideById(draft.companionId);
@@ -34,11 +35,7 @@ export default function CompanionScreen() {
   const places = plan?.places ?? nearbyPlaces;
 
   return (
-    <ScrollView
-      style={styles.scroll}
-      contentInsetAdjustmentBehavior="automatic"
-      contentContainerStyle={[styles.page, { paddingTop: insets.top + SPACE_16 }]}
-    >
+    <TabPage>
       <SampleBanner live={plan?.source === "live"} />
       <View style={styles.header}>
         <CharacterMark variant={guide.variant} size={AVATAR} animate />
@@ -52,32 +49,43 @@ export default function CompanionScreen() {
       <Text style={styles.section}>{nearbyTitle}</Text>
       <Text style={styles.body}>{placesNote}</Text>
       {places.map((place) => (
-        <GlassSurface key={place.id} style={styles.card} tint={hueFill[placeHue[place.kind]]}>
-          <View style={styles.meta}>
-            <IconWell hue={placeHue[place.kind]} name={placeIcon[place.kind]} size={TARGET} />
-            <Text style={styles.kind}>{placeLabel[place.kind]}</Text>
-          </View>
-          <Text style={styles.cardTitle}>{place.name}</Text>
-          <Text style={styles.body}>{place.offer}</Text>
-          <GlassChip label={place.priceLabel} tint={hueFill[placeHue[place.kind]]} />
-        </GlassSurface>
+        <PlaceCard key={place.id} place={place} />
       ))}
       <Text style={styles.section}>{talkTitle}</Text>
       {topics.length === 0 ? <Text style={styles.body}>{companionEmpty}</Text> : null}
       {topics.map((topic) => (
-        <GlassSurface key={topic.id} style={styles.card} tint={palette.honey}>
-          <CharacterMark variant={tasteCharacter(topic.seedId)} size={AVATAR} />
-          <Text style={styles.cardTitle}>{topic.title}</Text>
-          <Text style={styles.body}>{topic.prompt}</Text>
-        </GlassSurface>
+        <TopicCard key={topic.id} topic={topic} />
       ))}
-    </ScrollView>
+    </TabPage>
   );
 }
 
+const PlaceCard = memo(function PlaceCard({ place }: { place: NearbyPlace }) {
+  const hue = hueFill[placeHue[place.kind]];
+  return (
+    <WashCard style={styles.card} tint={hue}>
+      <View style={styles.meta}>
+        <IconWell hue={placeHue[place.kind]} name={placeIcon[place.kind]} size={TARGET} />
+        <Text style={styles.kind}>{placeLabel[place.kind]}</Text>
+      </View>
+      <Text style={styles.cardTitle}>{place.name}</Text>
+      <Text style={styles.body}>{place.offer}</Text>
+      <GlassChip label={place.priceLabel} tint={hue} />
+    </WashCard>
+  );
+});
+
+const TopicCard = memo(function TopicCard({ topic }: { topic: CompanionTopic }) {
+  return (
+    <WashCard style={styles.card} tint={palette.honey}>
+      <CharacterMark variant={tasteCharacter(topic.seedId)} size={AVATAR} />
+      <Text style={styles.cardTitle}>{topic.title}</Text>
+      <Text style={styles.body}>{topic.prompt}</Text>
+    </WashCard>
+  );
+});
+
 const styles = StyleSheet.create({
-  scroll: { flex: 1, backgroundColor: "transparent" },
-  page: { paddingHorizontal: SPACE_24, gap: SPACE_16, paddingBottom: SPACE_24 },
   header: { flexDirection: "row", gap: SPACE_16, alignItems: "center" },
   bubble: { flex: 1, borderRadius: RADIUS_CARD, padding: SPACE_16 },
   headerText: { fontFamily: "Nunito_800ExtraBold", fontSize: FONT_BODY, color: palette.ink },

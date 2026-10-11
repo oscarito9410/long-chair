@@ -2,8 +2,10 @@ import type { CharacterVariant } from "@long-chair/core";
 import { StyleSheet, Text, View } from "react-native";
 
 import { CharacterMark } from "../art/CharacterMark";
-import { GlassSurface } from "../glass/GlassSurface";
+import { WashCard } from "./WashCard";
+import { AppIcon } from "./AppIcon";
 import { PressableScale } from "../../motion/PressableScale";
+import { SpringCheck } from "../../motion/SpringCheck";
 import {
   AVATAR,
   FONT_BODY,
@@ -37,21 +39,23 @@ export function OptionRow({
       accessibilityState={{ selected }}
       style={styles.stretch}
     >
-      <GlassSurface
-        style={styles.card}
-        tint={hueFill[character.hue]}
-        selected={selected}
-        interactive={selected}
-      >
+      <WashCard style={styles.card} tint={hueFill[character.hue]} selected={selected}>
         <View style={styles.row}>
           <CharacterMark variant={character} size={AVATAR} animate={selected} />
           <View style={styles.copy}>
             <Text style={styles.title}>{title}</Text>
             <Text style={styles.detail}>{detail}</Text>
-            {selected ? <Text style={styles.selectedLabel}>{selectedLabel}</Text> : null}
+            {selected ? (
+              <View style={styles.picked}>
+                <SpringCheck>
+                  <AppIcon name="check" color={palette.seaglassDeep} size={18} />
+                </SpringCheck>
+                <Text style={styles.selectedLabel}>{selectedLabel}</Text>
+              </View>
+            ) : null}
           </View>
         </View>
-      </GlassSurface>
+      </WashCard>
     </PressableScale>
   );
 }
@@ -63,6 +67,7 @@ const styles = StyleSheet.create({
   copy: { flex: 1, gap: SPACE_8 },
   title: { fontFamily: "Nunito_800ExtraBold", fontSize: FONT_BODY, color: palette.ink },
   detail: { fontFamily: "Nunito_600SemiBold", fontSize: FONT_SECONDARY, color: palette.inkSoft },
+  picked: { flexDirection: "row", alignItems: "center", gap: SPACE_8 },
   selectedLabel: {
     fontFamily: "Nunito_700Bold",
     fontSize: FONT_SECONDARY,

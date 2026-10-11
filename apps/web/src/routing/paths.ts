@@ -10,5 +10,6 @@ export const paths = {
   kit: "#/kit",
   companion: "#/companion",
   compare: "#/compare",
+  settings: "#/settings",
   item: (id: string) => `#/item/${encodeURIComponent(id)}`,
 } as const;

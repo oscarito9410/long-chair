@@ -1,6 +1,6 @@
 import { StyleSheet, Text } from "react-native";
 
-import { GlassSurface } from "../glass/GlassSurface";
+import { WashCard } from "./WashCard";
 import { FONT_SECONDARY, palette, RADIUS_PILL, SPACE_16, SPACE_8 } from "../../theme/palette";
 
 export function GlassChip({
@@ -13,9 +13,9 @@ export function GlassChip({
   selected?: boolean;
 }) {
   return (
-    <GlassSurface tint={tint} selected={selected} style={styles.chip}>
+    <WashCard tint={tint} selected={selected} style={styles.chip}>
       <Text style={styles.label}>{label}</Text>
-    </GlassSurface>
+    </WashCard>
   );
 }
 

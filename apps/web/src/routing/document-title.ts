@@ -23,6 +23,8 @@ export function documentTitle(route: Route): string {
       return "Companion plan";
     case "compare":
       return "Plain model contrast";
+    case "settings":
+      return "Settings";
     case "item": {
       const item = itemById(route.itemId);
       return item ? item.title : "Piece";

@@ -4,6 +4,8 @@ import { cn } from "../../lib/cn.ts";
 import type { Route } from "../../routing/parse-route.ts";
 import { DotField } from "../background/DotField.tsx";
 import { SoftBlobs } from "../background/SoftBlobs.tsx";
+import { paths } from "../../routing/paths.ts";
+import { Icon } from "../ui/Icon.tsx";
 import { TabBar } from "./TabBar.tsx";
 
 const AppWindowContext = createContext<HTMLElement | null>(null);
@@ -34,6 +36,11 @@ export function AppShell({ children, route, showTabs, showDots }: AppShellProps)
         </div>
         <div className="app-window" id="app-window" ref={setWindowEl}>
           <div className={cn("layer-content page", showTabs ? "page-pad-tabs" : "page-pad")}>
+            {showTabs ? (
+              <a className="tab-gear glass-surface glass-thin glass-disc" href={paths.settings} aria-label="Settings">
+                <Icon name="gear" />
+              </a>
+            ) : null}
             <main id="main">{children}</main>
           </div>
           {showTabs ? <TabBar route={route} /> : null}

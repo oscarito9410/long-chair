@@ -11,10 +11,19 @@ import {
   usePathInterpolation,
   vec,
 } from "@shopify/react-native-skia";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { StyleSheet, useWindowDimensions } from "react-native";
-import { useDerivedValue, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
+import {
+  cancelAnimation,
+  useAnimatedReaction,
+  useDerivedValue,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 
+import { scrollActive } from "../../motion/scroll-activity";
 import { useReducedMotion } from "../../motion/use-reduced-motion";
 import { hueFill, palette } from "../../theme/palette";
 
@@ -35,17 +44,42 @@ function blobPath(svg: string) {
   return Skia.Path.MakeFromSVGString(svg) ?? Skia.Path.Make();
 }
 
+function useStudioDrift(reduced: boolean) {
+  const morph = useSharedValue(0);
+  const sway = useSharedValue(0);
+  const [scrolling, setScrolling] = useState(false);
+
+  useAnimatedReaction(
+    () => scrollActive.value > 0,
+    (active, previous) => {
+      if (active !== previous) {
+        scheduleOnRN(setScrolling, active);
+      }
+    },
+  );
+
+  useEffect(() => {
+    if (reduced || scrolling) {
+      cancelAnimation(morph);
+      cancelAnimation(sway);
+      if (reduced) {
+        morph.value = 0;
+        sway.value = 0;
+      }
+      return;
+    }
+    morph.value = withRepeat(withTiming(1, { duration: MORPH_MS }), -1, true);
+    sway.value = withRepeat(withTiming(1, { duration: DRIFT_MS }), -1, true);
+  }, [morph, reduced, scrolling, sway]);
+
+  return { morph, sway };
+}
+
 export function StudioBackground() {
   const reduced = useReducedMotion();
   const { width, height } = useWindowDimensions();
-  const morph = useSharedValue(0);
-  const sway = useSharedValue(0);
+  const { morph, sway } = useStudioDrift(reduced);
   const paths = useMemo(() => [blobPath(BLOB_REST), blobPath(BLOB_MORPH)], []);
-
-  useEffect(() => {
-    morph.value = reduced ? 0 : withRepeat(withTiming(1, { duration: MORPH_MS }), -1, true);
-    sway.value = reduced ? 0 : withRepeat(withTiming(1, { duration: DRIFT_MS }), -1, true);
-  }, [morph, reduced, sway]);
 
   const shape = usePathInterpolation(morph, [0, 1], paths);
   const dots = useMemo(() => dotGrid(width, height), [width, height]);

@@ -12,7 +12,7 @@ export function snapMinutes(value: number): number {
   return DIAL_MIN + steps * DIAL_TICK;
 }
 
-export function minutesFromPoint(x: number, y: number, cx: number, cy: number): number {
+export function rawMinutesFromPoint(x: number, y: number, cx: number, cy: number): number {
   "worklet";
   const radians = Math.atan2(y - cy, x - cx);
   let degrees = (radians * 180) / Math.PI;
@@ -28,8 +28,12 @@ export function minutesFromPoint(x: number, y: number, cx: number, cy: number): 
     const beforeStart = DIAL_TURN - fromStart;
     fromStart = pastEnd < beforeStart ? DIAL_SWEEP : 0;
   }
-  const minutes = (fromStart / DIAL_SWEEP) * DIAL_MAX;
-  return snapMinutes(minutes);
+  return (fromStart / DIAL_SWEEP) * DIAL_MAX;
+}
+
+export function minutesFromPoint(x: number, y: number, cx: number, cy: number): number {
+  "worklet";
+  return snapMinutes(rawMinutesFromPoint(x, y, cx, cy));
 }
 
 export function hourFigure(minutes: number): string {

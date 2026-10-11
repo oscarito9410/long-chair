@@ -7,20 +7,21 @@ import {
   guideById,
   motion,
   notMedicalAdvice,
-  onboardingStepIndex,
   stepState,
 } from "@long-chair/core";
 import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { announceMessage } from "../src/a11y/announce";
-import { CharacterMark } from "../src/components/art/CharacterMark";
-import { IconWell } from "../src/components/chrome/IconWell";
-import { ScreenScaffold } from "../src/components/chrome/ScreenScaffold";
-import { buildingCaption, buildingTitle, nowLabel } from "../src/copy/phrases";
-import { useReducedMotion } from "../src/motion/use-reduced-motion";
-import { useSession } from "../src/state/session";
+import { announceMessage } from "../../src/a11y/announce";
+import { CharacterMark } from "../../src/components/art/CharacterMark";
+import { IconWell } from "../../src/components/chrome/IconWell";
+import { buildingCaption, buildingTitle, nowLabel } from "../../src/copy/phrases";
+import { Enter } from "../../src/motion/Enter";
+import { SpringCheck } from "../../src/motion/SpringCheck";
+import { useOnboardingChrome } from "../../src/motion/onboarding-chrome";
+import { useReducedMotion } from "../../src/motion/use-reduced-motion";
+import { useSession } from "../../src/state/session";
 import {
   AVATAR,
   FONT_BODY,
@@ -31,8 +32,7 @@ import {
   SPACE_16,
   SPACE_8,
   WELL,
-} from "../src/theme/palette";
-import { screenTints } from "../src/theme/screen-tints";
+} from "../../src/theme/palette";
 
 export default function BuildingScreen() {
   const { draft } = useSession();
@@ -59,22 +59,17 @@ export default function BuildingScreen() {
     announceMessage(buildingLiveText(titles, visible));
   }, [titles, visible]);
 
+  useOnboardingChrome({
+    primary: complete ? buildingReadyLabel : buildingSkipLabel,
+    primaryHaptic: complete ? "firm" : "press",
+    onPrimary: () => {
+      router.push("/ready");
+    },
+    footerNote: notMedicalAdvice,
+  });
+
   return (
-    <ScreenScaffold
-      title={buildingTitle}
-      hideHeading
-      tint={screenTints.building}
-      step={onboardingStepIndex.building}
-      onBack={() => {
-        router.push("/company");
-      }}
-      footerNote={notMedicalAdvice}
-      primary={complete ? buildingReadyLabel : buildingSkipLabel}
-      primaryHaptic={complete ? "firm" : "press"}
-      onPrimary={() => {
-        router.push("/ready");
-      }}
-    >
+    <>
       <SessionHeader minutes={draft.durationMinutes} />
       <View style={styles.center}>
         <CharacterMark
@@ -90,7 +85,7 @@ export default function BuildingScreen() {
           state={stepState(index, visible, steps.length)}
         />
       ))}
-    </ScreenScaffold>
+    </>
   );
 }
 
@@ -109,13 +104,19 @@ function SessionHeader({ minutes }: { minutes: number }) {
 function StepLine({ title, state }: { title: string; state: "pending" | "active" | "done" }) {
   return (
     <View accessible accessibilityLabel={stepAccessLabel(title, state)} style={styles.step}>
-      {state === "pending" ? <View style={styles.empty} /> : null}
-      {state === "done" ? <IconWell hue="seaglass" name="check" /> : null}
-      {state === "active" ? (
-        <View style={styles.now}>
-          <Text style={styles.nowLabel}>{nowLabel}</Text>
-        </View>
-      ) : null}
+      <Enter key={state} index={0}>
+        {state === "pending" ? <View style={styles.empty} /> : null}
+        {state === "done" ? (
+          <SpringCheck>
+            <IconWell hue="seaglass" name="check" />
+          </SpringCheck>
+        ) : null}
+        {state === "active" ? (
+          <View style={styles.now}>
+            <Text style={styles.nowLabel}>{nowLabel}</Text>
+          </View>
+        ) : null}
+      </Enter>
       <Text style={styles.stepTitle}>{title}</Text>
     </View>
   );
