@@ -12,7 +12,7 @@ export function ThemesScreen() {
     <QuestionFrame
       screen="themes"
       title="What should stay out of the room?"
-      lede="These stay out of the kit."
+      lede="We left out three common ones. Change any."
       primary="Continue"
       primaryHref={paths.company}
       secondary="Skip for now"

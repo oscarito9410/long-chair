@@ -76,7 +76,7 @@ Washes are `color-mix` of a hue into the page (`wash-apricot`, `wash-seaglass`, 
 
 Spacing is the scale 4, 8, 16, 24, 32, 64. In Tailwind that is `1`, `2`, `4`, `6`, `8`, `16`. Do not use the steps in between (`p-3`, `gap-5`, `mt-10`, and the rest).
 
-Body copy is `text-lg` (18px) or larger. Secondary copy is `text-base` (16px) or larger. Do not use `text-sm` or `text-xs`. The tab label may be `text-base` under `sm` so the word "Companion" fits a phone, and `text-lg` from `sm` up. Card titles may stay at `text-2xl`. Secondary ink (`text-ink-soft`) has to clear 4.5:1 on the cream page and on every glass fill. Glows stay in the corners, off the text column. Measure before darkening `--lc-ink-soft`.
+Body copy is `text-lg` (1.125rem) or larger. Secondary copy is `text-base` (1rem) or larger: tile descriptors, kit time ranges, "Not medical advice", and any other supporting line. `html` sets `font-size: 100%` so those rem sizes follow the visitor's font setting. At a 16px root that is 18px and 16px. Do not use `text-sm`, `text-xs`, or a px font size on readable text. Tab labels are `text-base` (1rem) with an icon under `sm`, and `text-lg` from `sm` up, which stays above the 0.75rem floor. Card titles may stay at `text-2xl`. Secondary ink (`text-ink-soft`) has to clear 4.5:1 on the cream page and on every glass fill. Glows stay in the corners, off the text column. Measure before darkening `--lc-ink-soft`.
 
 Radii: `rounded-card` for rows and covers, `rounded-panel` for the detail sheet, `rounded-tag` for chips and stickers, `rounded-full` only for real actions (the near-black primary pill, the quiet text link still uses the pill hit area), the tab bar, and icon wells. Do not put a pill, a shadow, or a fill behind a label that is not an action. The fictional-sample tag appears once, on welcome. The column is `--lc-content` (800px), applied by the `.page` class. Question screens narrow further to `--lc-question` (440px).
 
@@ -96,7 +96,9 @@ Onboarding is four hash screens, not one form: `#/love`, `#/chair`, `#/themes`, 
 
 Use the character as the icon on an `OptionRow`, as the guide on `#/company` and the companion plan, and in empty and loading states (including the building screen). Sizes are `sm`, `md`, and `lg`. `animate` adds a bob and a blink. Both keyframes are collapsed by the global `prefers-reduced-motion` rule, which leaves the open-eye pose.
 
-Guides live in `src/data/guides.ts` (Pebble, Lumen, Nook, Brim). The draft stores `companionId`. Packing ignores it. Do not copy another product's characters, names, or lines.
+Guides live in `src/data/guides.ts` (Pebble, Lumen, Nook, Brim). Each line is one adult sentence. Do not write a guide as if it were speaking to a child. The draft stores `companionId`. Packing ignores it. Do not copy another product's characters, names, or lines.
+
+`#/company` shows the four guides in a 2×2 grid of thin-glass cards. One tap selects a guide (`aria-pressed`). The selected cell shows a check, a 2px ink border, and the name. The primary button reads "Choose" plus that name and then writes `companionId`. Skip leaves the guide unchanged. The companion plan puts "Open nearby" directly under the headline, so the hero count is the places in view. The guide is a compact line under those places. An unknown hash uses `EmptyState`: "We couldn't find that page", the pebble, and "Back to the start". If a control uses an arrow, its hit area is at least 44px and it has an `aria-label`.
 
 ### Option rows
 
@@ -104,7 +106,7 @@ Guides live in `src/data/guides.ts` (Pebble, Lumen, Nook, Brim). The draft store
 
 ### Dial
 
-`Dial` is the chair length, not a list of durations. It snaps to 1, 2, 3, or 4 hours. The center figure is the hour count, the word "hours", and "This chair". The control is a native range (`aria-label` "Hours in the chair", `aria-valuetext` including "This chair"). Focus draws the ink ring on `.dial`.
+`Dial` is the chair length. The arc runs from 1 hour to 4 hours. A native range sits on the dial with `role="slider"`, `aria-valuemin` 60, `aria-valuemax` 240, `aria-valuenow` in minutes, and `aria-valuetext` that includes the hour figure and "This chair". Arrow keys step 30 minutes. Four thin-glass pills under the dial (1h, 2h, 3h, 4h) set the same value, so the screen can be finished without dragging. A selected pill uses `aria-pressed` and a 2px ink border. The center figure is the hour count (a half hour shows one decimal), the word "hours", and "This chair". Hour ticks mark 1, 2, 3, and 4. The subline is "Turn the dial or tap a length." Focus draws the ink ring on `.dial`. The themes screen keeps illness, hospitals, and cancer preselected and says so: "We left out three common ones. Change any."
 
 ### Stamp and cover art
 
@@ -118,11 +120,11 @@ The page stays warm off-white. `SoftBlobs` paints three large, soft glows in the
 
 Glass is reserved. `GlassSurface` and `glassClass` are the only recipe. Thickness sets blur, saturation, and fill:
 
-| Thickness | Blur | Saturate | Fill | Use when                                                                |
-| --------- | ---- | -------- | ---- | ----------------------------------------------------------------------- |
-| thin      | 12px | 112%     | 86%  | Rows, building steps, companion cards, compare panels, arrow buttons    |
-| regular   | 24px | 145%     | 52%  | Dial disc, guide card, stamp, cover badges, the tab lens                |
-| thick     | 32px | 160%     | 68%  | Tab bar, kit cards over a blurred cover, the item sheet over the poster |
+| Thickness | Blur | Saturate | Fill | Use when                                                                         |
+| --------- | ---- | -------- | ---- | -------------------------------------------------------------------------------- |
+| thin      | 12px | 112%     | 86%  | Rows, building steps, companion cards, compare panels, length pills, guide picks |
+| regular   | 24px | 145%     | 52%  | Dial disc, guide card, stamp, cover badges, the tab lens                         |
+| thick     | 32px | 160%     | 68%  | Tab bar, kit cards over a blurred cover, the item sheet over the poster          |
 
 Shapes are `badge`, `chip`, `bar`, `sheet`, `card`, `pill`, `row`, `disc`, and `sticker`. A tint (`glass-tint-*`) is a light wash of the palette hue, not the saturated step. Strong glass keeps a 1px light edge, a short top sheen, a faint inner shadow, and a small drop shadow. Thin glass keeps the edge and a softer sheen, and almost no shadow. Pressable glass scales to 0.98.
 
@@ -180,7 +182,7 @@ Keep the field quiet. This screen sits beside a person for hours. Do not add tra
 - One `h1` per screen, inside `QuestionFrame`, `ScreenIntro`, or `EmptyState`.
 - Interactive controls meet `--lc-target` (48px) in height. Cards that are links count as the target.
 - Characters, cover art used as decoration, icon wells, and stickers are `aria-hidden`.
-- Tastes and themes are toggle buttons with `aria-pressed`. Duration is the dial's range input, not a set of radios.
+- Tastes, themes, length pills, and guide picks are toggle buttons with `aria-pressed`. Chair length is also the dial slider. Arrow keys on that slider move 30 minutes.
 - The building sequence checks steps off one by one. `prefers-reduced-motion: reduce` shows every step already done. The sequence exposes the current step and a polite live region, and it offers a way forward before the timer finishes.
 - Focus uses the visible `:focus-visible` ring. Do not remove outlines.
 - Ink on the page and on glass, page-colored type on the near-black primary, and page-colored glyphs on deep wells are the contrast pairs. Do not put text on a corner glow. Do not fade text with opacity to mean "disabled". Disabled buttons use the `line` token.

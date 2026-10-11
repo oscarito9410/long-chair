@@ -35,14 +35,14 @@ Open the app and move through the story, or jump with the hash:
 | ----------- | --------------------- | ---------------------------------------------------------------------------------------------- |
 | Welcome     | `#/welcome`           | The promise, paper notes of tastes, then get started or open the sample kit.                   |
 | Tastes      | `#/love`              | One question: what belongs in the room. `#/onboarding` lands here too.                         |
-| Length      | `#/chair`             | A dial from 1 to 4 hours.                                                                      |
+| Length      | `#/chair`             | Turn the dial, or tap 1h, 2h, 3h, or 4h. Arrow keys move 30 minutes.                           |
 | Themes      | `#/themes`            | What should stay out of the room.                                                              |
-| Company     | `#/company`           | Pick a guide. The choice changes the tone, not the kit.                                        |
+| Company     | `#/company`           | Tap one of four guides, then Choose that name. Skip leaves the guide as it was.                |
 | Building    | `#/building`          | Watch the five agent steps check off.                                                          |
 | Ready       | `#/ready`             | A postage-style card for this chair, then open the kit.                                        |
 | Session kit | `#/kit`               | A timeline whose durations add up to the chair. Each card is a cover, a title, and one reason. |
 | Piece       | `#/item/north-window` | Cover, creator, why it was kept, and a one-line theme check.                                   |
-| Companion   | `#/companion`         | The guide, short prompts from the same tastes, and places shown as open nearby.                |
+| Companion   | `#/companion`         | Places open nearby sit under the headline. The guide is a short line below them.               |
 | Contrast    | `#/compare`           | An unfiltered title beside the piece Long Chair kept, each with one line.                      |
 
 After the kit exists, a floating glass tab bar switches among Kit, Companion, and Compare. The sample chair is 4 hours with Pebble as the guide. Most of the shelf is selected, Sunday Engines is not, and grief and the death of a parent are not held back, so both row states are visible. **See a sample kit** on the welcome screen opens that timeline immediately.
@@ -100,7 +100,7 @@ There are no environment variables. The app does not read a `.env` file.
 
 ## Design
 
-The interface is meant to be readable at arm's length, in a chair, on a phone first. Body type is 18px or larger. A four-hue palette (apricot, sea glass, honey, wisteria) plus ink and a warm page color. Podcasts use sea glass, with episodes. Honey is food and a pause. Each onboarding question is its own screen, with a near-black primary pill and a quiet text link. Original blob characters mark choices, keep company, and sit in empty states. Soft color glows sit in the corners. Glass is kept for the tab bar, the dial, covers, the stamp, and the guide card. Rows and panels stay calm. Welcome leads with the promise, paper notes, and no oversized number. Building, the kit, the companion plan, and the contrast each keep one figure.
+The interface is meant to be readable at arm's length, in a chair, on a phone first. Body type is 1.125rem (18px at a 16px root) or larger, and supporting lines are 1rem. A four-hue palette (apricot, sea glass, honey, wisteria) plus ink and a warm page color. Podcasts use sea glass, with episodes. Honey is food and a pause. Each onboarding question is its own screen, with a near-black primary pill and a quiet text link. Original blob characters mark choices, keep company, and sit in empty states. Soft color glows sit in the corners. Glass is kept for the tab bar, the dial, covers, the stamp, and thin cards. Rows and panels stay calm. Welcome leads with the promise, paper notes, and no oversized number. Building, the kit, the companion plan, and the contrast each keep one figure.
 
 The background is a faint canvas of dots. They ease toward a pointer, then settle. The field pauses when the tab is hidden and draws once, still, when the visitor prefers reduced motion. Nunito carries the UI. Caveat is only the welcome stickers. Both are open fonts (SIL Open Font License) loaded through Fontsource.
 

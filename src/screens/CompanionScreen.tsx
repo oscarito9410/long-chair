@@ -21,13 +21,6 @@ export function CompanionScreen() {
         caption="open nearby"
         title="For the person with you"
       />
-      <div className="flex flex-col items-center gap-4 text-center">
-        <Character variant={guide.variant} size="lg" animate />
-        <GlassSurface variant="chip" thickness="thin" className="px-4 py-2">
-          <span className="text-base font-bold">{guide.personality}</span>
-        </GlassSurface>
-        <p className="text-lg leading-relaxed">{guide.quote}</p>
-      </div>
       <section className="flex flex-col gap-6">
         <SectionHeading>Open nearby</SectionHeading>
         <div className="flex flex-col gap-6">
@@ -36,6 +29,15 @@ export function CompanionScreen() {
           ))}
         </div>
       </section>
+      <div className="flex items-center gap-4">
+        <Character variant={guide.variant} size="md" animate />
+        <div className="flex min-w-0 flex-col items-start gap-2">
+          <GlassSurface variant="chip" thickness="thin" className="px-4 py-2">
+            <span className="text-base font-bold">{guide.personality}</span>
+          </GlassSurface>
+          <p className="text-lg leading-relaxed">{guide.quote}</p>
+        </div>
+      </div>
       <section className="flex flex-col gap-6">
         <SectionHeading>Things to talk about</SectionHeading>
         {topics.length === 0 ? (

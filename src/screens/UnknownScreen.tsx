@@ -6,7 +6,7 @@ export function UnknownScreen() {
     <div data-screen="unknown">
       <EmptyState
         heading="h1"
-        title="That page is not on the chair"
+        title="We couldn't find that page"
         href={paths.welcome}
         action="Back to the start"
       />
