@@ -1,0 +1,59 @@
+{
+  "success": true,
+  "results": {
+    "entities": [
+      {
+        "name": "Harbor Lights: The Blue Buoy",
+        "entity_id": "00000000-0000-4000-8000-000000000003",
+        "type": "urn:entity",
+        "subtype": "urn:entity:tv_show",
+        "x-long-chair-slug": "blue-buoy",
+        "properties": {
+          "description": "A buoy drifts into the wrong channel. The night desk follows it with radios and tea.",
+          "duration": 44,
+          "image": {
+            "url": ""
+          },
+          "popularity": 0.5,
+          "tags": [
+            {
+              "id": "urn:tag:keyword:media:fictional_repair",
+              "name": "Repair",
+              "type": "urn:tag:keyword:media"
+            }
+          ],
+          "short_descriptions": [
+            {
+              "value": "One quiet clue on the water."
+            }
+          ],
+          "creator": "Series by Nana Ibarra"
+        },
+        "query": {
+          "explainability": {
+            "x-long-chair-confidence": "unconfirmed",
+            "warning": null,
+            "entities": [
+              {
+                "entity_id": "00000000-0000-4000-8000-000000000011",
+                "score": 0.8
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "query": {
+    "explainability": {
+      "x-long-chair-confidence": "unconfirmed",
+      "warning": null,
+      "entities": [
+        {
+          "entity_id": "00000000-0000-4000-8000-000000000011",
+          "score": 0.8
+        }
+      ]
+    }
+  }
+}

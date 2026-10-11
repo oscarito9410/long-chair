@@ -1,0 +1,232 @@
+# Visual Material
+
+A page made only of type and tables is not "restrained"; on a marketing surface it is unfinished. The first wave of
+slop was decoration without decisions; the over-correction is **decisions without material**: serif headline, fact
+table, one button, gray boxes labelled "[photo]". Users read that as a wireframe. This file makes visual material a
+requirement, tells you how to choose it per industry and attribute, and how to produce it in a prototype without
+fabricating anything.
+
+## Contents
+
+1. The rule
+2. Choosing the visual anchor
+3. Photography: art direction, not "add a photo"
+4. Illustration and graphic devices
+5. Product and interface imagery
+6. Color fields, texture, and material
+7. Generated imagery (when an image tool is available)
+8. Placeholders that are still designed
+9. Sourcing for prototypes (licences)
+10. Video and motion imagery
+11. Industry starting points
+12. Visual-material slop
+13. Checks
+
+---
+
+## 1. The rule
+
+- **Persuade surfaces:** the first viewport contains at least one strong non-text visual anchor (photograph, product,
+  illustration, graphic device, color field with a mark, or video). A typographic-only first viewport is allowed only
+  when the brand is genuinely typographic (a type foundry, a publication, a law firm whose identity *is* a lettermark)
+  **and** the moodboard names that as the memorable thing. Even then, later sections carry imagery.
+- **Operate surfaces:** imagery is functional (avatars, thumbnails, charts, maps, product images); no hero art.
+- **Read surfaces:** figures, diagrams, and one lead image per article.
+- **The prototype shows the anchor the direction chose, in its real form.** Photographic anchor: real licensed images,
+  as many as the content needs and no more. Typographic, colour-field or diagram anchor: built in type, tokens or SVG,
+  with no photographs required. Declare it as `Anchor type:` in `DESIGN.md` (or `data-nsd-anchor` on the element), so
+  the linter judges the page against the decision rather than an image count. Never empty boxes with captions;
+  placeholders only as described in §8.
+- **"No assets" is not a direction.** A one-sentence brief never comes with photographs, so an agent that reads
+  "no assets → type and SVG" produces the same flat page for every industry: six test pages in a row carried zero
+  images. For any business with a place, people, a product or a process (§2, first row), the direction considers a
+  photographic or illustrated anchor first — licensed stock that passes the three-match test (§3b), generated
+  imagery when an image tool exists (§7), or a commissioned-illustration placeholder mapped to a shot list (§8) — and
+  writes one line on why it was rejected if the page ends up without images. `design_log.py` warns when the last three
+  pages had no image.
+- **The moodboard decides the imagery direction** (subject, light, color treatment, crop, people or not) before any
+  screen is composed. "Imagery: TBD" is not a direction.
+
+## 2. Choosing the visual anchor
+
+| Anchor type | Choose when | Not when |
+|---|---|---|
+| Full-bleed photograph with type overlaid or beside | place, people, craft, hospitality, food, health, travel, real estate | product is abstract software with nothing to photograph |
+| Split: image half, text half | balanced argument (who we are + what to do) | image is weak; then the split exposes it |
+| Product-first (the object, the interface, the packaging) | anything with a physical or on-screen product | early-stage with no real product yet (use illustration or diagram) |
+| Color field + brand mark + short claim | strong identity color and a mark; fashion, culture, events | no distinctive mark or color |
+| Illustration system | abstract services, finance, education, children, when photography would be generic stock | budget/time for a coherent illustration style is absent (do not hand-code mascots) |
+| Diagram / data as image | developer tools, logistics, analytics, science | the diagram is decorative rather than explanatory |
+| Collage / editorial composition | culture, publishing, fashion, music | corporate trust contexts |
+| Video / motion loop | product demos, hospitality, sport, games | bandwidth-sensitive audiences; must have a poster frame |
+| Type as image (display type is the anchor) | R3–R4 culture, publishing, music, fashion; a name or claim worth setting large | when the words are generic |
+| Real-time scene (WebGL / 3D / generative) | R4 only, with the five conditions in `expression-register.md` §6 | anything whose job is a phone number |
+
+Register raises the stakes: at R3–R4 the anchor is usually full-bleed and the composition is built around it, so a
+weak image sinks the page. Do not choose R3 without assets.
+
+Decide by asking: what does this business have that a competitor does not have a photograph of? The room, the
+people, the product, the process, the place. Then show that.
+
+## 3. Photography: art direction, not "add a photo"
+
+Write the art direction into the moodboard and DESIGN.md; it drives the shot list and the placeholder choice.
+
+| Dimension | Decide |
+|---|---|
+| Subject | the actual place / team / product / process / customer moment (name them) |
+| People | none · hands only · candid at work · portraits looking at camera (rarely) · never stock-smiling-at-laptop |
+| Light | daylight, window light, golden hour, overcast, studio; consistent across the set |
+| Color treatment | natural · muted (−15% saturation) · warm/cool grade toward the brand hue · black and white; one treatment for the whole site |
+| Crop and framing | tight details vs wide establishing; eye-level vs top-down; leave negative space where type sits |
+| Ratios | fixed set: 3:2 hero, 4:5 portrait, 1:1 thumbnail, 16:9 video; token them |
+| Texture | film grain or clean; matches the material story |
+| What is banned | stock clichés (handshake, lightbulb, rocket, team laughing, doctor with folded arms, gavel and scales), AI-generated people with artefacts, duotone washes over everything, dark overlays hiding weak images |
+
+Provide a **shot list** of 6–12 photographs with subject, framing, and where each is used. This is a real deliverable
+the client can hand to a photographer.
+
+## 3b. The three-match test (choosing a specific photograph)
+
+Writing the art direction is not enough; the individual image has to be checked against it. Every photograph placed
+in a prototype must match the written direction on **all three** of these, or it is rejected:
+
+1. **Subject** — it shows the thing on the shot list (this kind of room, this material, this process), not a cousin
+   of it. A modern hotel room with a glass-tower view does not stand in for a stone house with a courtyard.
+2. **Light** — the same light the direction names (morning side light, overcast, studio). Mixed light across a set
+   is the fastest way to look like stock.
+3. **Material and palette** — the surfaces and colors sit inside the token palette after the stated grade. If it
+   needs a heavy filter to fit, it does not fit.
+
+Also check: crop leaves room where type sits; no recognisable faces or logos you have no rights to; not the first
+row of results for the obvious search term (those images are on a thousand sites); resolution ≥ 2× the display size;
+no visible watermark, artefacts, or AI-generation errors.
+
+**Look at the image before you ship it.** Open it, or render the page and screenshot it. Do not place a URL you have
+not seen. Record subject, photographer, source page and the three-match note in `design/assets.md`.
+
+If nothing passes, use a designed placeholder (§8) and say so; a wrong photograph is a stronger tell than an honest
+color field.
+
+## 4. Illustration and graphic devices
+
+- Illustration needs a *system*: line weight, palette (from tokens), perspective, level of abstraction, how people are
+  drawn (or not). One illustrator, one style. If none is available, do not hand-code SVG scenes; use a graphic device
+  instead.
+- **Graphic devices** are cheap and ownable: a recurring geometric mark derived from the logo, a rule/grid motif from
+  the industry (timetable lines, ledger rules, map contours), large numerals, a signature crop, a color-block
+  system, an editorial frame. One device per brand, used consistently, becomes recognisable.
+- Icons are not illustration; a page of icons is not visual material.
+- Corporate-Memphis flat people, 3D clay renders, isometric offices, gradient blobs: banned (see `anti-slop.md` §5).
+
+## 5. Product and interface imagery
+
+- Show the real product: screenshots at device-correct sizes with real content, or physical product photographed on
+  a surface consistent with the palette.
+- No re-drawn browser chrome or hand-built phone frames unless an accurate device frame asset is used.
+- Interface screenshots get one consistent treatment (flat on surface, slight perspective never; shadow from
+  `shadow.overlay`).
+
+## 6. Color fields, texture, and material
+
+Large fields of brand color, paper/linen/concrete textures, or a material photograph can be the anchor when the
+brand story is material (a bakery, a print shop, a fabric brand). Texture must be a decision from the moodboard,
+subtle (opacity ≤ 8%), and consistent. Noise-over-everything is over-correction slop.
+
+## 7. Generated imagery (when an image tool is available)
+
+If the session has an image-generation tool (an MCP image generator, Figma image tools, or similar):
+
+1. Generate from the **art direction** in §3, not from the headline: subject, light, treatment, crop, negative space,
+   "no people" or "hands only", ratio.
+2. Never generate recognisable people as if they were the client's staff or customers. Rooms, objects, materials,
+   landscapes, abstract material studies are fine.
+3. Match the grade to the tokens (warm/cool) in post: a CSS `filter` or the tool's own color controls.
+4. Label generated images as such in the handoff; they are placeholders for a real shoot unless the client accepts them.
+5. Generate the full ratio set for the hero (3:2 and 4:5) so mobile art direction works with `<picture>`.
+6. **Refuse the tool's default look.** Left to itself an image model returns one photograph: a rustic wooden table,
+   soft side light from a window, shallow depth of field, warm browns. A restaurant, a bakery and a ceramics studio in
+   a row all came back that way. Write light, surface and palette into every prompt from the direction — Alfama at
+   dusk on stone, a steel counter under shop fluorescents, a white plaster wall at noon, a tiled floor from above —
+   and record them in `design_log.py` as `--image-look angle;light;surface;palette` from a fixed vocabulary
+   (angle: top-down, eye-level, low-angle, close-up, wide · light: side-window, overcast, hard-sun, dusk-night,
+   studio, artificial · surface: wood, stone, metal, fabric, paper, tile, glass, plant, street, seamless · palette:
+   warm, cool, neutral, saturated, mono). Free words hid a repeat: a restaurant on "limestone" and a ceramics studio on
+   "kiln-shelf alumina" were both top-down on pale stone. The log warns when two pages in a row share three facets,
+   or the same angle and surface.
+
+## 8. Placeholders that are still designed
+
+When no image tool exists and no client assets are available:
+
+- Use **real, licensed photographs** matching the art direction from Unsplash / Pexels (see §9), chosen with the same
+  care as a final image: correct subject, light, and crop. Add `data-placeholder="shot-03"` and a visible small
+  caption only in the review build, not in the design.
+- If a real photo cannot match, use a **designed placeholder**: a color field from the palette with the brand mark or
+  the graphic device, at the exact ratio, with the shot-list caption. Never a gray box with square-bracket text.
+- **People are not colour fields.** A portrait slot filled with a tinted box and a label reads as a grey box in brand
+  colours (a 1.13 law-firm test did this for three solicitors). For people use a licensed stand-in portrait marked
+  "stand-in" in the caption and in `assets.md`, a generated portrait when an image tool exists and the caption says so,
+  or a designed placeholder that still reads as a person: a cropped silhouette, or the initials set large as type.
+  `slop_lint.py` flags `people-placeholder-slab`.
+- Every placeholder maps to a shot-list item so the client knows exactly what to shoot.
+
+## 9. Sourcing for prototypes (licences)
+
+| Source | Licence | Notes |
+|---|---|---|
+| Unsplash | Unsplash License (free, commercial, no attribution required, no resale as-is) | search by subject + light ("dental room window light"); avoid the top results, which are overused |
+| Pexels | Pexels License (free, commercial) | good for video loops too |
+| Wikimedia Commons | per-file (CC BY / CC0) | check attribution requirements |
+| Client assets | theirs | always preferred; ask in discovery |
+| Stock (Getty, Stocksy, Death to Stock) | paid | Stocksy/Death to Stock for non-cliché imagery; note the cost in handoff |
+
+Hotlinking Unsplash/Pexels URLs is acceptable in a prototype; download and self-host for anything beyond a review
+build. Record the source URL for each image in `design/assets.md`.
+
+## 10. Video and motion imagery
+
+Short loops (6–12 s, muted, `autoplay loop playsinline`, poster frame, `prefers-reduced-motion` → poster only) can
+be the anchor for hospitality, sport, product, and food. Keep under 2 MB, `preload="metadata"`, never autoplay with
+sound.
+
+## 11. Industry clichés (what not to show)
+
+There is no industry → anchor table here any more: it was a template, and the anchor now comes from the measured
+market line (`design-language.md` §3, the `imagery` axis) and the direction. What survives is the list of what every
+category's stock imagery reaches for, so the page does not.
+
+| Industry | Have (what only this business can show) | Avoid (the category's stock reflex) |
+|---|---|---|
+| Dental / clinic | the treatment room, daylight, the team at work, the street entrance | folded-arms doctor, tooth icons, blue gradients |
+| Coffee roaster | beans, the roaster, bags/packaging, origin landscapes, pour, steam | latte art stock, brown-on-brown everywhere |
+| Law firm | the people, the building/office, the town, documents as material | gavel, scales, columns, handshake, navy + gold by reflex |
+| Restaurant / hotel | food, rooms, light at different hours, staff | stock plates, drone shots only |
+| SaaS / developer tool | the product UI, diagrams of how it works, real customer artefacts | dashboard mockups in perspective, blobs |
+| E-commerce fashion | product on body, product flat, detail | busy collages, badges |
+| Education | students at work, materials, outcomes | graduation caps, lightbulbs |
+| Finance | people in context, real statements/charts, the app | gradients, vault icons, generic city skyline |
+| Real estate / architecture | the buildings, interiors, plans | drone-only, HDR |
+| Nonprofit | the work, the people served (with consent), the place | sad-eyed stock, hands holding seedling |
+
+## 12. Visual-material slop
+
+- No visual decision on a marketing page (no anchor of any kind); grey boxes with "[Photo: …]" text.
+- A "fact ledger" or definition-list table as the hero on every project regardless of industry.
+- Serif display + dark background + one green button as a default "honest" look.
+- Stock clichés listed in §3; AI-generated people; hand-coded SVG scenes; icon grids as imagery.
+- Duotone/dark overlay on every photo; images cropped without regard to where type sits.
+- Placeholder captions shipped in the design; alt text missing or "image".
+- **Photo-stuffing:** an image in every section because sections "should have one"; stock that repeats the headline;
+  photographs added to a direction that chose type, colour or a diagram. The over-correction to the text-only page.
+
+## 13. Checks
+
+- First viewport of every Persuade page shows the anchor the direction chose; photographs appear only if that anchor is
+  photographic, and none were added to fill space.
+- Art direction written (subject, people, light, treatment, crop, ratios) and reflected in every image.
+- Shot list delivered; every placeholder maps to a shot.
+- Images sized with `width`/`height`, `srcset`, `loading` (not lazy on the LCP image), alt per `accessibility.md`.
+- Sources recorded; licences compatible with the use.
+- Imagery treatment consistent site-wide and matched to the token palette.
+- The page does not resemble the previous project in this workspace, and does not default to the serif + ledger look.

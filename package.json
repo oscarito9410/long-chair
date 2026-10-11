@@ -2,7 +2,7 @@
   "name": "long-chair",
   "private": true,
   "version": "0.1.0",
-  "description": "Static design prototype of Long Chair, a session companion for long infusion and dialysis hours.",
+  "description": "Responsive web app and session API for Long Chair, a companion for long infusion and dialysis hours.",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,8 +10,11 @@
     "preview": "vite preview",
     "typecheck": "tsc -b --pretty false",
     "lint": "eslint .",
+    "test": "vitest run",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "lint:slop": "python3 .cursor/skills/no-slop-design/scripts/slop_lint.py src",
+    "lint:slopmd": "node tools/slopmd/bin/slopmd.js src && node tools/slopmd/bin/slopmd.js services/api"
   },
   "dependencies": {
     "@fontsource/caveat": "^5.2.7",
@@ -35,6 +38,7 @@
     "tailwindcss": "^4.1.16",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.46.1",
-    "vite": "^8.3.0"
+    "vite": "^8.3.0",
+    "vitest": "5.0.3"
   }
 }

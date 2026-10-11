@@ -1,44 +1,37 @@
 # Agent guide
 
-Long Chair is a static design prototype. Read this before editing. The product story and the run steps live in `README.md`.
+Long Chair is a responsive web app for the Qloo Agentic Hackathon, plus a FastAPI session service. Read this before editing. The product story and the run steps live in `README.md`.
 
 ## What this repo is
 
-A Vite + React + TypeScript UI with fictional sample data. Visitors can plan a chair, watch an illustrated agent sequence, and open the kit, the companion plan, and the plain-model contrast.
+The deliverable is the Vite + React + TypeScript app in `src/`. It is mobile-first and widens for a tablet and a desktop. Screens still render the in-memory sample shelf. They do not call the API yet.
 
-The hackathon architecture is written and not yet implemented. Read `docs/architecture/ARCHITECTURE.md`, `docs/architecture/qloo-port.md`, `docs/adr/`, and `docs/plan/ROADMAP.md` before adding a server or a client app. Do not start either until a person asks for the implementation milestone. Until then, do not add a Qloo client, an LLM SDK, authentication, or a database to the Vite app, and do not scaffold `apps/client`.
+The session API lives in `services/api`. It is hexagonal: domain, application, ports, adapters, and the HTTP layer. `BuildSessionKit` resolves tastes, asks for insights with exclusion tags, checks once, packs the chair, and returns explanations plus a companion plan. `FakeQlooAdapter` is the default. `HttpQlooAdapter` and `RecordingQlooAdapter` stay behind `QlooPort`.
 
-The client decision is Flutter ([ADR 0006](docs/adr/0006-flutter-client.md)). [ADR 0005](docs/adr/0005-client-strategy.md) is superseded. Do not add a React Native toolchain. The Vite app in `src/` is the design reference and the fallback judge URL. The Qloo key never ships inside a binary. Clients call the Python API only.
+A native Swift app is a post-hackathon idea. Flutter and React Native are not the client plan. [ADR 0007](docs/adr/0007-responsive-web-client.md) is the living client decision. [ADR 0006](docs/adr/0006-flutter-client.md) is superseded. Do not scaffold `apps/client`.
 
-## Flutter rules
+Read `docs/architecture/ARCHITECTURE.md`, `docs/architecture/qloo-port.md`, `docs/adr/`, and `docs/plan/ROADMAP.md` before changing the pipeline or the hosting plan.
 
-These apply to `apps/client` once it exists. The Vite prototype keeps the rules further down in this file.
+## Code rules
 
-- **Analyze.** `very_good_analysis` is the lint set. Do not weaken a lint to land a screen. `flutter analyze` is part of done, alongside the existing `npm run lint` for the prototype.
-- **Layers.** Feature-first folders. Each feature has `domain`, `data`, and `presentation`. Domain does not import Flutter. Repository interfaces live in domain. Data implements them against `/v1`. Presentation talks to the interface.
-- **State.** Riverpod. A provider returns `AsyncValue` for a plan request. Do not add Bloc events for a single HTTP call.
-- **Models.** `freezed` and `json_serializable` for anything that crosses the wire. Match `SessionDraft`, `CatalogItem`, `PackedSession`, `CompanionTopic`, and `NearbyPlace`. Change them in the same commit as the OpenAPI change.
-- **Tokens.** Colors, space, radius, and type floors live on a `ThemeExtension`. Widgets read the theme. Do not hard-code a hex in a screen.
-- **Glass.** `GlassSurface` is the only blur. It uses `BackdropFilter` and `ImageFilter.blur`, and the opaque card when the visitor wants less transparency or when web scroll cannot afford the blur. Do not add a shader liquid-glass package.
-- **SOLID and DRY.** One theme, one glass widget, one HTTP client, one repository per feature. Screens compose. They do not pack a session or parse a Qloo document. The packer stays in the API.
+These apply to code this team writes. The design-system rules further down still govern `src/`.
 
-Do not invent live API responses. Do not commit API keys, `.env` files, `.qloo-cache/`, or real Qloo payloads. Hackathon rules forbid Qloo data in the public repo. Fictional fixtures that match the documented JSON shape are allowed. A recording of a real response is not a fixture.
-
-When implementation starts, map Qloo search hits and insight rows onto the types in `src/data/types.ts` inside the adapter. Keep the screens on those types.
-
-## Architecture rules
-
-These apply to the session API. The prototype UI stays presentational.
-
-- **Ports and adapters.** The pipeline calls `QlooPort`. `HttpQlooAdapter`, `FakeQlooAdapter`, and `RecordingAdapter` are the only Qloo I/O. Screens and the packer do not import `httpx` or know the host `hackathon.api.qloo.com`.
-- **One mapper.** Qloo JSON becomes `CatalogItem`, `TasteSeed`, and `NearbyPlace` in a single module. Adapters do not each invent a mapping.
-- **Contract tests.** The fake and live adapters share one suite. CI runs the fake entry. The live entry runs only on a machine that has a key, and it must not write a response into the repo.
+- **SlopMD.** The prime directives between the `slopmd` markers in this file, and the same block in `.cursor/rules/slopmd.mdc`, are binding. Before any new dependency, run `node tools/slopmd/bin/slopmd.js check-dep <package>`. Exit 0: pin the exact version. Exit 1: pin it and write the one-line reason. Exit 2: stop for a person. The lab scan is `node tools/slopmd/bin/slopmd.js <path>`.
+- **Design slop.** `.cursor/skills/no-slop-design` is the visual reference. `slop_lint.py` is informational. Do not restyle the prototype to chase it. Do not add another code anti-slop plugin.
+- **Ports and adapters.** The pipeline calls `QlooPort`. `HttpQlooAdapter`, `FakeQlooAdapter`, and `RecordingQlooAdapter` are the only Qloo I/O. Screens and the packer do not import `httpx` or know the host `hackathon.api.qloo.com`.
+- **One mapper.** Qloo JSON becomes catalog items, taste hits, and nearby places in a single module. Adapters do not each invent a mapping.
+- **Contract tests.** The fake and HTTP adapters share one suite. CI runs the fake entry on every relevant change. The live HTTP entry runs only from the scheduled or manual workflow, and only when the `QLOO_API_KEY` repo secret is set. It must not print the key or write a response into the repo.
 - **Validate, then send.** A bad Qloo parameter comes back as an empty success. Reject it in the adapter before the request.
 - **SOLID.** The port is the interface the pipeline depends on. Each adapter has one job. The checker, the packer, and the prose step are separate. A new adapter does not require a change to the pipeline. The packer still ignores `companionId`.
 - **DRY.** Parameter validation, the JSON models, and the mapper exist once. Do not copy the contract tests per adapter.
 - **Clean boundaries.** Domain types cross the API. Qloo documents stay inside the adapter. The optional model sees titles we already kept, not a chart and not the raw payload.
+- **Web client.** When a screen starts calling the API, it does so through a typed repository aimed at `/v1`. Feature folders stay feature-first. Do not put a Qloo client, an LLM SDK, authentication, or a database in the Vite app.
 - **Privacy.** No personal name, diagnosis, or medical record on the wire to Qloo or to a model. Exclusion themes are content tags, not a description of the visitor.
 - **Replay.** The judge demo after the key is deactivated reads the private cache. That cache is gitignored. A second copy lives in the team's password store, not on GitHub.
+
+Do not invent live API responses. Do not commit API keys, `.env` files, `.qloo-cache/`, or real Qloo payloads. Hackathon rules forbid Qloo data in the public repo. Fictional fixtures that match the documented JSON shape are allowed. A recording of a real response is not a fixture.
+
+Map Qloo search hits and insight rows onto the types in `src/data/types.ts` inside the adapter. Keep the screens on those types.
 
 ## Layout
 
@@ -226,20 +219,91 @@ npm run format
 npm run format:check
 npm run lint
 npm run typecheck
+npm test
 npm run build
 npm run dev
+npm run lint:slop
+npm run lint:slopmd
 ```
 
 `npm run dev` serves http://127.0.0.1:4179.
+
+`lint:slop` and `lint:slopmd` are informational. CI runs them and does not fail the build on their findings yet.
+
+The API, from `services/api` with [uv](https://docs.astral.sh/uv/) 0.13:
+
+```bash
+uv sync --extra dev
+uv run ruff check .
+uv run ruff format --check .
+uv run mypy
+uv run pytest
+```
+
+`pytest` includes the shared FakeQloo contract tests and fails if coverage on `app/domain` and `app/application` is under 85 percent. The live HTTP test stays skipped unless `QLOO_API_KEY` is set.
 
 ## Definition of done
 
 A change is done when all of the following are true:
 
-- `format:check`, `lint`, `typecheck`, and `build` pass.
+- `format:check`, `lint`, `typecheck`, `test`, and `build` pass for the web app when it changed.
+- `ruff`, `mypy`, and `pytest` pass for the API when it changed.
 - New color, spacing, radius, and type choices go through the tokens above.
 - A new screen is reachable from the hash router and from a control on an existing screen.
 - Empty and thin results have a sentence that says what to do next.
 - Reduced motion still shows the content. The dot field does not animate.
 - Sample copy stays in English, and fictional records stay labeled as fictional.
 - No key, no Qloo response, and no medical record was added to the tree.
+
+<!-- slopmd:begin -->
+
+# SlopMD Prime Directives
+
+Non-negotiable rules for all code you write or modify in this project.
+
+## Before writing
+
+1. Read neighboring code first. Match the project's style, idioms, libraries, layers, and test patterns, even against your own preference.
+2. Search the repo and the standard library for an existing helper before writing a new one.
+3. Never add a dependency without verification: it must exist on the official registry, be established, and be pinned to an exact version. If SlopMD is installed, run `npx slopmd check-dep <package>` and stop for human approval when it requires it.
+
+## Naming
+
+4. Name by domain intent, not mechanism. One term per concept across the codebase; reuse the project's existing vocabulary.
+5. Banned in identifiers: `enhanced`, `improved`, `new`, `simple`, `my`, `_v2`, `final`, and meaning-free suffixes like `Manager`, `Helper`, `Util`, `Processor`, `Data`, `Info`, unless they name a real pattern already in use here.
+
+## Functions and abstraction
+
+6. Split functions by subproblem, never by line count. If understanding one algorithm requires hopping between fragments, inline them back.
+7. Guard clauses over nesting. More than 3 levels of nesting means refactor.
+8. No wrappers that only delegate, no interfaces with a single implementation, no design pattern unless you can name the axis of change it isolates today.
+9. Duplication is cheaper than the wrong abstraction. Abstract on the third occurrence, and only when the copies represent the same knowledge.
+
+## Comments and docs
+
+10. Never write comments that narrate the code, apologize, or address the reviewer ("as requested", "in a real app you would"). If a block needs a what-comment, extract a well-named function instead.
+11. Do document public interfaces: contract, units, ranges, invariants, and the why behind non-obvious decisions.
+12. Plain ASCII punctuation everywhere: no em dashes, en dashes, middle dots, or typographic quotes. No emojis in code, comments, logs, commit messages, or docs.
+
+## Errors, types, and security
+
+13. Catch only what you can handle. Never catch-and-continue silently, never bare `except`, never an empty catch block.
+14. Validate at system boundaries. Inside them, trust inputs and assert the impossible instead of re-validating everywhere.
+15. No `any` or type-suppression directives without a written justification on the same line.
+16. Named constants instead of magic numbers, hardcoded strings, and inline URLs.
+17. Never hardcode secrets, keys, tokens, or credentials anywhere, including tests, comments, and docs. Config comes from the environment.
+18. Parameterize every query. Never concatenate untrusted input into SQL, shell, HTML, paths, or eval.
+
+## Performance
+
+19. No queries, network calls, or blocking I/O inside loops over records; batch or prefetch. Run independent async operations concurrently unless a real dependency or rate limit forces sequence.
+20. Anything subtler: measure before optimizing, and never trade clarity for an unmeasured win.
+
+## Diff discipline
+
+21. One intent per diff. Never mix refactoring with behavior change, never reformat lines you did not otherwise touch, no drive-by renames.
+22. Tests must be able to fail: never assert the mock, never test implementation details, never weaken or delete a failing test to go green.
+23. Before finishing: remove debug prints, unused imports, dead branches, and commented-out code.
+24. If you cannot explain why the code works, it is not done.
+
+<!-- slopmd:end -->

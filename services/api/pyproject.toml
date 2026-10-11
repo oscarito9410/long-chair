@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools==84.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "long-chair-api"
+version = "0.1.0"
+description = "Session kit API for Long Chair"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi==0.143.0",
+  "httpx==0.28.1",
+  "pydantic==2.14.0",
+  "uvicorn==0.54.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "mypy==2.4.0",
+  "pytest==9.1.1",
+  "pytest-asyncio==1.4.0",
+  "pytest-cov==7.1.0",
+  "ruff==0.17.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "--cov=app/domain --cov=app/application --cov-report=term-missing --cov-fail-under=85"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["app", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+strict = true
+packages = ["app"]
+python_version = "3.12"
+plugins = ["pydantic.mypy"]
+
+[tool.coverage.run]
+branch = true
+source = ["app/domain", "app/application"]

@@ -1,0 +1,100 @@
+{
+  "success": true,
+  "results": {
+    "entities": [
+      {
+        "name": "North Window",
+        "entity_id": "00000000-0000-4000-8000-000000000001",
+        "type": "urn:entity",
+        "subtype": "urn:entity:movie",
+        "x-long-chair-slug": "north-window",
+        "properties": {
+          "description": "A woman spends a summer repairing a greenhouse that was never hers.",
+          "duration": 108,
+          "image": {
+            "url": ""
+          },
+          "popularity": 0.5,
+          "tags": [
+            {
+              "id": "urn:tag:keyword:media:fictional_repair",
+              "name": "Repair",
+              "type": "urn:tag:keyword:media"
+            }
+          ],
+          "short_descriptions": [
+            {
+              "value": "A slow repair, told through weather and glass."
+            }
+          ],
+          "production_companies": ["Written and directed by Ellis Maren"]
+        },
+        "query": {
+          "explainability": {
+            "x-long-chair-confidence": "unconfirmed",
+            "warning": null,
+            "entities": [
+              {
+                "entity_id": "00000000-0000-4000-8000-000000000010",
+                "score": 0.8
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "Ward Clock",
+        "entity_id": "00000000-0000-4000-8000-000000000007",
+        "type": "urn:entity",
+        "subtype": "urn:entity:movie",
+        "x-long-chair-slug": "ward-clock",
+        "properties": {
+          "description": "A night shift where Illness is the whole plot.",
+          "duration": 90,
+          "image": {
+            "url": ""
+          },
+          "popularity": 0.5,
+          "tags": [
+            {
+              "id": "urn:tag:keyword:media:fictional_illness",
+              "name": "Illness",
+              "type": "urn:tag:keyword:media",
+              "x-long-chair-theme-id": "illness"
+            }
+          ],
+          "short_descriptions": [
+            {
+              "value": "A shift that should stay out of the room."
+            }
+          ],
+          "production_companies": ["A film by a fictional crew"]
+        },
+        "query": {
+          "explainability": {
+            "x-long-chair-confidence": "unconfirmed",
+            "warning": null,
+            "entities": [
+              {
+                "entity_id": "00000000-0000-4000-8000-000000000010",
+                "score": 0.8
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "query": {
+    "explainability": {
+      "x-long-chair-confidence": "unconfirmed",
+      "warning": null,
+      "entities": [
+        {
+          "entity_id": "00000000-0000-4000-8000-000000000010",
+          "score": 0.8
+        }
+      ]
+    }
+  }
+}

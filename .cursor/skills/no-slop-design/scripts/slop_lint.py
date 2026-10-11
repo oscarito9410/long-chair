@@ -1,0 +1,758 @@
+#!/usr/bin/env python3
+"""
+slop_lint.py — static scan for "AI slop" UI signatures in web + mobile source.
+
+Usage:
+  python3 slop_lint.py src/                       # scan a tree
+  python3 slop_lint.py index.html style.css       # specific files
+  python3 slop_lint.py src/ --json                # machine-readable
+  python3 slop_lint.py src/ --strict              # exit 1 on any HIGH finding
+
+Scans: .html .htm .css .scss .jsx .tsx .js .ts .vue .svelte .astro .mdx .dart .swift .kt .xml
+Heuristic by design: every hit is a question ("is this earned?"), not a verdict.
+Findings map to references/anti-slop.md sections so you can read the "why" and the fix.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import re
+import sys
+from collections import Counter, defaultdict
+
+EXTS = {".html", ".htm", ".css", ".scss", ".jsx", ".tsx", ".js", ".ts", ".vue", ".svelte", ".astro", ".mdx",
+        ".dart", ".swift", ".kt", ".xml"}
+SKIP_DIRS = {"node_modules", ".git", "dist", "build", ".next", ".nuxt", "out", "coverage", "vendor", ".dart_tool",
+             "Pods", "DerivedData", "__pycache__"}
+
+# (id, severity, regex, message, anti-slop section)
+RULES = [
+    # ---------------------------------------------------------------- color
+    ("purple-gradient", "HIGH",
+     r"(from-(violet|purple|indigo|fuchsia)-\d+|to-(violet|purple|indigo|fuchsia|pink)-\d+|"
+     r"linear-gradient\([^)]*#(7c3aed|8b5cf6|a855f7|6366f1|4f46e5|c084fc|d946ef|ec4899)|"
+     r"linear-gradient\([^)]*(violet|purple|indigo|fuchsia))",
+     "purple/indigo/violet gradient — the single most recognisable AI-UI tell", "§1 Color"),
+    ("gradient-text", "HIGH", r"bg-clip-text\s+text-transparent|text-transparent\s+bg-clip-text|-webkit-background-clip:\s*text",
+     "gradient text on headline", "§1 Color"),
+    ("glow-blob", "HIGH", r"blur-(2xl|3xl)|filter:\s*blur\((6|7|8|9)\d px\)|filter:\s*blur\(1\d\dpx\)",
+     "giant blurred glow blob / background orb", "§1 Color"),
+    # background context only: a token file that defines `--color-black: #000000` as a primitive is not a black page
+    ("neon-on-black", "MED", r"background(?:-color)?\s*:[^;{}]*(?:#0a0a0a|#000000\b|#000\b|#0b0b0f|#09090b|\bblack\b)|\bbg-black\b",
+     "pure black background — check it isn't the 'AI dark mode' with neon accents", "§1 Color"),
+    ("tailwind-default-primary", "MED", r"\b(bg|text|border|ring)-(blue|indigo|violet)-(500|600)\b",
+     "Tailwind default blue/indigo as brand color — define a real brand token", "§1 Color"),
+    # ---------------------------------------------------------------- typography
+    ("default-font", "HIGH", r"font-family:[^;]*\b(Inter|Roboto|Poppins|Open Sans|Montserrat|Lato)\b|"
+                             r"fonts\.googleapis\.com/css2?\?family=(Inter|Roboto|Poppins|Open\+Sans|Montserrat|Lato)\b|"
+                             r"GoogleFonts\.(inter|roboto|poppins|openSans|montserrat|lato)\(",
+     "default-reflex typeface (Inter/Roboto/Poppins/Open Sans/Montserrat/Lato) — choose on purpose, see typography.md", "§2 Typography"),
+    ("system-ui-primary", "MED", r"font-family:\s*(system-ui|-apple-system|ui-sans-serif)\b",
+     "system-ui as PRIMARY typeface (fine as fallback, and fine for native iOS/Android UI; a tell on the web)", "§2 Typography"),
+    ("startup-default-font", "MED", r"Space Grotesk|Space\+Grotesk|Plus Jakarta|Plus\+Jakarta|Sora\b|Outfit\b|Manrope\b|DM Sans|DM\+Sans",
+     "2023-2026 'startup default' typeface — only if the moodboard actually calls for it", "§2 Typography"),
+    ("tracking-widest-caps", "LOW", r"tracking-(wider|widest)\s+uppercase|uppercase\s+tracking-(wider|widest)",
+     "spaced uppercase eyebrow label — the 'FEATURES' eyebrow cliché", "§2 Typography"),
+    # ---------------------------------------------------------------- layout & components
+    ("three-col-grid", "MED", r"grid-cols-3\b|grid-template-columns:\s*repeat\(3,|md:grid-cols-3\b|lg:grid-cols-3\b",
+     "3-column grid — is it the icon+title+blurb feature grid?", "§3 Layout"),
+    ("icon-circle", "HIGH", r"(rounded-full|rounded-(xl|2xl))\s+[^\"']*bg-(\w+)-(50|100)|bg-(\w+)/10\s+[^\"']*rounded-(full|xl|2xl)|"
+                            r"\.icon-(wrap|box|circle)|w-1[02]\s+h-1[02]\s+[^\"']*rounded-(full|xl)",
+     "icon in a tinted circle/rounded square — SaaS starter template look", "§3 Layout"),
+    ("accent-left-border", "HIGH", r"border-l-(2|4|8)\s|border-left:\s*[2-6]px\s+solid",
+     "colored left border on card/quote", "§3 Layout"),
+    ("everything-centered", "LOW", r"text-center", "text-center (density check — count below)", "§3 Layout"),
+    ("uniform-radius", "LOW", r"rounded-(2xl|3xl)", "large radius (density check — is every element bubbly?)", "§3 Layout"),
+    ("glassmorphism", "MED", r"backdrop-blur(-\w+)?\s+[^\"']*bg-(white|black|\w+)/\d+|bg-(white|black|\w+)/\d+\s+[^\"']*backdrop-blur|"
+                             r"backdrop-filter:\s*blur",
+     "glass card (blur + translucent fill) — earned only over real imagery", "§4 Components"),
+    ("bento", "LOW", r"bento|col-span-2\s+row-span-2", "bento grid — the 2023 Apple-keynote homage", "§3 Layout"),
+    ("wavy-divider", "MED", r"<path[^>]*d=\"M0,\d+\s*C|wave-divider|shape-divider|clip-path:\s*ellipse",
+     "wavy SVG section divider", "§3 Layout"),
+    ("dashed-border-decor", "LOW", r"border-dashed", "dashed border decoration", "§4 Components"),
+    ("card-in-card", "LOW", r"shadow-(lg|xl|2xl)\s+[^\"']*rounded-(xl|2xl)\s+[^\"']*shadow-", "nested shadow cards", "§4 Components"),
+    ("badge-pill-new", "MED", r"rounded-full[^>]*>\s*(✨|🚀|New|NEW|Beta|Introducing)", "pill badge 'New ✨' above hero headline", "§4 Components"),
+    # ---------------------------------------------------------------- iconography / emoji
+    ("emoji-ui", "HIGH", r"[\U0001F300-\U0001FAFF✨⭐⚡✅✔❌❤]",
+     "emoji used as UI element / bullet / heading decoration", "§5 Iconography"),
+    ("sparkles-icon", "HIGH", r"<Sparkles\b|lucide-sparkles|IconSparkles|sparkles-icon|Icons\.auto_awesome|sparkles\b",
+     "the ✨ 'AI feature' sparkle icon", "§5 Iconography"),
+    ("rocket-icon", "MED", r"<Rocket\b|lucide-rocket|rocket_launch|IconRocket", "rocket icon", "§5 Iconography"),
+    # ---------------------------------------------------------------- copy
+    ("slop-copy", "HIGH",
+     r"\b(Unlock the power|Unleash|Supercharge|Elevate your|Seamless(ly)?|Effortless(ly)?|Revolutioni[sz]e|"
+     r"Take your \w+ to the next level|all-in-one (solution|platform)|Welcome to|Empower(ing)? (your|teams)|"
+     r"Built for the future|Next-generation|Cutting-edge|Game-chang(er|ing)|Say goodbye to|Say hello to|"
+     r"In today's fast-paced|Streamline your|Transform (the way|your)|Experience the|Discover the|Join thousands|"
+     r"Trusted by \d[\d,]*\+? (companies|teams|users)|Get started for free|Lightning[- ]fast|Blazing[- ]fast|"
+     r"Your (journey|success) starts here|Made with ❤|Powered by AI)\b",
+     "generic marketing copy — see content-microcopy.md banned list", "§6 Copy"),
+    ("lorem", "MED", r"lorem ipsum|Lorem Ipsum", "placeholder text", "§6 Copy"),
+    ("fake-social-proof", "MED", r"(Acme|Globex|Initech|Umbrella|Hooli|Stark Industries)\b|logo-cloud|trusted-by",
+     "placeholder logo cloud / fake social proof", "§6 Copy"),
+    # ---------------------------------------------------------------- motion
+    ("fade-up-everything", "LOW", r"animate-fade-in-up|fade-in-up|whileInView|data-aos=",
+     "scroll fade-up (density check — is every section doing it?)", "§7 Motion"),
+    ("transition-all", "MED", r"transition:\s*all\b|transition-all\b", "transition: all — list properties explicitly", "§7 Motion"),
+    ("outline-none", "HIGH", r"outline-none(?!\s+[^\"']*focus-visible)|outline:\s*none(?![^}]*focus-visible)",
+     "focus outline removed — must be replaced with focus-visible ring", "§9 Accessibility"),
+    ("hover-scale", "LOW", r"hover:scale-1\d\d|hover:-translate-y-[12]\b", "hover lift/scale on cards", "§7 Motion"),
+    ("marquee", "MED",
+     r"\bmarquee\b|animation:[^;]*\binfinite\b|<marquee|animate-\[?scroll|ticker__track|infinite-scroll",
+     "auto-scrolling marquee or infinite ticker — content that moves at rest cannot be read or clicked, and a "
+     "thematic story (\"they tour\", \"logos scroll\") is the usual dressing for it (anti-slop.md \u00a77)", "\u00a77 Motion"),
+    # ---------------------------------------------------------------- imagery / structure
+    ("stock-avatar", "MED", r"randomuser\.me|pravatar\.cc|i\.pravatar|unsplash\.com/photo-\w+.*(?:face|portrait|person)|placeholder\.com|placehold\.co",
+     "placeholder avatar/image service", "§8 Imagery"),
+    ("hero-3cards-testimonials", "LOW", r"id=\"(features|testimonials|pricing|faq|cta)\"",
+     "canonical section ids — is the page the hero→features→testimonials→pricing→CTA template?", "§3 Layout"),
+    ("shadcn-default-theme", "MED", r"--primary:\s*222\.2 47\.4% 11\.2%|--ring:\s*215 20\.2% 65\.1%|--radius:\s*0\.5rem;\s*\}",
+     "untouched shadcn/ui default theme values", "§1 Color"),
+    ("mobile-emoji-tab", "MED", r"(BottomNavigationBarItem|Tab\()[^)]*[\U0001F300-\U0001FAFF]", "emoji in mobile tab bar", "§5 Iconography"),
+    ("mobile-gradient-button", "MED", r"LinearGradient\([^)]*Colors\.(purple|deepPurple|indigo)|gradient:\s*LinearGradient",
+     "gradient-filled button (Flutter/SwiftUI)", "§4 Components"),
+    ("placeholder-box", "HIGH", r"\[(Photo|Image|Photograph|Illustration|Video|Hero image)[:\s][^\]]{0,160}\]",
+     "bracketed image caption in a box instead of a real or designed placeholder image (visual-material.md §8)", "§8 Imagery"),
+]
+
+# File-level rules: evaluated once per HTML document
+PHOTO_ANCHOR_WORDS = ("photo", "product", "video", "film", "footage")
+
+
+def declared(path: str, text: str, attr: str, pattern: str) -> str | None:
+    """A decision the direction wrote down: the data-nsd-* attribute on the page, else the nearest design/DESIGN.md
+    line matching `pattern`. Unfilled template text ({...}) counts as undeclared."""
+    m = re.search(attr + r"\s*=\s*[\"']([^\"']+)", text, re.I)
+    if m:
+        return m.group(1).strip().lower()
+    d = os.path.dirname(os.path.abspath(path))
+    for _ in range(3):
+        cand = os.path.join(d, "design", "DESIGN.md")
+        if os.path.exists(cand):
+            body = open(cand, encoding="utf-8", errors="ignore").read()
+            m = re.search(pattern, body, re.I)
+            if m and "{" not in m.group(1):
+                return m.group(1).strip().strip("*.").lower()
+            return None
+        d = os.path.dirname(d)
+    return None
+
+
+def declared_anchor(path: str, text: str) -> str | None:
+    return declared(path, text, "data-nsd-anchor", r"Anchor type:\**\s*([^\n]+)")
+
+
+def declared_surface(path: str, text: str) -> str | None:
+    return declared(path, text, "data-nsd-surface", r"Surface mode\**\s*(?:\|\s*|:\**\s*)([^\n|]+)")
+
+
+_STARTER: dict[str, str] | None = None
+
+
+def starter_scales() -> dict[str, str]:
+    """CSS custom properties the starter template defines for the structural scales, as build_tokens names them."""
+    global _STARTER
+    if _STARTER is None:
+        _STARTER = {}
+        p = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "templates", "tokens", "primitives.json")
+        try:
+            prim = json.load(open(p, encoding="utf-8"))
+        except (OSError, ValueError):
+            return _STARTER
+
+        def walk(node, path):
+            if isinstance(node, dict):
+                if "$value" in node and not isinstance(node["$value"], (dict, list)):
+                    _STARTER["--" + "-".join(path)] = str(node["$value"])
+                for k, v in node.items():
+                    if not k.startswith("$"):
+                        walk(v, path + [k])
+        for group in ("space", "radius", "size", "border", "duration"):
+            walk(prim.get(group, {}), [group])
+    return _STARTER
+
+
+def strip_regions(text: str, attr_pattern: str) -> str:
+    """Remove every element whose opening tag matches attr_pattern, with its content (nested same-name tags counted)."""
+    out, pos = [], 0
+    opener = re.compile(r"<([a-z][a-z0-9]*)\b[^>]*(?:" + attr_pattern + r")[^>]*>", re.I)
+    while True:
+        m = opener.search(text, pos)
+        if not m:
+            out.append(text[pos:])
+            return "".join(out)
+        out.append(text[pos:m.start()])
+        name, depth, i = m.group(1).lower(), 1, m.end()
+        tag = re.compile(rf"<(/?){name}\b[^>]*>", re.I)
+        while depth:
+            t = tag.search(text, i)
+            if not t:
+                i = len(text)
+                break
+            depth += -1 if t.group(1) else 1
+            i = t.end()
+        pos = i
+
+
+def declared_language(path: str, text: str) -> str | None:
+    """The BCP 47 primary subtag from 'Primary language:' in DESIGN.md (or data-nsd-language): 'az — Azerbaijani' → 'az'."""
+    value = declared(path, text, "data-nsd-language", r"Primary language\**\s*(?:\|\s*|:\**\s*)([^\n|]+)")
+    m = re.match(r"\s*([a-z]{2,3})(?:[-_][a-z0-9]{2,8})*\b", value or "", re.I)
+    return m.group(1).lower() if m else None
+
+
+LANGUAGE_AXES = ("surface", "chroma", "type", "density", "radius", "imagery", "layout", "motion", "controls")
+LANGUAGE_WORDS = {
+    "surface": ("light", "dark", "mixed"), "chroma": ("achromatic", "low", "saturated"),
+    "type": ("grotesk", "humanist", "serif", "slab", "mono", "condensed", "system"), "density": ("tight", "medium", "airy"),
+    "radius": ("square", "soft", "round", "pill"), "imagery": ("none", "product", "photo", "illustration", "type", "3d"),
+    "layout": ("centered", "left", "asymmetric", "grid"), "motion": ("none", "functional", "choreographed", "scene"),
+    "controls": ("hairline", "solid", "raw"),
+}
+
+
+def declared_design_language(path: str, text: str) -> dict[str, str] | None:
+    """The nine-axis design language the direction wrote (design-language.md §4): `data-nsd-design-language` on the
+    page, else the 'Design language:' line in design/DESIGN.md. None when absent or not from the vocabulary."""
+    value = declared(path, text, "data-nsd-design-language", r"Design language\**\s*(?:\|\s*|:\**\s*|\([^)]*\)\**:?\s*)\**\s*`?([a-z0-9;?-]+)")
+    parts = [p.strip() for p in (value or "").split(";")]
+    if len(parts) != len(LANGUAGE_AXES):
+        return None
+    prof = dict(zip(LANGUAGE_AXES, parts))
+    return prof if all(prof[a] == "?" or prof[a] in LANGUAGE_WORDS[a] for a in LANGUAGE_AXES) else None
+
+
+def market_evidence(path: str) -> bool:
+    """Whether DESIGN.md's 'Market:' line names measured competitors (two URLs, or a profile judged by eye)."""
+    d = os.path.dirname(os.path.abspath(path))
+    for _ in range(3):
+        cand = os.path.join(d, "design", "DESIGN.md")
+        if os.path.exists(cand):
+            body = open(cand, encoding="utf-8", errors="ignore").read()
+            m = re.search(r"^\W*Market\**\s*:\**\s*(.+)$", body, re.I | re.M)
+            line = m.group(1) if m else ""
+            return len(re.findall(r"https?://", line)) >= 2 or bool(re.search(r"by eye|shoot\.py --profile", line, re.I))
+        d = os.path.dirname(d)
+    return False
+
+
+def relaxed_rules(lang: dict[str, str] | None) -> set[str]:
+    """Rules that describe a genre's native devices, not its untouched defaults. A language written down with market
+    evidence makes them decisions: a centred hero in a developer tool, a three-column grid in a component library,
+    system type in a brutalist page, dense rows in documentation. What stays flagged in every language is the default
+    nobody chose: untouched theme values, the reflex typeface without a brand line, purple gradients, glow blobs."""
+    if not lang:
+        return set()
+    out: set[str] = set()
+    if lang["layout"] == "centered":
+        out |= {"everything-centered"}
+    if lang["layout"] == "grid" or lang["imagery"] == "product":
+        out |= {"three-col-grid", "bento"}
+    if lang["density"] == "tight":
+        out |= {"ledger-site", "ledger-hero", "tables-as-sections"}
+    if lang["type"] == "system":
+        out |= {"system-ui-primary"}
+    if lang["type"] == "mono":
+        out |= {"tracking-widest-caps"}
+    if lang["controls"] == "raw":
+        out |= {"dashed-border-decor"}
+    if lang["radius"] == "pill":
+        out |= {"uniform-radius"}
+    if lang["motion"] in ("choreographed", "scene"):
+        out |= {"fade-up-everything"}
+    return out
+
+
+def page_css(path: str, text: str) -> str:
+    """CSS only — <style> blocks plus linked local stylesheets. The HTML around them has no rules, and reading it as
+    CSS once made a whole document look like one selector."""
+    css = "\n".join(re.findall(r"<style[^>]*>(.*?)</style>", text, re.I | re.S))
+    hrefs = re.findall(r"<link[^>]+rel=[\"']?stylesheet[^>]*href=[\"']([^\"']+)", text, re.I)
+    hrefs += re.findall(r"<link[^>]+href=[\"']([^\"']+\.css)[\"'][^>]*rel=[\"']?stylesheet", text, re.I)
+    for href in hrefs:
+        local = os.path.join(os.path.dirname(os.path.abspath(path)), href.split("?")[0])
+        if not href.startswith(("http:", "https:", "//")) and os.path.exists(local):
+            css += "\n" + open(local, encoding="utf-8", errors="ignore").read()
+    return re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+
+
+def file_rules(path: str, text: str):
+    """Page-level checks. Only rendered documents can be judged for imagery: a .tsx page that composes
+    <Panel> and <Chart> components has no <img> in its own source and is not a text-only page."""
+    out = []
+    if not path.lower().endswith((".html", ".htm", ".astro")):
+        return out
+    base = os.path.basename(path).lower()
+    in_design = os.sep + "design" + os.sep in os.path.abspath(path)
+    is_page = re.search(r"<(main|section|header)\b", text, re.I) and len(text) > 3000
+    # review scaffolding left beside the product: a page that only frames another local page, or a screenshot folder
+    if not in_design and not is_page and re.search(r"<iframe\b[^>]*\bsrc=[\"'](?!https?:|//)[^\"']*\.html?\b", text, re.I):
+        out.append(("review-scaffolding", "MED", "a wrapper page that only frames another local page — screenshot "
+                                                 "scaffolding in the deliverable. Use scripts/shoot.py, which writes outside the "
+                                                 "project, and delete wrappers, shots/ folders and harness scripts before hand-off "
+                                                 "(review-checklist.md §1)", "§10 Process"))
+        return out
+    if not in_design and is_page:
+        for folder in ("shots", "screenshots", "frames", "harness"):
+            fp = os.path.join(os.path.dirname(os.path.abspath(path)), folder)
+            if os.path.isdir(fp) and any(f.lower().endswith((".png", ".jpg", ".py", ".js", ".html")) for f in os.listdir(fp)):
+                out.append(("review-scaffolding", "MED", f"'{folder}/' beside the page holds review captures or harness files — "
+                                                         "review evidence is not product; keep it outside the deliverable or in "
+                                                         "design/review/ (review-checklist.md §1)", "§10 Process"))
+                break
+    if any(k in base for k in ("moodboard", "review", "spec", "storybook", "handoff")) or "data-nsd-doc" in text:
+        return out  # working documents, not product pages
+    has_media = re.search(r"<(img|picture|video|canvas)\b|<svg[^>]*(viewBox=\"0 0 (?!2[04] 2[04])[^\"]+\"|width=\"(?!1[0-9]|2[0-9]|3[0-2])\d{3,})", text, re.I)
+    anchor = declared_anchor(path, text)
+    photographic = bool(anchor) and any(w in anchor for w in PHOTO_ANCHOR_WORDS)
+    non_photo = bool(anchor) and not photographic
+    if is_page and not has_media and not non_photo:
+        out.append(("no-imagery", "HIGH", "no visual anchor on the page and none declared — decide one in the direction "
+                                          "(photograph, type as image, colour field, diagram, illustration). If it is not an "
+                                          "image, write 'Anchor type:' in design/DESIGN.md or add data-nsd-anchor; do not add "
+                                          "photographs just to pass this (visual-material.md §1–2)", "§8 Imagery"))
+    dl_hero = re.search(r"<(header|section)[^>]*>(?:(?!</(header|section)>).){0,4000}<dl\b", text, re.I | re.S)
+    if dl_hero and not has_media and not non_photo:
+        out.append(("ledger-hero", "MED", "definition-list / fact table as the first-viewport composition with no visual anchor — the 'honest ledger' over-correction (anti-slop.md §8)", "§3 Layout"))
+
+    # the "ledger site": label/value rows as the layout device across the page
+    dl_count = len(re.findall(r"<dl\b", text, re.I))
+    rowish = len(re.findall(r'class="[^"]*\b(fact|facts|ledger|spec|specs|meta-row|label-value|kv|detail-row)\b', text, re.I))
+    if is_page and dl_count + rowish >= 3:
+        out.append(("ledger-site", "MED", f"label/value tables used as the layout device in {dl_count + rowish} places — vary the device per section; this is the skill's own tell (expression-register.md §10)", "§3 Layout"))
+
+    # the design record Standard mode promises: a run that skips the brief has no written reason for its decisions
+    d = os.path.dirname(os.path.abspath(path))
+    if is_page and not in_design and os.path.isdir(os.path.join(d, "design")) and base in ("index.html", "index.htm"):
+        need = ["design/brief.md", "design/DESIGN.md", "design/assets.md", "design/design-log.json",
+                "design/contrast-pairs.txt", "tokens/primitives.json", "tokens/semantic.json"]
+        missing = [n for n in need if not os.path.exists(os.path.join(d, n))]
+        if missing:
+            out.append(("design-record-incomplete", "MED", f"the design record is missing {', '.join(missing)} — Standard mode "
+                                                           "writes these (SKILL.md, project layout); the brief and contrast pairs "
+                                                           "are where the decisions and the AA evidence live", "§10 Process"))
+
+    # the design language: a page without one written down speaks the skill's own; one without market evidence was
+    # chosen from taste. Both are how ten industries came out 50% alike (design-language.md §1)
+    if is_page and not in_design and base in ("index.html", "index.htm") and os.path.isdir(os.path.join(d, "design")):
+        lang = declared_design_language(path, text)
+        if not lang:
+            out.append(("design-language-unrecorded", "MED", "no valid 'Design language:' line in design/DESIGN.md (nine words: "
+                                                             + ";".join(LANGUAGE_AXES) + ") — the page speaks the skill's own language "
+                                                             "unless the market's is measured and written down; run `shoot.py --profile "
+                                                             "<competitor urls>`, then `shoot.py index.html` and copy its 'language' line "
+                                                             "(design-language.md §3–4)", "§10 Process"))
+        elif not market_evidence(path):
+            out.append(("design-language-unmeasured", "LOW", "'Design language:' is written but no 'Market:' line names measured "
+                                                             "competitors (two URLs from `shoot.py --profile`, or 'by eye' with the "
+                                                             "pages looked at) — a language chosen from taste is the skill's, not the "
+                                                             "market's (design-language.md §3)", "§10 Process"))
+
+    # a departure from the market on the skeleton axes with no written reason: the 1.22 pages left their markets on
+    # layout in 7 of 10 cases, all toward the skill's own 'left', and none of the records said why
+    if is_page and not in_design and base in ("index.html", "index.htm") and os.path.isdir(os.path.join(d, "design")):
+        lang = declared_design_language(path, text)
+        design_md = os.path.join(d, "design", "DESIGN.md")
+        body = open(design_md, encoding="utf-8", errors="ignore").read() if os.path.exists(design_md) else ""
+        mk = re.search(r"^\W*Market\**\s*:\**\s*`?([a-z0-9;?-]+)", body, re.I | re.M)
+        market = mk.group(1).lower().split(";") if mk else None
+        if lang and market and len(market) == len(LANGUAGE_AXES):
+            dep = re.search(r"Departs on\**\s*:\**(.*?)(?:\n\s*\n|\n\*\*|\Z)", body, re.I | re.S)
+            written = (dep.group(1) if dep else "").lower()
+            unwritten = [ax for ax in ("layout", "controls", "type", "surface", "density", "motion") if lang[ax] != "?"
+                         and market[LANGUAGE_AXES.index(ax)] != "?" and lang[ax] != market[LANGUAGE_AXES.index(ax)]
+                         and not re.search(r"\b" + ax + r"\b", written)]
+            if unwritten:
+                out.append(("departure-unwritten", "MED", f"the design language leaves the market line on {', '.join(unwritten)} and "
+                                                          "'Departs on:' in DESIGN.md does not name that axis — a departure the brief did "
+                                                          "not buy is the skill's own habit (design-language.md §4–5); a market that "
+                                                          "moves ('scene') and a page that only transitions is such a departure", "§10 Process"))
+
+    # a convergence warning the run saw and neither acted on nor answered in writing
+    warn_file = os.path.join(d, "design", "convergence-warnings.json")
+    if is_page and not in_design and base in ("index.html", "index.htm") and os.path.exists(warn_file):
+        try:
+            warned = json.load(open(warn_file, encoding="utf-8")).get("warnings", [])
+        except (ValueError, OSError):
+            warned = []
+        design_md = os.path.join(d, "design", "DESIGN.md")
+        body = open(design_md, encoding="utf-8", errors="ignore").read() if os.path.exists(design_md) else ""
+        section = re.search(r"Convergence overrides(.*?)(?:\n#{1,3} |\Z)", body, re.I | re.S)
+        answered = section.group(1).lower() if section else ""
+        open_keys = sorted({w.split(":")[0].strip().lower() for w in warned
+                            if not re.search(r"^\s*[-*]\s*" + re.escape(w.split(':')[0].strip().lower()) + r"\b\s*:?.{12,}", answered, re.M)})
+        if open_keys:
+            out.append(("convergence-unanswered", "MED", f"design_log.py warned about {', '.join(open_keys)} and DESIGN.md has no "
+                                                         "line for it under 'Convergence overrides'. Change the direction and "
+                                                         "re-run plan, or write '- <warning>: <why it stays>' (SKILL.md "
+                                                         "non-negotiable 14)", "§10 Process"))
+
+    # the starter's own dialect: every run kept the template's radius, spacing, control, border and motion scales
+    # verbatim, so a restaurant, a ceramics shop and a law firm shared one set of buttons and one rhythm
+    tokens_css = os.path.join(d, "build", "tokens.css")
+    if is_page and not in_design and os.path.exists(tokens_css):
+        starter = starter_scales()
+        if starter:
+            css_vars = dict(re.findall(r"(--[a-z0-9-]+)\s*:\s*([^;]+);", open(tokens_css, encoding="utf-8", errors="ignore").read()))
+            present = [k for k in starter if k in css_vars]
+            same = [k for k in present if css_vars[k].strip().lower() == starter[k].lower()]
+            if len(present) >= 12 and len(same) / len(present) >= 0.75:
+                out.append(("starter-dialect", "MED", f"{len(same)} of {len(present)} structural token values (radius, spacing, "
+                                                      "control sizes, borders, motion) are the template's own — the page speaks "
+                                                      "the skill's dialect whatever its colour. Derive the radius family, spacing "
+                                                      "rhythm, control height, border weight and motion speed from the direction "
+                                                      "(design-tokens.md §2)", "§3 Layout"))
+
+    # a page that reads unfinished: bracketed placeholders across the main path, not just in the contact block. A 1.19
+    # restaurant left "[Restoranın təsviri: …]" under dolma and piti — dishes anyone can describe truthfully.
+    if is_page and not in_design:
+        main_text = strip_regions(re.sub(r"<(script|style)\b.*?</\1>", "", text, flags=re.I | re.S),
+                                  r"(?:class|id)=[\"'][^\"']*\b(?:footer|contact|address|visit|legal|imprint|find|location|hours|order-form)\b")
+        main_text = re.sub(r"<footer\b.*?</footer>", "", main_text, flags=re.I | re.S)
+        visible = re.sub(r"<[^>]+>", " ", main_text)
+        # short tokens are client-only facts ([price], [Studio name], [phone]) and belong in brackets; what reads
+        # unfinished is a bracket standing in for a sentence the designer could have written
+        brackets = [b for b in re.findall(r"\[[^\]\n<>]{3,160}\]", visible) if len(b) >= 30]
+        if len(brackets) > 3:
+            out.append(("placeholder-overload", "MED", f"{len(brackets)} sentence-length bracketed placeholders outside the contact and legal "
+                                                       f"blocks (e.g. {brackets[0][:50]}) — the page reads unfinished. Write "
+                                                       "what is common knowledge truthfully (what dolma is, how a firing works) "
+                                                       "and keep brackets for facts only the client has (content-microcopy.md §5)",
+                        "§6 Copy"))
+
+    # promises the client never made, presented as fact: a 1.17 shop told buyers every piece ships in a signed
+    # paulownia box, which the studio had not said
+    design_md = os.path.join(d, "design", "DESIGN.md")
+    if is_page and not in_design and os.path.exists(design_md):
+        body = open(design_md, encoding="utf-8", errors="ignore").read()
+        sec = re.search(r"Proposals to confirm\**:?(.*?)(?:\n\*\*[A-Z]|\n#{1,3} |\Z)", body, re.S)
+        items = [l for l in (sec.group(1).splitlines() if sec else []) if re.match(r"\s*[-*]\s+\S", l) and "{" not in l]
+        marked = len(re.findall(r"data-nsd-proposed", text, re.I))
+        if items and marked < len(items):
+            out.append(("proposal-unmarked", "MED", f"DESIGN.md lists {len(items)} proposal(s) the client has not confirmed, but "
+                                                    f"only {marked} element(s) on the page carry data-nsd-proposed — a service, "
+                                                    "policy, guarantee or option the brief never stated must read as a "
+                                                    "proposal on the page, not as fact (SKILL.md non-negotiable 10)", "§6 Copy"))
+
+    # a result the visitor cannot read: bracketed placeholders where the estimate should be
+    root = re.search(r"<(section|div|form|article|aside|main)\b[^>]*data-nsd-interaction[^>]*>", text, re.I)
+    if is_page and root:
+        end = text.find(f"</{root.group(1).lower()}>", root.end())
+        region = text[root.end():end if end > 0 else len(text)]
+        region += "".join(re.findall(r"<(?:output|[a-z]+[^>]*aria-live)[^>]*>.*?</(?:output|[a-z]+)>", text, re.I | re.S))
+        blanks = re.findall(r"\[(?:n|x|nn|xx|\?|price|qiymət|date|tarix|days|gün|amount|N)\]|\[\s*n\s*\]|—\s*₼|\?\?", region, re.I)
+        if blanks:
+            out.append(("placeholder-result", "MED", f"the signature interaction shows placeholders where its answer should be "
+                                                     f"({', '.join(sorted(set(blanks))[:3])}). A price or date the visitor cannot "
+                                                     "read answers nothing: use sample rates labelled as samples, and list the real "
+                                                     "rates as an open item (interaction-depth.md §7, Numbers)", "Interaction"))
+
+    # a persuasive page needs one signature interaction that performs the top job (interaction-depth.md)
+    if is_page and not re.search(r"data-nsd-interaction", text, re.I):
+        outside_forms = re.sub(r"<form\b.*?</form>", "", text, flags=re.I | re.S)
+        controls = re.search(r"<(button|input|select|textarea)\b|role=\"(slider|switch|tab|listbox|spinbutton)\"", outside_forms, re.I)
+        result = re.search(r"<output\b|aria-live\s*=", outside_forms, re.I)
+        if not (controls and result):
+            out.append(("no-signature-interaction", "LOW", "no signature interaction: nothing outside the contact form lets the visitor "
+                                                          "do the top job (price, availability, fit) and see a result. A language switch "
+                                                          "or an accordion does not count. If one exists, mark its root with "
+                                                          "data-nsd-interaction (interaction-depth.md §3)", "Interaction"))
+
+    # the interaction's result must stay on screen on a phone while inputs change (interaction-depth.md §7)
+    # the page speaks the market's language: <html lang> must exist and match the declared primary language
+    if is_page and re.search(r"<html\b", text, re.I):
+        lang_attr = re.search(r"<html\b[^>]*\blang\s*=\s*[\"']?([a-z]{2,3})", text, re.I)
+        want = declared_language(path, text)
+        if not lang_attr:
+            out.append(("page-language", "MED", "<html> has no lang attribute — screen readers, hyphenation and fonts guess "
+                                                "the language; set it to the market's primary language (discovery.md §3)", "§9 Accessibility"))
+        elif want and lang_attr.group(1).lower() != want:
+            out.append(("page-language", "MED", f"the page is lang=\"{lang_attr.group(1)}\" but DESIGN.md declares the primary "
+                                                f"language '{want}' — write the page in the market's language, or change the "
+                                                "declaration and write why (SKILL.md decision rules, Language)", "§6 Copy"))
+    css = page_css(path, text) if is_page else ""
+    if is_page and re.search(r"data-nsd-interaction", text, re.I):
+        # a sticky header does not show the result, and an element hidden by default is only shown conditionally —
+        # the 1.6 run's dock appeared after the result had scrolled past, i.e. never while the visitor was editing
+        persistent = False
+        # a result placed above the inputs in source order stays on screen while they change — no sticky element needed
+        iroot = re.search(r"<[a-z]+\b[^>]*data-nsd-interaction[^>]*>", text, re.I)
+        scope = text[iroot.end():] if iroot else text
+        first_result = re.search(r"<output\b|aria-live\s*=", scope, re.I)
+        first_input = re.search(r"<select\b|<textarea\b|<input\b(?![^>]*type\s*=\s*[\"']?(?:hidden|submit|button))", scope, re.I)
+        if first_result and first_input and first_result.start() < first_input.start():
+            persistent = True
+        # or directly after one or two controls, with no section or heading between: the whole question and its answer
+        # fit one phone screen (the 1.18 ceramics dates sat right under a single country select)
+        elif first_result and first_input:
+            between = scope[first_input.start():first_result.start()]
+            controls = len(re.findall(r"<select\b|<textarea\b|<input\b(?![^>]*type\s*=\s*[\"']?(?:hidden|submit|button))", between, re.I))
+            if controls <= 2 and len(between) < 2500 and not re.search(r"<(section|h2|h3|article)\b", between, re.I):
+                persistent = True
+        for rule in re.finditer(r"([^{}]+)\{[^{}]*position\s*:\s*(?:sticky|fixed)[^{}]*\}", css, re.I):
+            for sel in rule.group(1).split(","):
+                sel = sel.strip()
+                if not sel or re.search(r"header|nav|head\b|menu|skip|toast|cookie|banner", sel, re.I):
+                    continue
+                names = re.findall(r"[.#]([\w-]+)", sel)
+                if not names:
+                    persistent = True  # tag or attribute selector: cannot resolve statically, give it the benefit of the doubt
+                    continue
+                token = re.escape(names[-1])
+                tags = re.findall(r"<[a-z][^>]*(?:class=[\"'][^\"']*\b" + token + r"\b[^\"']*[\"']|id=[\"']" + token + r"[\"'])[^>]*>", text, re.I)
+                if any(not re.search(r"\shidden(\s|>|=|/)", t, re.I) for t in tags):
+                    persistent = True
+        if not persistent and not re.search(r"<dialog\b", text, re.I):
+            out.append(("interaction-result-offscreen", "LOW", "no result stays on screen while the visitor changes inputs: nothing sticky "
+                                                              "or fixed besides the header, or it is hidden until the result has scrolled past. "
+                                                              "On a phone the visitor edits and sees nothing change. Check at 375 px by changing "
+                                                              "the main input (interaction-depth.md §7, Mobile)", "Interaction"))
+
+    tables = len(re.findall(r"<table\b", text, re.I))
+    # a table that scrolls sideways on a phone with nothing showing that it does: the visitor never sees the last column
+    if is_page and tables and re.search(r"overflow(?:-x)?\s*:\s*(?:auto|scroll)", css, re.I):
+        cue = re.search(r"background(?:-attachment)?\s*:[^;{}]*\blocal\b|mask-image|scroll-(?:cue|hint|shadow)|edge-fade|"
+                        r"animation-timeline\s*:\s*scroll|scroll-timeline", css + text, re.I)
+        reflow = re.search(r"@media[^{]*\{(?:[^{}]*\{[^{}]*\})*?[^{}]*\b(?:table|thead|tbody|tr|td|th)\b[^{}]*\{[^{}]*display\s*:\s*(?:block|grid|flex)", css, re.I)
+        if not (cue or reflow or "data-nsd-scroll-cue" in text):
+            out.append(("table-scroll-no-cue", "LOW", "a table scrolls horizontally with no visible edge cue and no narrow "
+                                                      "reflow — on a phone the last columns look like they do not exist. Reflow "
+                                                      "rows to label–value pairs below ~480 px, or add scroll shadows "
+                                                      "(background-attachment: local) (components.md §8)", "§3 Layout"))
+    # the interaction answered the top job, and every other section became a spreadsheet
+    surface = declared_surface(path, text) or ""
+    persuasive = surface.startswith("persuade") or (not surface and re.search(r"data-nsd-interaction", text, re.I))
+    outside = text
+    root = re.search(r"<(section|div|form|article|aside)\b[^>]*data-nsd-interaction[^>]*>", text, re.I)
+    if root:  # tables drawn inside the interaction (a route, a result breakdown) are part of it, not page sections
+        end = text.find(f"</{root.group(1).lower()}>", root.end())
+        nested = len(re.findall(rf"<{root.group(1)}\b", text[root.end():end if end > 0 else len(text)], re.I))
+        for _ in range(nested):  # skip past same-name children so the cut ends at the root's own close tag
+            nxt = text.find(f"</{root.group(1).lower()}>", end + 1)
+            end = nxt if nxt > 0 else end
+        outside = text[:root.start()] + text[end if end > 0 else len(text):]
+    tables = len(re.findall(r"<table\b", outside, re.I))
+    if is_page and persuasive and tables >= 2:
+        out.append(("tables-as-sections", "MED", f"{tables} data tables on a persuasive page — beside the signature interaction "
+                                                  "the other sections turned into a spreadsheet. Keep one table (the price list or "
+                                                  "the no-JS fallback) and give the rest a different device: a diagram, a "
+                                                  "sequence, a worked example (interaction-depth.md §8, anti-slop.md §8)", "§3 Layout"))
+
+    # people shown as flat colour slabs: a portrait slot filled with a tinted box and a label is a grey box in brand colours
+    slabs = [m for m in re.finditer(r"<(div|span|figure)\b[^>]*class=[\"'][^\"']*\b(portrait|headshot|avatar|photo|team-photo)\b[^\"']*[\"'][^>]*>(.*?)</\1>",
+                                    text, re.I | re.S) if not re.search(r"<(img|picture|svg|video)\b", m.group(3), re.I)]
+    if is_page and slabs:
+        out.append(("people-placeholder-slab", "MED", f"{len(slabs)} portrait slot(s) filled with a flat colour box — a grey "
+                                                      "box in brand colours. Use a designed placeholder with a shot-list note "
+                                                      "(a cropped silhouette, an initial monogram set as type, or a licensed "
+                                                      "stand-in marked as such) (visual-material.md §8)", "§8 Imagery"))
+
+    # performance and provenance of the imagery that is there
+    imgs = re.findall(r"<img\b[^>]*>", text, re.I)
+    if imgs:
+        first = imgs[0]
+        if re.search(r'loading\s*=\s*["\']?lazy', first, re.I):
+            out.append(("lcp-lazy", "MED", "the first image on the page is loading=\"lazy\" — the LCP image must load eagerly "
+                                           "(web-frontend.md, performance as design)", "§8 Imagery"))
+        undim = [i for i in imgs if not (re.search(r"\bwidth\s*=", i, re.I) and re.search(r"\bheight\s*=", i, re.I))
+                 and not re.search(r"aspect-ratio", i, re.I)]
+        if undim:
+            out.append(("img-no-dimensions", "MED", f"{len(undim)} of {len(imgs)} images have no width/height or aspect-ratio — "
+                                                    "each one is a layout shift (CLS)", "§8 Imagery"))
+        # provenance: if the project keeps design/assets.md, every image must be recorded there
+        assets = None
+        d = os.path.dirname(os.path.abspath(path))
+        for _ in range(3):
+            cand = os.path.join(d, "design", "assets.md")
+            if os.path.exists(cand):
+                assets = open(cand, encoding="utf-8", errors="ignore").read()
+                break
+            d = os.path.dirname(d)
+        if assets:
+            srcs = [m.group(1) for i in imgs for m in [re.search(r'src\s*=\s*["\']([^"\']+)', i, re.I)] if m]
+            missing = [s for s in srcs if s.split("?")[0].rsplit("/", 1)[-1][:24] not in assets and s[:60] not in assets]
+            if missing:
+                out.append(("asset-unrecorded", "MED", f"{len(missing)} image(s) are not recorded in design/assets.md "
+                                                       f"(first: {missing[0][:60]}) — provenance, licence and the three-match note "
+                                                       "belong there before hand-off (visual-material.md §3b, §9)", "§8 Imagery"))
+
+    if is_page:
+        img_count = len(re.findall(r"<img\b|<picture\b|<video\b", text, re.I))
+        if photographic and 0 < img_count < 2 and len(text) > 12000:
+            out.append(("thin-imagery", "MED", f"the direction chose a photographic anchor ({anchor}) but this long page carries "
+                                               f"only {img_count} image — the page owes the imagery it promised, or the direction "
+                                               "should change (visual-material.md §1)", "§8 Imagery"))
+        content_imgs = [i for i in imgs if not re.search(r"\.svg\b|logo|avatar|icon|favicon", i, re.I)]
+        # photographs that are the content itself — dishes on a menu, pieces in a shop, rooms in a hotel — are not the
+        # anchor and do not contradict a diagram or type direction (a 1.16 restaurant was graded B for its menu photos)
+        catalog = strip_regions(text, r"(?:class|id)=[\"'][^\"']*\b(menu|dish(?:es)?|products?|shop|catalog(?:ue)?|gallery|"
+                                      r"items?|pieces?|rooms?|collection|batch|firing|work|portfolio)\b|data-nsd-content")
+        anchor_imgs = [i for i in re.findall(r"<img\b[^>]*>", catalog, re.I) if not re.search(r"\.svg\b|logo|avatar|icon|favicon", i, re.I)]
+        if non_photo and len(anchor_imgs) >= 3:
+            out.append(("images-contradict-direction", "MED", f"the direction chose '{anchor}' as the anchor, yet the page "
+                                                              f"carries {len(anchor_imgs)} photographs outside its menu, product or "
+                                                              "gallery sections — images the direction "
+                                                              "never asked for (anti-slop.md §5, photo-stuffing)", "§8 Imagery"))
+        sections = len(re.findall(r"<section\b", text, re.I))
+        if sections >= 4 and len(content_imgs) >= 6 and len(content_imgs) >= sections:
+            out.append(("photo-stuffing", "LOW", f"{len(content_imgs)} photographs across {sections} sections — an image in "
+                                                 "nearly every section; unless this is a gallery or catalogue, check each one "
+                                                 "earns its place (anti-slop.md §5)", "§8 Imagery"))
+    return out
+
+COMPILED = [(i, s, re.compile(p, re.IGNORECASE if i not in ("emoji-ui", "mobile-emoji-tab") else 0), m, sec) for i, s, p, m, sec in RULES]
+DENSITY_RULES = {  # id: (threshold per 100 lines, message)
+    "everything-centered": (2.5, "text-center density is high — centred layouts read as 'template'; left-align body/section copy"),
+    "uniform-radius": (2.0, "rounded-2xl/3xl density is high — establish a radius hierarchy (see spacing-layout.md)"),
+    "fade-up-everything": (1.0, "scroll-triggered fade on most sections — motion should be 2-3 intentional moments"),
+    "three-col-grid": (0.6, "many 3-col grids — layout is component-first, not composition-first"),
+}
+
+
+def iter_files(paths):
+    for p in paths:
+        if os.path.isfile(p):
+            yield p
+            continue
+        for root, dirs, files in os.walk(p):
+            dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
+            for f in files:
+                if os.path.splitext(f)[1].lower() in EXTS:
+                    yield os.path.join(root, f)
+
+
+REVEAL_HIDE = re.compile(r"\.(reveal|fade-?in|animate-?in|scroll-?reveal|gsap|aos)[^{]*\{[^}]*opacity:\s*0", re.I)
+REVEAL_SHOW = re.compile(r"\.(is-in|is-visible|in-view|revealed|is-revealed|aos-animate|active)\b", re.I)
+NOJS_GUARD = re.compile(r"<noscript|\.no-js\b|html\.js\b|documentElement\.classList\.add\(['\"]js", re.I)
+
+
+_MANDATED: dict[str, str] = {}
+
+
+def mandated_text(path: str) -> str:
+    """Lines of the nearest design/brief.md and DESIGN.md that record brand-fixed choices. Brief beats skill: a client
+    who asked to keep Inter should not have their page graded down for Inter (a 1.13 test got a B for exactly that)."""
+    d = os.path.dirname(os.path.abspath(path))
+    for _ in range(3):
+        if os.path.isdir(os.path.join(d, "design")):
+            break
+        d = os.path.dirname(d)
+    if d not in _MANDATED:
+        lines = []
+        for name in ("brief.md", "DESIGN.md"):
+            p = os.path.join(d, "design", name)
+            if os.path.exists(p):
+                lines += [l for l in open(p, encoding="utf-8", errors="ignore").read().splitlines()
+                          if re.search(r"\b(fixed|keep|kept|mandated|required by|client('s)? (brand|font)|brand (font|typeface|colour|color))\b", l, re.I)]
+        _MANDATED[d] = "\n".join(lines)
+    return _MANDATED[d]
+
+
+def scan(paths):
+    findings, counts, total_lines = [], Counter(), 0
+    reveal_hides, nojs_guard = [], False
+    for path in iter_files(paths):
+        try:
+            text = open(path, encoding="utf-8", errors="ignore").read()
+        except OSError:
+            continue
+        lines = text.splitlines()
+        total_lines += len(lines)
+        if REVEAL_HIDE.search(text) and REVEAL_SHOW.search(text):
+            reveal_hides.append(path)
+        if NOJS_GUARD.search(text):
+            nojs_guard = True
+        relaxed = relaxed_rules(declared_design_language(path, text)) if path.lower().endswith((".html", ".htm", ".css", ".astro", ".jsx", ".tsx", ".vue", ".svelte")) else set()
+        for rid, sev, msg, sec in file_rules(path, text):
+            if rid in relaxed:
+                continue
+            counts[rid] += 1
+            findings.append({"rule": rid, "severity": sev, "file": path, "line": 1, "section": sec, "message": msg, "snippet": ""})
+        is_native = path.endswith((".swift", ".kt", ".dart"))
+        for ln, line in enumerate(lines, 1):
+            if line.strip().startswith(("//", "#", "*", "/*")) and "font" not in line.lower():
+                continue
+            for rid, sev, rx, msg, sec in COMPILED:
+                if rid == "system-ui-primary" and is_native:
+                    continue
+                if rid in relaxed:
+                    continue
+                m = rx.search(line)
+                if m:
+                    if rid in ("default-font", "startup-default-font", "tailwind-default-primary"):
+                        face = re.search(r"Inter|Roboto|Poppins|Open[ +]Sans|Montserrat|Lato|Space[ +]Grotesk|Plus[ +]Jakarta|Sora|Outfit|Manrope|DM[ +]Sans",
+                                         m.group(0), re.I)
+                        if face and re.search(re.escape(face.group(0)).replace(r"\+", "[ +]").replace(r"\ ", "[ +]"),
+                                              mandated_text(path), re.I):
+                            continue  # the brand fixed this choice; brief beats skill
+                    counts[rid] += 1
+                    if rid in DENSITY_RULES:
+                        continue  # aggregated below
+                    findings.append({"rule": rid, "severity": sev, "file": path, "line": ln, "section": sec,
+                                     "message": msg, "snippet": line.strip()[:140]})
+    if reveal_hides and not nojs_guard:
+        counts["reveal-no-fallback"] += 1
+        findings.append({"rule": "reveal-no-fallback", "severity": "HIGH", "file": reveal_hides[0], "line": 0,
+                         "section": "§7 Motion",
+                         "message": "scroll-reveal styles hide content at rest (opacity: 0) with no no-JS fallback — "
+                                    "if the script fails the page is blank. Add a <noscript> reset or gate the hiding "
+                                    "behind a `js` class set by script (motion.md, anti-slop.md §7)",
+                         "snippet": ""})
+    for rid, (thr, msg) in DENSITY_RULES.items():
+        if total_lines and counts[rid] / max(total_lines, 1) * 100 >= thr:
+            findings.append({"rule": rid, "severity": "MED", "file": "(aggregate)", "line": 0,
+                             "section": dict((r[0], r[4]) for r in RULES)[rid],
+                             "message": f"{msg} ({counts[rid]} hits / {total_lines} lines)", "snippet": ""})
+    return findings, counts, total_lines
+
+
+def slop_score(findings, total_lines) -> tuple[str, int]:
+    """Grade distinct (rule, file) pairs. One choice repeated across six lines of CSS is one choice."""
+    weight = {"HIGH": 3, "MED": 1.5, "LOW": 0.5}
+    seen: dict[tuple[str, str], str] = {}
+    for f in findings:
+        seen.setdefault((f["rule"], f["file"]), f["severity"])
+    raw = sum(weight[s] for s in seen.values())
+    per_kloc = raw / max(total_lines / 1000, 0.25)
+    grade = "A" if per_kloc < 1 else "B" if per_kloc < 4 else "C" if per_kloc < 10 else "D" if per_kloc < 20 else "F"
+    return grade, round(per_kloc, 1)
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("paths", nargs="+")
+    ap.add_argument("--json", action="store_true")
+    ap.add_argument("--strict", action="store_true", help="exit 1 if any HIGH finding")
+    args = ap.parse_args()
+
+    findings, counts, total = scan(args.paths)
+    findings.sort(key=lambda f: ({"HIGH": 0, "MED": 1, "LOW": 2}[f["severity"]], f["file"], f["line"]))
+    grade, density = slop_score(findings, total)
+
+    if args.json:
+        print(json.dumps({"grade": grade, "weighted_per_kloc": density, "lines": total, "findings": findings}, indent=2))
+    else:
+        by_sev = defaultdict(list)
+        for f in findings:
+            by_sev[f["severity"]].append(f)
+        print(f"no-slop-design slop lint — {total} lines scanned\n")
+        for sev in ("HIGH", "MED", "LOW"):
+            if not by_sev[sev]:
+                continue
+            print(f"== {sev} ({len(by_sev[sev])})")
+            for f in by_sev[sev]:
+                loc = f"{f['file']}:{f['line']}" if f["line"] else f["file"]
+                print(f"  [{f['rule']}] {loc}\n      {f['message']}  ({f['section']})")
+                if f["snippet"]:
+                    print(f"      > {f['snippet']}")
+            print()
+        print(f"SLOP GRADE: {grade}   (weighted findings per 1k lines: {density})")
+        print("A = no tells · B = a few earned choices to confirm · C = template-flavoured · D/F = reads as generated")
+    if args.strict and any(f["severity"] == "HIGH" for f in findings):
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

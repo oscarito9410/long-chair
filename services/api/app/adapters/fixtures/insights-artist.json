@@ -1,0 +1,59 @@
+{
+  "success": true,
+  "results": {
+    "entities": [
+      {
+        "name": "Mira Solano at Cedar Hall",
+        "entity_id": "00000000-0000-4000-8000-000000000005",
+        "type": "urn:entity",
+        "subtype": "urn:entity:artist",
+        "x-long-chair-slug": "cedar-hall",
+        "properties": {
+          "description": "Nine songs and the sound of chairs. She talks once about the weather, then sings.",
+          "duration": 28,
+          "image": {
+            "url": ""
+          },
+          "popularity": 0.5,
+          "tags": [
+            {
+              "id": "urn:tag:keyword:media:fictional_repair",
+              "name": "Repair",
+              "type": "urn:tag:keyword:media"
+            }
+          ],
+          "short_descriptions": [
+            {
+              "value": "A small hall and a warm voice."
+            }
+          ],
+          "creator": "A live recording"
+        },
+        "query": {
+          "explainability": {
+            "x-long-chair-confidence": "unconfirmed",
+            "warning": null,
+            "entities": [
+              {
+                "entity_id": "00000000-0000-4000-8000-000000000013",
+                "score": 0.8
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "query": {
+    "explainability": {
+      "x-long-chair-confidence": "unconfirmed",
+      "warning": null,
+      "entities": [
+        {
+          "entity_id": "00000000-0000-4000-8000-000000000013",
+          "score": 0.8
+        }
+      ]
+    }
+  }
+}

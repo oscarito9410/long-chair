@@ -1,0 +1,192 @@
+openapi: 3.1.0
+info:
+  title: Long Chair session kit
+  version: 0.1.0
+  description: |
+    Our API, not Qloo's. This slice covers health, sessions, and the demo kit.
+    Errors use one body. Messages are English and safe to show.
+servers:
+  - url: https://api.example.invalid
+paths:
+  /v1/health:
+    get:
+      operationId: getHealth
+      summary: Liveness and which catalog mode is active
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Health"
+  /v1/demo/plan:
+    post:
+      operationId: planDemo
+      summary: The mixed four-hour demo. No name and no diagnosis.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmptyObject"
+      responses:
+        "200":
+          description: The demo kit
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionKit"
+        "422":
+          $ref: "#/components/responses/Error"
+  /v1/sessions:
+    post:
+      operationId: createSession
+      summary: Store a draft
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSession"
+      responses:
+        "201":
+          description: Session id
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [sessionId]
+                properties:
+                  sessionId:
+                    type: string
+        "422":
+          $ref: "#/components/responses/Error"
+  /v1/sessions/{sessionId}/plan:
+    post:
+      operationId: planSession
+      summary: Build the kit for a stored draft
+      parameters:
+        - in: path
+          name: sessionId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Kit
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionKit"
+        "404":
+          $ref: "#/components/responses/Error"
+        "422":
+          $ref: "#/components/responses/Error"
+components:
+  responses:
+    Error:
+      description: Refused or failed
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorBody"
+  schemas:
+    EmptyObject:
+      type: object
+      additionalProperties: false
+    ErrorBody:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+    Health:
+      type: object
+      required: [ok, qlooMode]
+      properties:
+        ok:
+          type: boolean
+        qlooMode:
+          type: string
+          enum: [fake, live, replay]
+    CreateSession:
+      type: object
+      additionalProperties: false
+      required: [draft]
+      properties:
+        draft:
+          $ref: "#/components/schemas/SessionDraft"
+        locality:
+          type: string
+          minLength: 1
+          maxLength: 80
+        weekday:
+          type: string
+          enum: [monday, tuesday, wednesday, thursday, friday, saturday, sunday]
+    SessionDraft:
+      type: object
+      additionalProperties: false
+      required: [seedIds, avoidIds, durationMinutes, companionId]
+      properties:
+        seedIds:
+          type: array
+          minItems: 1
+          items:
+            type: string
+        avoidIds:
+          type: array
+          items:
+            type: string
+        durationMinutes:
+          type: integer
+          enum: [60, 90, 120, 150, 180, 210, 240]
+        companionId:
+          type: string
+          minLength: 1
+    SessionKit:
+      type: object
+      required: [packed, items, topics, places, source]
+      properties:
+        packed:
+          type: object
+          required: [slots, filledMinutes, durationMinutes, openMinutes]
+          properties:
+            slots:
+              type: array
+              items:
+                type: object
+                required: [itemId, startMinute, endMinute]
+                properties:
+                  itemId:
+                    type: string
+                  startMinute:
+                    type: integer
+                  endMinute:
+                    type: integer
+            filledMinutes:
+              type: integer
+            durationMinutes:
+              type: integer
+            openMinutes:
+              type: integer
+        items:
+          type: array
+          items:
+            type: object
+        topics:
+          type: array
+          items:
+            type: object
+        places:
+          type: array
+          items:
+            type: object
+        source:
+          type: string
+          enum: [fake, live, replay]

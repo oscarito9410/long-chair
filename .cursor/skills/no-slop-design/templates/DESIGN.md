@@ -1,0 +1,221 @@
+# {Product} Design System — DESIGN.md
+
+> The single source of truth for how {Product} looks, feels, and behaves. Lives at the repo root (or `/design`).
+> Any agent or human designing for {Product} loads this first. If something is not decided here, decide it here
+> before using it in a screen. Raw values live in `tokens/*.json` (DTCG); this document explains **why**.
+
+## 0. Status
+
+| Field | Value |
+|---|---|
+| Version | 0.1.0 |
+| Owner | |
+| Last reviewed | {date} |
+| Applies to | {web app · marketing · iOS · Android · Flutter} |
+| Market & audience | {country/region · language(s) & script · local conventions honoured} |
+| Primary language | {BCP 47 code, e.g. az — the page's `<html lang>`; if not the market's language, why} |
+| Surface mode | {Persuade · Operate · Read · Play} |
+| **Expression register** | {R1 Utility · R2 Composed · R3 Expressive · R4 Experimental} — because {decision type + category norm + asset budget} |
+| **Interaction depth** | {I1 Static · I2 Functional · I3 Demonstrative · I4 Immersive} — because {top job + whether its answer depends on the visitor's inputs} |
+| **Design language** | {surface;chroma;type;density;radius;imagery;layout;motion;controls — nine words from `design-language.md` §2} — from the market line below, departing on {axes, or none} |
+| Mode | {Standard · Deep} |
+| Token source | `tokens/primitives.json`, `tokens/semantic.json`, `tokens/semantic.dark.json`, `tokens/components.json` |
+| Build | `python3 scripts/build_tokens.py tokens/*.json --out build/` |
+
+## 1. Foundations of intent
+
+**The memorable thing:** {one sentence}
+
+**Attributes / anti-attributes:**
+
+| We are | We are not | Visual consequence |
+|---|---|---|
+| | | |
+| | | |
+| | | |
+
+**Direction: "{Two-word name}"** — {visual thesis in one sentence: typography discipline of X × colour world of Y × density of Z}.
+
+*Standard mode records the direction here; Deep mode also builds `design/moodboard.html`.*
+
+**Design language** (`design-language.md` §4): {nine words, e.g. light;low;serif;airy;square;photo;left;functional;hairline}
+Market: {the `market` line from `python3 scripts/shoot.py --profile <urls>`} — from {n} pages: {url} {url} {url} {url} {or: by eye: urls}
+Splits: {axes where the competitors disagree, from the `split` lines — free choices}
+Departs on: {axis (word) — the brief's reason} · {axis (word) — reason} {or: none — the category is not saturated}
+Market opening: {the `opening` line from `shoot.py --profile`: heading;panel;image} · Opening: {this page's, from `shoot.py`; if it differs, why}
+Nearest calibration point: {§6 name, or "none of the six"}. Measured after the build: {shoot.py `language` line; matches / differs on … because …}
+
+**References** (≥ 5; ≥ 2 from the audience's market; ≥ 30% non-UI; each with what was taken):
+
+| # | Source (URL) | Type | Taken | Serves |
+|---|---|---|---|---|
+| R1 | | | | |
+| R2 | | | | |
+| R3 | | | | |
+| R4 | | | | |
+| R5 | | | | |
+
+**Alternative considered — "{name}" ({one register away})**: {five lines: what changes, what it costs, why it was
+not chosen}. Recorded so the ambition can be traded without redoing the research.
+
+**Imagery art direction** (drives `design/assets.md` and the shot list): subject {…} · people {none / hands only /
+candid} · light {…} · treatment {…} · crop {…} · ratios {hero 3:2, portrait 4:5, detail 1:1} · banned {…}.
+Anchor type: {full-bleed photograph · product-first · type as image · colour field · diagram · illustration · video · scene}.
+Photographs needed: {yes, n — because … · no — the anchor is …}. `slop_lint.py` reads the `Anchor type:` line.
+
+**Register techniques used** (from `expression-register.md` §7, anything off-row justified): {…}
+
+**Signature interaction** (`interaction-depth.md` §3, §5): {what the visitor does} → {the result they see} → {where the
+result carries}. Declared on the page as `data-nsd-interaction="{type}"`. Without JavaScript: {the static equivalent}.
+Result form: {figure · diagram · calendar · map · card · list · table · media · paper} — because {what the answer is}.
+
+**Proposals to confirm** (every service, policy, guarantee, packaging or delivery option the brief did not state; each
+is marked `data-nsd-proposed` on the page):
+- {proposal} — {why it helps the top job} — {who must confirm}
+
+**Convergence overrides** (one line per warning in `design/convergence-warnings.json` that this direction keeps;
+a warning acted on needs no line — re-run `design_log.py plan … --record` after changing the direction):
+- {warning key, e.g. composition}: {why this page keeps it, in terms of this content — not "deliberate"}
+Placed: {section n of m, and why there}. The page ends on: {this business's next real step}.
+
+**Design principles (max 5, each with a tie-breaker rule):**
+1. *{Principle}* — when in conflict with {other}, {this} wins because {…}.
+2. …
+
+## 2. Color
+
+**Model:** OKLCH primitives → semantic roles → component tokens. Never use a primitive in UI code.
+
+### Primitive scales
+| Scale | Hue (°) | Steps | Notes |
+|---|---|---|---|
+| neutral | {e.g. 70 (warm)} | 0–1000 in 50s | tinted toward brand hue, chroma {0.004–0.012} |
+| brand | | | |
+| accent | | | |
+| status: success / warning / danger / info | | | hue-locked, chroma matched to brand |
+
+### Semantic roles (light · dark)
+| Role | Light | Dark | Use |
+|---|---|---|---|
+| `surface.base` | | | page background |
+| `surface.raised` | | | cards that are interactive, sheets |
+| `surface.sunken` | | | wells, inputs on raised |
+| `surface.overlay` | | | menus, popovers |
+| `text.primary` | | | |
+| `text.secondary` | | | |
+| `text.tertiary` | | | metadata; still ≥ 4.5:1 |
+| `text.on-action` | | | |
+| `text.link` | | | visited differs |
+| `border.subtle` / `border.strong` | | | |
+| `action.primary` / `-hover` / `-pressed` | | | |
+| `focus` | | | 3:1 vs adjacent, 2px ring |
+| `status.*` + `status.*-surface` + `status.*-text` | | | |
+
+**Dark mode rules:** elevation by lightness step (not shadow), text off-white `{L≈0.93}`, accent chroma −10–20%, no pure black, images dimmed 10%.
+
+**Contrast policy:** WCAG 2.2 AA everywhere; APCA Lc ≥ 75 body, ≥ 60 secondary, ≥ 45 large/UI. Verified with `scripts/contrast.py --pairs design/contrast-pairs.txt`.
+
+## 3. Typography
+
+| Role | Family | Why this face (one sentence, tied to attributes) | Weights loaded |
+|---|---|---|---|
+| Display | | | |
+| Text / UI | | | |
+| Mono (if any) | | | |
+
+**Scale:** {ratio min→max}, fluid via `clamp()` (`scripts/type_scale.py --min-base … --max-base …`).
+
+| Token | Size (min→max) | Line-height | Tracking | Use |
+|---|---|---|---|---|
+| `text.display` | | 1.0–1.05 | −0.03em | hero, one per page |
+| `text.h1` … `text.h4` | | | | |
+| `text.body-lg` / `text.body` / `text.body-sm` | | 1.5–1.6 | 0 | |
+| `text.label` / `text.caption` | | 1.3–1.4 | 0 / +0.01em | ≥ 12px |
+
+**Rules:** measure 45–75ch; `text-wrap: balance` on headings, `pretty` on paragraphs; `tabular-nums` for numbers; real quotes and ellipsis; never letter-space lowercase; never fake bold/italic.
+
+**Script coverage:** {Latin ext · Cyrillic · Arabic · …} — fallback chain per script: {…}
+
+## 4. Spacing, sizing, layout
+
+- Base unit **4px**; scale `space.0–space.24` = 0, 2, 4, 6, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96, 128.
+- Density modes: {comfortable (default) · compact} — how they map.
+- Layout grid: {12-col, gutter `space.6`, margin `space.6`→`space.12`}; max content width {…}; reading width {65–72ch}.
+- Breakpoints: {360 · 600 · 905 · 1240 · 1440} (content-driven, name them by layout change, not device).
+- Radius hierarchy: `radius.none 0 · radius.control 6 · radius.card 12 · radius.sheet 20 · radius.pill 999` — nested inner = outer − padding.
+- Elevation: `shadow.raised` / `shadow.overlay` / `shadow.modal` — {light: shadow; dark: lightness step}.
+- Control heights: 32 / 40 / 48; icon sizes 16 / 20 / 24; touch targets ≥ 44 (iOS) / 48 (Android).
+
+## 5. Motion
+
+| Token | Value | Use |
+|---|---|---|
+| `duration.instant` | 80ms | press feedback |
+| `duration.fast` | 120–150ms | hover, toggles |
+| `duration.base` | 200–250ms | reveal, menus |
+| `duration.slow` | 300–400ms | sheets, page-level |
+| `ease.standard` | cubic-bezier(0.2, 0, 0, 1) | most things |
+| `ease.decelerate` | cubic-bezier(0, 0, 0, 1) | entering |
+| `ease.accelerate` | cubic-bezier(0.3, 0, 1, 1) | exiting |
+
+Motion principles: {2–3 signature moments named here}; everything else is functional. `prefers-reduced-motion` → {what remains}.
+
+## 6. Iconography & imagery
+
+- Icon set: {name, stroke weight, optical sizes}; custom icons follow {grid}. Never emoji as icons.
+- Illustration / photo direction: {style, color treatment, subjects, what's banned}.
+- Empty states, error states: {illustration or typographic? decide once}.
+
+## 7. Components (index)
+
+| Component | Spec | Status |
+|---|---|---|
+| Button | `components/button.md` | ✅ |
+| Input / Select / Checkbox / Radio / Switch | | |
+| Card (only when the card IS the interaction) | | |
+| Navigation (top / side / tab bar) | | |
+| Table / List / Data row | | |
+| Dialog / Sheet / Popover / Toast | | |
+| Empty state / Error state / Skeleton | | |
+
+## 8. Voice & microcopy
+
+Tone in three words: {…}. Sentence case. Verb-first buttons. Errors say what happened + what to do. See `references/content-microcopy.md` banned list; project-specific bans: {…}
+
+## 9. Platform notes
+
+- **Web:** CSS custom properties from `build/tokens.css`; Tailwind v4 `@theme` from `build/theme.css`; `color-scheme` set; focus rings; `env(safe-area-inset-*)`.
+- **iOS:** SF Pro / SF Rounded unless brand face has Dynamic Type sizing; 44pt targets; native navigation; materials only where HIG intends.
+- **Android:** Material 3 shape/type scales mapped from tokens; 48dp targets; predictive back; dynamic color {on/off}.
+
+## 10. Never list (project-specific slop)
+
+- {e.g. no gradient buttons}
+- {e.g. no icon-in-circle feature rows}
+- …
+
+## 11. Review of record
+
+Ten lines from the review gate (`review-checklist.md`); Deep mode writes the full report to `design/review-{date}.md`.
+
+| Gate | Grade | One line |
+|---|---|---|
+| 1 Brief & register honoured | | |
+| 3 Hierarchy & composition | | |
+| 5 Colour & contrast | | |
+| 6 Spacing, layout, responsive | | |
+| 10 Accessibility (incl. JS-disabled pass) | | |
+| 13 Slop & originality | | |
+
+Scripts: `slop_lint.py` {grade} · `contrast.py --tokens` {exit} · `build_tokens.py --check` {warnings} ·
+`design_log.py check` {convergence warnings, and which axes this direction broke} ·
+`shoot.py --set {input=value}` {375 editing result visible / not; scroll containers and their cue; dark share}.
+Anchor at full weight in the first viewport: {where}. Previous run compared: {none · link — more / less expressive, why}.
+Budget: {mode} target {n} min, actual {n} min; {what was cut, or what overran and why}.
+Studio test: {would a studio sign it; what they would change first}. Open items: {…}.
+
+## 12. Changelog
+
+| Version | Date | Change |
+|---|---|---|
+| 0.1.0 | | initial |

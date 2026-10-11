@@ -1,0 +1,37 @@
+{
+  "success": true,
+  "results": {
+    "tags": [
+      {
+        "id": "urn:tag:keyword:media:fictional_illness",
+        "name": "Illness",
+        "type": "urn:tag:keyword:media",
+        "x-long-chair-theme-id": "illness"
+      },
+      {
+        "id": "urn:tag:keyword:media:fictional_hospitals",
+        "name": "Hospitals",
+        "type": "urn:tag:keyword:media",
+        "x-long-chair-theme-id": "hospitals"
+      },
+      {
+        "id": "urn:tag:keyword:media:fictional_cancer",
+        "name": "Cancer",
+        "type": "urn:tag:keyword:media",
+        "x-long-chair-theme-id": "cancer"
+      },
+      {
+        "id": "urn:tag:keyword:media:fictional_parent_death",
+        "name": "Death of a parent",
+        "type": "urn:tag:keyword:media",
+        "x-long-chair-theme-id": "parent-death"
+      },
+      {
+        "id": "urn:tag:keyword:media:fictional_grief",
+        "name": "Grief",
+        "type": "urn:tag:keyword:media",
+        "x-long-chair-theme-id": "grief"
+      }
+    ]
+  }
+}

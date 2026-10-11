@@ -1,6 +1,6 @@
 # Long Chair architecture
 
-Status: decided, not implemented. The running app in this repo is still the static prototype. This document is the plan for the hackathon build. Adapter details live in [qloo-port.md](qloo-port.md). The choices that were close are the ADRs in `docs/adr/`. The calendar is [the roadmap](../plan/ROADMAP.md).
+Status: the session-kit API is implemented behind `FakeQlooAdapter`. The Vite screens still use the in-memory sample shelf and are not wired to `/v1`. Adapter details live in [qloo-port.md](qloo-port.md). The choices that were close are the ADRs in `docs/adr/`. The calendar is [the roadmap](../plan/ROADMAP.md).
 
 Deadline: 30 October 2026, 21:45 America/Mexico_City. The hosted demo has to keep working after the hackathon key is turned off, through judging. Nothing returned by Qloo is committed to this public repo.
 
@@ -12,14 +12,14 @@ The prototype already shows that story. The hackathon build replaces the fiction
 
 ## Decisions
 
-| Topic          | Choice                                                            | Where                                      |
-| -------------- | ----------------------------------------------------------------- | ------------------------------------------ |
-| Backend        | Python, FastAPI                                                   | [ADR 0001](../adr/0001-backend-fastapi.md) |
-| Language model | Optional, prose only, off by default                              | [ADR 0002](../adr/0002-llm-optional.md)    |
-| Hosting        | Static web app plus a small always-on API with a private disk     | [ADR 0003](../adr/0003-hosting.md)         |
-| Repo layout    | Monorepo. The prototype stays at the root until the API milestone | [ADR 0004](../adr/0004-monorepo.md)        |
-| Clients        | Flutter for iOS, Android, and the hosted web build                | [ADR 0006](../adr/0006-flutter-client.md)  |
-| Qloo access    | `QlooPort`, three adapters, shared contract tests                 | [qloo-port.md](qloo-port.md)               |
+| Topic          | Choice                                                        | Where                                            |
+| -------------- | ------------------------------------------------------------- | ------------------------------------------------ |
+| Backend        | Python, FastAPI                                               | [ADR 0001](../adr/0001-backend-fastapi.md)       |
+| Language model | Optional, prose only, off by default                          | [ADR 0002](../adr/0002-llm-optional.md)          |
+| Hosting        | Static web app plus a small always-on API with a private disk | [ADR 0003](../adr/0003-hosting.md)               |
+| Repo layout    | Monorepo. Vite app at the root, API in `services/api`         | [ADR 0004](../adr/0004-monorepo.md)              |
+| Client         | Responsive web app. Swift is post-hackathon only              | [ADR 0007](../adr/0007-responsive-web-client.md) |
+| Qloo access    | `QlooPort`, three adapters, shared contract tests             | [qloo-port.md](qloo-port.md)                     |
 
 ## System context
 
@@ -27,8 +27,8 @@ The prototype already shows that story. The hackathon build replaces the fiction
 C4Context
 title Long Chair, system context
 
-Person(visitor, "Visitor", "Plans a chair in the iOS app, the Android app, or the hosted site")
-Person(judge, "Judge", "Uses the hosted site, a TestFlight link, or the APK")
+Person(visitor, "Visitor", "Plans a chair in the responsive web app")
+Person(judge, "Judge", "Opens the hosted site. No install")
 System(longchair, "Long Chair", "Resolves tastes, excludes themes, packs a session, plans company")
 System_Ext(qloo, "Qloo hackathon API", "Search, tags, and insights. Key lives only on our server")
 System_Ext(llm, "Optional chat model", "Rewrites explanations. The product works with this absent")
@@ -49,7 +49,7 @@ title Long Chair, containers
 
 Person(visitor, "Visitor")
 
-Container(client, "Client", "Flutter", "One codebase: iOS, Android, and the web build. Calls our API only")
+Container(client, "Web app", "React, Vite, TypeScript", "Phone, tablet, and desktop. Calls our API only")
 Container(api, "Session API", "Python, FastAPI", "Pipeline, packing, privacy boundary, demo cache")
 ContainerDb(cache, "Demo cache", "Private volume, gitignored", "Recorded Qloo responses for replay. Not in git")
 Container_Ext(qloo, "Qloo", "hackathon.api.qloo.com", "Taste graph")
@@ -444,4 +444,4 @@ OpenTelemetry is optional and off unless `OTEL_EXPORTER_OTLP_ENDPOINT` is set. T
 
 ## What this repo holds today
 
-The Vite app, the fictional shelf, and these documents. The next code change, when someone asks for it, adds `services/api` and wires the port. It does not move Qloo JSON into `src/data/`.
+The Vite app and the fictional shelf in `src/`. The session-kit slice in `services/api`: domain, `BuildSessionKit`, `QlooPort`, `FakeQlooAdapter`, `HttpQlooAdapter`, `RecordingQlooAdapter`, and `/v1` routes. Screens are not wired to that API yet. Qloo JSON stays in the adapter fixtures, not in `src/data/`.

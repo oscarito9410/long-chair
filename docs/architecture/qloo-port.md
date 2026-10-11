@@ -2,14 +2,14 @@
 
 The pipeline depends on one interface, `QlooPort`. Three adapters implement it. A shared mapper and a shared JSON schema sit beside them, so the fake and the live client cannot drift.
 
-This is a specification. There is no Python package in the repo yet.
+The package is `services/api`. `FakeQlooAdapter` is the default. `HttpQlooAdapter` talks to the hackathon host. `RecordingQlooAdapter` records and replays through a cache. Fictional fixtures live under `services/api/app/adapters/fixtures/`.
 
 ## Shape
 
 ```text
 pipeline  -->  QlooPort  -->  HttpQlooAdapter ----> hackathon.api.qloo.com
                       \-->  FakeQlooAdapter ----> committed fictional fixtures
-                      \-->  RecordingAdapter --> HttpQlooAdapter
+                      \-->  RecordingQlooAdapter --> HttpQlooAdapter
                                          \--> gitignored local cache
 ```
 

@@ -1,0 +1,91 @@
+{
+  "success": true,
+  "results": {
+    "entities": [
+      {
+        "name": "The Paper Kite",
+        "entity_id": "00000000-0000-4000-8000-000000000010",
+        "type": "urn:entity",
+        "subtype": "urn:entity:movie",
+        "properties": {
+          "description": "A slow road film about a repair",
+          "short_descriptions": [
+            {
+              "value": "A slow road film about a repair"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Harbor Lights",
+        "entity_id": "00000000-0000-4000-8000-000000000011",
+        "type": "urn:entity",
+        "subtype": "urn:entity:tv_show",
+        "properties": {
+          "description": "A coastal mystery, told quietly",
+          "short_descriptions": [
+            {
+              "value": "A coastal mystery, told quietly"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Slow Kitchen Radio",
+        "entity_id": "00000000-0000-4000-8000-000000000012",
+        "type": "urn:entity",
+        "subtype": "urn:entity:podcast",
+        "properties": {
+          "description": "One recipe, and no rush",
+          "short_descriptions": [
+            {
+              "value": "One recipe, and no rush"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Mira Solano",
+        "entity_id": "00000000-0000-4000-8000-000000000013",
+        "type": "urn:entity",
+        "subtype": "urn:entity:artist",
+        "properties": {
+          "description": "Warm vocal jazz in small rooms",
+          "short_descriptions": [
+            {
+              "value": "Warm vocal jazz in small rooms"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Salt and Windowlight",
+        "entity_id": "00000000-0000-4000-8000-000000000014",
+        "type": "urn:entity",
+        "subtype": "urn:entity:book",
+        "properties": {
+          "description": "Essays on kitchens and weather",
+          "short_descriptions": [
+            {
+              "value": "Essays on kitchens and weather"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Sunday Engines",
+        "entity_id": "00000000-0000-4000-8000-000000000015",
+        "type": "urn:entity",
+        "subtype": "urn:entity:movie",
+        "properties": {
+          "description": "A gentle film about small trains",
+          "short_descriptions": [
+            {
+              "value": "A gentle film about small trains"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

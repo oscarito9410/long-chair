@@ -6,7 +6,7 @@ A calm session kit for the hours people already spend in an infusion or dialysis
 
 Someone names a few films, shows, books, podcasts, or records, how long the chair is, and which themes should stay out of the room (illness, hospitals, cancer, the death of a parent, grief). Long Chair turns that into a timeline that fits the visit, says why each piece was kept, and prepares a small plan for the person sitting alongside: things to talk about, and places to eat that are open nearby.
 
-This repository is a **static design prototype** for the [Qloo Agentic Hackathon](https://qloo.devpost.com/). It is here to validate the idea and iterate on the interface. It is not the hackathon submission build.
+This repository is the [Qloo Agentic Hackathon](https://qloo.devpost.com/) build: a responsive web app and a small session API. The screens are still the clickable prototype. They do not call the API yet.
 
 ## Scope
 
@@ -19,9 +19,10 @@ This repository is a **static design prototype** for the [Qloo Agentic Hackathon
 
 **This prototype is not:**
 
-- A backend. There is no FastAPI server, no database, and no account.
-- A Qloo client. Nothing calls `https://hackathon.api.qloo.com`. There is no `QLOO_API_KEY`.
-- A language-model feature. Explanations are written into the sample shelf.
+- Wired to the API. `services/api` is a FastAPI session kit with a fake Qloo adapter. The screens still pack the in-memory shelf.
+- A database or an account.
+- A Qloo client in the browser. Nothing in `src/` calls `https://hackathon.api.qloo.com`. There is no `QLOO_API_KEY` in the web app.
+- A language-model feature on screen. Explanations in the sample shelf are written in. The API can keep the template when no model is configured.
 - Medical software. It does not collect names, diagnoses, or any health information, and it does not give advice.
 - A store of real Qloo responses. Hackathon rules forbid publishing Qloo data in a public repo. Every title on the Long Chair shelf is fictional. The comparison screen names _The Fault in Our Stars_ only as the familiar example of what an unfiltered model often reaches for. No text from that work is included.
 
@@ -52,6 +53,7 @@ The five illustrated steps are the agent this product will run once a key exists
 ## Project structure
 
 ```
+services/api/     FastAPI session kit. Domain, use cases, ports, adapters.
 src/
   components/     UI. One component per file.
     art/          Characters, generated covers, and the stamp.
@@ -86,17 +88,43 @@ The dev server is [http://127.0.0.1:4179](http://127.0.0.1:4179).
 
 Other scripts:
 
-| Script                 | What it does                          |
-| ---------------------- | ------------------------------------- |
-| `npm run dev`          | Vite on port 4179.                    |
-| `npm run build`        | Typecheck and write a static `dist/`. |
-| `npm run preview`      | Serve that build on port 4179.        |
-| `npm run typecheck`    | `tsc -b` with strict TypeScript.      |
-| `npm run lint`         | ESLint, including type-aware rules.   |
-| `npm run format`       | Prettier write.                       |
-| `npm run format:check` | Prettier check.                       |
+| Script                 | What it does                                          |
+| ---------------------- | ----------------------------------------------------- |
+| `npm run dev`          | Vite on port 4179.                                    |
+| `npm run build`        | Typecheck and write a static `dist/`.                 |
+| `npm run preview`      | Serve that build on port 4179.                        |
+| `npm run typecheck`    | `tsc -b` with strict TypeScript.                      |
+| `npm run lint`         | ESLint, including type-aware rules.                   |
+| `npm run format`       | Prettier write.                                       |
+| `npm run format:check` | Prettier check.                                       |
+| `npm test`             | Vitest. Pure helpers, not the browser.                |
+| `npm run lint:slop`    | Design slop lint on `src/`. Informational.            |
+| `npm run lint:slopmd`  | SlopMD lab scan on `src/` and the API. Informational. |
 
-There are no environment variables. The app does not read a `.env` file.
+The web app does not read a `.env` file.
+
+### Session API
+
+Requires Python 3.12 and [uv](https://docs.astral.sh/uv/) 0.13.
+
+```bash
+cd services/api
+uv sync --extra dev
+uv run uvicorn app.api.main:app --host 127.0.0.1 --port 8099
+```
+
+Health is `GET /v1/health`. The demo kit is `POST /v1/demo/plan` with `{}`. Default mode is `fake`, so this works with no Qloo key. Checks:
+
+```bash
+uv run ruff check .
+uv run ruff format --check .
+uv run mypy
+uv run pytest
+```
+
+## GitHub Actions
+
+Workflows in `.github/workflows/` run only after this project is on GitHub. A local clone does not execute them. Push and pull requests run the path-filtered frontend and backend jobs. A weekly schedule, and a manual run, execute the live HTTP Qloo contract only when the repository secret `QLOO_API_KEY` is set. That job skips when the secret is absent and does not print the key. Dependabot config is `.github/dependabot.yml`.
 
 ## Design
 
@@ -115,7 +143,7 @@ The judging build is a hosted web app plus a small API. This prototype is the UI
 - [ADRs](docs/adr/): FastAPI, an optional prose model, hosting, the monorepo, and the client strategy.
 - [Roadmap](docs/plan/ROADMAP.md): gates from 11 October through submission on 30 October 2026, 21:45 America/Mexico_City.
 
-The client is one Flutter app: iOS, Android, and a web build from the same code. Judges get a URL they can finish in the browser, a TestFlight link once Apple approves the beta, and an APK. The Vite prototype stays the design reference, and it is the fallback URL if the Flutter web build is unpleasant to use. The API is Python and FastAPI. Clients call that API and never call Qloo. The key stays on the server. Until the key arrives, the pipeline runs on the fake adapter. After the key is turned off, judges hit a private replay cache that is not in this repository.
+The client is the responsive web app in this repo. Judges get a URL they can finish in the browser. A native Swift app is a post-hackathon idea. TestFlight and an APK are not part of the submission. The API is Python and FastAPI. The web app will call that API and never call Qloo. The key stays on the server. Until the key arrives, the pipeline runs on the fake adapter. After the key is turned off, judges hit a private replay cache that is not in this repository.
 
 Do not commit Qloo responses, keys, or a copy of the replay cache. The Devpost page needs a public repo, the MIT license in the About field, the hosted demo URL, and an English description. The product is not medical advice, and the request to Qloo carries titles and a neighborhood, not a name or a diagnosis.
 

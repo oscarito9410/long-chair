@@ -1,0 +1,49 @@
+{
+  "success": true,
+  "results": {
+    "entities": [
+      {
+        "name": "Linen & Rye",
+        "entity_id": "00000000-0000-4000-8000-000000000021",
+        "type": "urn:entity",
+        "subtype": "urn:entity:place",
+        "x-long-chair-slug": "linen-rye",
+        "properties": {
+          "description": "Soup, brown bread, and a quiet corner",
+          "x-long-chair-kind": "bakery",
+          "x-long-chair-walk-minutes": 6,
+          "x-long-chair-open-until": "4:30 pm",
+          "x-long-chair-price-label": "Light meal, low price"
+        }
+      },
+      {
+        "name": "Cedar Spoon",
+        "entity_id": "00000000-0000-4000-8000-000000000022",
+        "type": "urn:entity",
+        "subtype": "urn:entity:place",
+        "x-long-chair-slug": "cedar-spoon",
+        "properties": {
+          "description": "Broth and rice, and the room stays low",
+          "x-long-chair-kind": "kitchen",
+          "x-long-chair-walk-minutes": 9,
+          "x-long-chair-open-until": "6:00 pm",
+          "x-long-chair-price-label": "Light meal, low price"
+        }
+      },
+      {
+        "name": "Little Harbor Coffee",
+        "entity_id": "00000000-0000-4000-8000-000000000023",
+        "type": "urn:entity",
+        "subtype": "urn:entity:place",
+        "x-long-chair-slug": "little-harbor",
+        "properties": {
+          "description": "Tea, and something small if that is enough",
+          "x-long-chair-kind": "coffee",
+          "x-long-chair-walk-minutes": 4,
+          "x-long-chair-open-until": "5:00 pm",
+          "x-long-chair-price-label": "Light meal, low price"
+        }
+      }
+    ]
+  }
+}

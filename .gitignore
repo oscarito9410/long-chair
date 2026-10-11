@@ -32,3 +32,13 @@ uploads
 .env.*
 !.env.example
 .qloo-cache/
+
+# Python
+.venv/
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/

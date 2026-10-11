@@ -1,0 +1,251 @@
+# Actions run only on GitHub. A local clone does not execute this file.
+# Slop scans stay non-blocking until the inherited src tree is cleaned on purpose.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # Monday 15:30 UTC. Live catalog checks only, and only when the secret exists.
+    - cron: "30 15 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  changes:
+    name: Detect paths
+    if: github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      slop: ${{ steps.filter.outputs.slop }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Filter paths
+        id: filter
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE_SHA: ${{ github.event.before }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          mark_all() {
+            echo "backend=true" >> "$GITHUB_OUTPUT"
+            echo "frontend=true" >> "$GITHUB_OUTPUT"
+            echo "slop=true" >> "$GITHUB_OUTPUT"
+          }
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            mark_all
+            exit 0
+          fi
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            base="$BASE_SHA"
+          else
+            base="$BEFORE_SHA"
+          fi
+          if [ -z "$base" ] || [ "$base" = "0000000000000000000000000000000000000000" ]; then
+            mark_all
+            exit 0
+          fi
+          if ! files="$(git diff --name-only "$base" HEAD)"; then
+            mark_all
+            exit 0
+          fi
+          backend=false
+          frontend=false
+          slop=false
+          while IFS= read -r path; do
+            [ -z "$path" ] && continue
+            case "$path" in
+              services/api/*|.github/workflows/*|.github/dependabot.yml)
+                backend=true
+                slop=true
+                ;;
+            esac
+            case "$path" in
+              src/*|public/*|index.html|package.json|package-lock.json|tsconfig*.json|eslint.config.js|prettier.config.js|.prettierignore|vite.config.ts|.github/workflows/*)
+                frontend=true
+                ;;
+            esac
+            case "$path" in
+              src/*|services/api/*|tools/slopmd/*|.cursor/skills/no-slop-design/*|.github/workflows/*)
+                slop=true
+                ;;
+            esac
+          done <<< "$files"
+          echo "backend=$backend" >> "$GITHUB_OUTPUT"
+          echo "frontend=$frontend" >> "$GITHUB_OUTPUT"
+          echo "slop=$slop" >> "$GITHUB_OUTPUT"
+
+  backend:
+    name: Backend
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install uv
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          version: "0.13.0"
+          python-version: "3.12"
+          enable-cache: true
+          working-directory: services/api
+      - name: Sync dependencies
+        working-directory: services/api
+        run: uv sync --frozen --extra dev
+      - name: Ruff
+        working-directory: services/api
+        run: uv run ruff check .
+      - name: Ruff format
+        working-directory: services/api
+        run: uv run ruff format --check .
+      - name: mypy strict
+        working-directory: services/api
+        run: uv run mypy
+      - name: pytest with coverage and FakeQloo contracts
+        working-directory: services/api
+        run: uv run pytest
+
+  frontend:
+    name: Frontend
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: ESLint
+        run: npm run lint
+      - name: Prettier
+        run: npm run format:check
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Vitest
+        run: npm test
+      - name: Build
+        run: npm run build
+
+  slop:
+    name: Slop scans
+    needs: changes
+    if: needs.changes.outputs.slop == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    continue-on-error: true
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "22"
+      - name: SlopMD lab scan
+        run: |
+          node tools/slopmd/bin/slopmd.js src
+          node tools/slopmd/bin/slopmd.js services/api
+      - name: no-slop-design slop_lint
+        run: python3 .cursor/skills/no-slop-design/scripts/slop_lint.py src
+
+  qloo-live:
+    name: Live Qloo contract
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install uv
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          version: "0.13.0"
+          python-version: "3.12"
+          enable-cache: true
+          working-directory: services/api
+      - name: Sync dependencies
+        working-directory: services/api
+        run: uv sync --frozen --extra dev
+      - name: Detect the catalog key
+        id: key
+        env:
+          QLOO_API_KEY: ${{ secrets.QLOO_API_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -n "${QLOO_API_KEY}" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "QLOO_API_KEY repo secret is not set. Live contract tests skipped."
+          fi
+      - name: HttpQloo contract
+        if: steps.key.outputs.enabled == 'true'
+        working-directory: services/api
+        env:
+          QLOO_API_KEY: ${{ secrets.QLOO_API_KEY }}
+        run: uv run pytest tests/contract/test_qloo_contract.py -k test_live_search_is_opt_in --override-ini=addopts= -q
+
+  ci:
+    name: CI result
+    needs: [changes, backend, frontend, slop]
+    if: always() && (github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Require the filtered jobs
+        env:
+          CHANGES: ${{ needs.changes.result }}
+          BACKEND: ${{ needs.backend.result }}
+          FRONTEND: ${{ needs.frontend.result }}
+          SLOP: ${{ needs.slop.result }}
+        run: |
+          set -euo pipefail
+          echo "changes=$CHANGES backend=$BACKEND frontend=$FRONTEND slop=$SLOP"
+          fail=0
+          for result in "$CHANGES" "$BACKEND" "$FRONTEND"; do
+            if [ "$result" = "failure" ] || [ "$result" = "cancelled" ]; then
+              fail=1
+            fi
+          done
+          # Slop scans are informational. A cancelled scan still means the workflow stopped early.
+          if [ "$SLOP" = "cancelled" ]; then
+            fail=1
+          fi
+          exit "$fail"

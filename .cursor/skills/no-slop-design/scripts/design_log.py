@@ -1,0 +1,650 @@
+#!/usr/bin/env python3
+"""
+design_log.py — cross-project memory, so the skill stops repeating itself.
+
+The per-project `design/design-log.json` is empty on every new project, which is exactly when convergence
+happens: four fresh directories in a row produced four dark pages. This keeps a short fingerprint of each
+finished direction in one place and answers a single question before the next direction is chosen:
+**what have I been doing lately, and what am I about to repeat?**
+
+Store: `~/.no-slop-design/history.json` (override with NSD_HISTORY).
+
+Usage:
+  python3 scripts/design_log.py check                      # read at Phase 0/3; prints convergence warnings
+  python3 scripts/design_log.py add --project qala-house \\
+      --register R3 --surface dark --hue 66 --display "Archivo Expanded" --text Archivo \\
+      --structure "full-bleed photo + horizontal timetable" --industry festival --market DE
+  python3 scripts/design_log.py add ... --screenshot full-page.png   # surface polarity measured from pixels
+  python3 scripts/design_log.py measure full-page.png                 # just print the dark share
+  python3 scripts/design_log.py list --limit 10
+  python3 scripts/design_log.py check --json
+
+An entry is a fingerprint, not a portfolio: register, surface polarity, brand hue, typefaces, the structural
+idea in a few words, industry, market. `check` warns when the last few entries share an axis, and names the
+axes that must differ this time.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import struct
+import sys
+import zlib
+from collections import Counter
+from datetime import date
+
+STORE = os.environ.get("NSD_HISTORY") or os.path.expanduser("~/.no-slop-design/history.json")
+WINDOW = 5          # how many recent entries count as "lately"
+STREAK = 3          # this many in a row on one axis is a streak worth breaking
+PLAN_HOURS = 6      # a planned direction counts in `check` for this long, so parallel runs can see each other
+LONG = 6            # habits that swing back after a streak is broken are counted over this many runs
+
+
+def project_dir(args) -> str:
+    """The project a plan or record belongs to, by folder rather than name: a 1.18 run renamed its project between plans
+    and was compared with itself again. design/convergence-warnings.json → the project folder above design/."""
+    if getattr(args, "dir", None):
+        return os.path.abspath(args.dir)
+    if getattr(args, "record", None):
+        return os.path.dirname(os.path.dirname(os.path.abspath(args.record)))
+    return os.getcwd()
+
+
+def same_run(e: dict, entry: dict) -> bool:
+    return e.get("status") == "planned" and (e.get("project") == entry.get("project")
+                                             or (e.get("dir") and e.get("dir") == entry.get("dir")))
+RESULT_FORMS = ("figure", "paper", "diagram", "card", "list", "table", "calendar", "map", "media")
+# image look, recorded as angle;light;surface;palette from these words only (or "none" for a page without imagery)
+LOOK = {
+    "angle": ("top-down", "eye-level", "low-angle", "close-up", "wide"),
+    "light": ("side-window", "overcast", "hard-sun", "dusk-night", "studio", "artificial"),
+    "surface": ("wood", "stone", "metal", "fabric", "paper", "tile", "glass", "plant", "street", "seamless"),
+    "palette": ("warm", "cool", "neutral", "saturated", "mono"),
+}
+
+
+LANGUAGE = {  # design-language.md §2: the nine axes of a design language and their only allowed words, in this order
+    "surface": ("light", "dark", "mixed"),
+    "chroma": ("achromatic", "low", "saturated"),
+    "type": ("grotesk", "humanist", "serif", "slab", "mono", "condensed", "system"),
+    "density": ("tight", "medium", "airy"),
+    "radius": ("square", "soft", "round", "pill"),
+    "imagery": ("none", "product", "photo", "illustration", "type", "3d"),
+    "layout": ("centered", "left", "asymmetric", "grid"),
+    "motion": ("none", "functional", "choreographed", "scene"),
+    "controls": ("hairline", "solid", "raw"),
+}
+
+
+def parse_language(value: str, what: str = "--language") -> str:
+    """Validate a nine-axis design-language profile against LANGUAGE; '?' is allowed for an axis that could not be
+    measured. Raises ValueError naming the allowed words."""
+    parts = [p.strip().lower() for p in value.strip().split(";")]
+    if len(parts) != len(LANGUAGE):
+        raise ValueError(f"{what} takes {';'.join(LANGUAGE)} — nine words from design-language.md §2, "
+                         "as shoot.py's 'language' line prints them")
+    for (axis, words), p in zip(LANGUAGE.items(), parts):
+        if p != "?" and p not in words:
+            raise ValueError(f"{what} {axis} '{p}' is not one of: {', '.join(words)} (pick the nearest; free words hide repeats)")
+    return ";".join(parts)
+
+
+def language_distance(a: str | None, b: str | None) -> list[str]:
+    """The axes on which two profiles differ (unknown '?' axes are skipped)."""
+    if not a or not b:
+        return []
+    pa, pb = a.split(";"), b.split(";")
+    if len(pa) != len(LANGUAGE) or len(pb) != len(LANGUAGE):
+        return []
+    return [ax for ax, x, y in zip(LANGUAGE, pa, pb) if x != y and x != "?" and y != "?"]
+
+
+def parse_look(value: str) -> str:
+    """Validate an --image-look value against LOOK; raises ValueError with the allowed words."""
+    v = value.strip().lower()
+    if v == "none":
+        return v
+    parts = [p.strip() for p in v.split(";")]
+    if len(parts) != 4:
+        raise ValueError("--image-look takes angle;light;surface;palette, e.g. top-down;overcast;stone;neutral")
+    for (facet, words), p in zip(LOOK.items(), parts):
+        if p not in words:
+            raise ValueError(f"--image-look {facet} '{p}' is not one of: {', '.join(words)} (pick the nearest; "
+                             "free words hide repeats — limestone and kiln shelf are both stone)")
+    return ";".join(parts)
+
+
+def load() -> list[dict]:
+    if not os.path.exists(STORE):
+        return []
+    try:
+        with open(STORE, encoding="utf-8") as fh:
+            data = json.load(fh)
+        return data.get("entries", []) if isinstance(data, dict) else data
+    except (json.JSONDecodeError, OSError):
+        return []
+
+
+def save(entries: list[dict]) -> None:
+    os.makedirs(os.path.dirname(STORE), exist_ok=True)
+    with open(STORE, "w", encoding="utf-8") as fh:
+        json.dump({"$schema": "no-slop-design/history v1", "entries": entries[-100:]}, fh, indent=2, ensure_ascii=False)
+
+
+def hue_family(h) -> str:
+    try:
+        h = float(h) % 360
+    except (TypeError, ValueError):
+        return "unknown"
+    for lo, hi, name in [(0, 45, "red-orange"), (45, 95, "amber-yellow"), (95, 165, "green"),
+                         (165, 215, "teal-cyan"), (215, 265, "blue"), (265, 315, "violet-magenta"), (315, 360, "pink-red")]:
+        if lo <= h < hi:
+            return name
+    return "unknown"
+
+
+
+# --------------------------------------------------------------------------- surface polarity from a screenshot
+# A declared surface is often wrong: a light hero over a mostly dark page gets recorded as "light". The pixels are
+# what the visitor sees, so measure them. Stdlib PNG reader for 8-bit RGB/RGBA non-interlaced files, which is what
+# headless Chrome and Playwright write. Use a 1x full-page screenshot; 2x works but is four times slower.
+DARK_L = 0.18          # relative luminance below which a pixel reads as dark (sRGB ~#767676 sits at 0.18)
+
+
+def read_png(path: str):
+    data = open(path, "rb").read()
+    if data[:8] != b"\x89PNG\r\n\x1a\n":
+        raise ValueError(f"{path}: not a PNG")
+    pos, idat, w = 8, [], None
+    while pos < len(data):
+        ln, typ = struct.unpack(">I4s", data[pos:pos + 8])
+        chunk = data[pos + 8:pos + 8 + ln]
+        pos += 12 + ln
+        if typ == b"IHDR":
+            w, h, depth, ctype, _, _, interlace = struct.unpack(">IIBBBBB", chunk)
+            if depth != 8 or interlace or ctype not in (2, 6):
+                raise ValueError(f"{path}: unsupported PNG (depth {depth}, colour type {ctype}, interlace {interlace})")
+            bpp = 3 if ctype == 2 else 4
+        elif typ == b"IDAT":
+            idat.append(chunk)
+        elif typ == b"IEND":
+            break
+    raw = zlib.decompress(b"".join(idat))
+    stride, prev, rows, i = w * bpp, bytearray(w * bpp), [], 0
+    for _ in range(h):
+        f, line = raw[i], bytearray(raw[i + 1:i + 1 + stride])
+        i += 1 + stride
+        if f == 1:
+            for x in range(bpp, stride):
+                line[x] = (line[x] + line[x - bpp]) & 255
+        elif f == 2:
+            for x in range(stride):
+                line[x] = (line[x] + prev[x]) & 255
+        elif f == 3:
+            for x in range(stride):
+                line[x] = (line[x] + ((line[x - bpp] if x >= bpp else 0) + prev[x]) // 2) & 255
+        elif f == 4:
+            for x in range(stride):
+                a = line[x - bpp] if x >= bpp else 0
+                b, c = prev[x], (prev[x - bpp] if x >= bpp else 0)
+                p = a + b - c
+                pa, pb, pc = abs(p - a), abs(p - b), abs(p - c)
+                line[x] = (line[x] + (a if pa <= pb and pa <= pc else b if pb <= pc else c)) & 255
+        rows.append(line)
+        prev = line
+    return w, h, bpp, rows
+
+
+def dark_share(paths: list[str], step: int = 4) -> float:
+    lin = [((v / 255) / 12.92 if v / 255 <= 0.04045 else ((v / 255 + 0.055) / 1.055) ** 2.4) for v in range(256)]
+    dark = total = 0
+    for path in paths:
+        w, h, bpp, rows = read_png(path)
+        for y in range(0, h, step):
+            row = rows[y]
+            for x in range(0, w, step):
+                o = x * bpp
+                total += 1
+                dark += (0.2126 * lin[row[o]] + 0.7152 * lin[row[o + 1]] + 0.0722 * lin[row[o + 2]]) < DARK_L
+    return dark / total if total else 0.0
+
+
+def polarity(share: float) -> str:
+    return "dark" if share >= 0.6 else "light" if share <= 0.35 else "mixed"
+
+
+def record(path: str | None, project: str | None, warns: list[str]) -> None:
+    """Write the warnings a run saw into its project, so they cannot be read and quietly ignored (a 1.16 run kept a
+    repeated composition 'deliberately' with no reason on record)."""
+    if not path:
+        return
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as fh:
+        json.dump({"project": project, "date": date.today().isoformat(), "warnings": warns}, fh, indent=2, ensure_ascii=False)
+    print(f"warnings recorded in {path}: {len(warns)} — act on each, or answer it under 'Convergence overrides' in DESIGN.md")
+
+
+def live(entries: list[dict]) -> list[dict]:
+    """Finished entries plus planned ones younger than PLAN_HOURS; a finished entry replaces its own plan."""
+    import time
+    done = {e.get("project") for e in entries if e.get("status") != "planned"}
+    now = time.time()
+    return [e for e in entries if e.get("status") != "planned"
+            or (e.get("project") not in done and now - e.get("planned_at", 0) < PLAN_HOURS * 3600)]
+
+
+def analyse(entries: list[dict]) -> list[str]:
+    recent = live(entries)[-WINDOW:]
+    longer = live(entries)[-LONG:]
+    warns: list[str] = []
+    if len(recent) < 2:
+        return warns
+
+    def streak(key, label, n=STREAK, fmt=lambda v: v):
+        vals = [e.get(key) for e in recent if e.get(key)]
+        if len(vals) < n:
+            return
+        tail = vals[-n:]
+        if len(set(tail)) == 1:
+            warns.append(f"{label}: the last {n} directions were all {fmt(tail[0])} — vary this one or write down why not")
+
+    # surface polarity is the first thing anyone sees, so two in a row already count
+    streak("surface", "surface polarity", n=2)
+    streak("display", "display typeface")
+    # the register is not an axis to break: it comes from the brief (decision type, category norm, asset budget).
+    # A 1.8 run moved a translation agency to R3 because the last three runs were R2 — history deciding ambition.
+    hues = [hue_family(e.get("hue")) for e in recent if e.get("hue") is not None]
+    if len(hues) >= STREAK and len(set(hues[-STREAK:])) == 1 and hues[-1] != "unknown":
+        warns.append(f"brand hue family: the last {STREAK} were all {hues[-1]} — a different family is the cheapest way to look different")
+    # the first-viewport composition measured by shoot.py — a named structure, not free text, so a repeat is exact
+    comps = [(e.get("composition"), e.get("industry")) for e in recent if e.get("composition")]
+    if len(comps) >= 2 and comps[-1][0] == comps[-2][0]:
+        inds = sorted({i for _, i in comps[-2:] if i})
+        warns.append(f"composition: the last two first viewports were both '{comps[-1][0]}'"
+                     + (f" ({' and '.join(inds)})" if len(inds) > 1 else "")
+                     + " — a different industry with the same first viewport is a house style forming; choose another composition")
+    else:
+        long_comps = [e.get("composition") for e in longer if e.get("composition")]
+        if len(long_comps) >= 3:
+            top, n = Counter(long_comps).most_common(1)[0]
+            if n >= 3 and long_comps[-1] == top:
+                warns.append(f"composition: '{top}' in {n} of the last {len(long_comps)} runs — choose another first-viewport composition")
+    # the page skeleton measured by shoot.py: the device of each section, in order
+    def collapse(s):
+        out = []
+        for part in (s or "").split(">"):
+            if part and (not out or out[-1] != part):
+                out.append(part)
+        return out
+
+    def lcs(a, b):
+        t = [[0] * (len(b) + 1) for _ in range(len(a) + 1)]
+        for i, x in enumerate(a):
+            for j, y in enumerate(b):
+                t[i + 1][j + 1] = t[i][j] + 1 if x == y else max(t[i][j + 1], t[i + 1][j])
+        return t[-1][-1]
+
+    skels = [(collapse(e.get("skeleton")), e.get("industry")) for e in recent if e.get("skeleton")]
+    if len(skels) >= 2:
+        (a, ia), (b, ib) = skels[-2], skels[-1]
+        if len(a) >= 3 and len(b) >= 3 and lcs(a, b) / max(len(a), len(b)) >= 0.75:
+            warns.append(f"skeleton: the last two pages ran the same sections in the same order ({' > '.join(b)})"
+                         + (f" for {ia} and {ib}" if ia and ib and ia != ib else "")
+                         + " — the skill's house skeleton; derive the sections from this content, not from the last page")
+    media = [e.get("media") for e in recent if e.get("media") is not None]
+    if len(media) >= 3 and all(int(m) == 0 for m in media[-3:]):
+        warns.append("imagery: the last 3 pages carried no image at all — 'no assets' is not a direction; consider "
+                     "licensed photography, commissioned or generated illustration, and write why it was rejected")
+    structures = [(e.get("structure") or "").lower() for e in recent if e.get("structure")]
+    if len(structures) >= 2:
+        words = [set(s.split()) for s in structures[-2:]]
+        shared = words[0] & words[1] - {"a", "the", "with", "and", "of", "+", "one"}
+        if len(shared) >= 2:
+            warns.append(f"structure: the last two share “{', '.join(sorted(shared))}” — change the composition idea, not just the palette")
+    # the interaction's answer given the same physical form: calendar leaf, receipt, solicitor's letter in a row
+    forms = [e.get("result_form") for e in recent if e.get("result_form")]
+    if len(forms) >= 2 and forms[-1] == forms[-2]:
+        warns.append(f"result form: the last two interactions answered as a '{forms[-1]}' — give this answer another form "
+                     f"({', '.join(f for f in RESULT_FORMS if f != forms[-1])})")
+    elif len(forms) >= 3 and Counter(forms).most_common(1)[0][1] >= 3:
+        top = Counter(forms).most_common(1)[0][0]
+        warns.append(f"result form: '{top}' in {Counter(forms)[top]} of the last {len(forms)} runs — the paper-artefact "
+                     "result is becoming a house style" if top == "paper" else
+                     f"result form: '{top}' in {Counter(forms)[top]} of the last {len(forms)} runs — vary it")
+    # the cheapest bold move repeated: poster-scale type on every first viewport (1.14 tests: 166, 400, 176, 158, 384 px).
+    # Counted over a longer window, not only as a streak: 1.15 broke the streak, two rounds later it swung back to 15×.
+    ratios = [float(e["display_ratio"]) for e in longer if e.get("display_ratio") is not None]
+    big = [r for r in ratios if r >= 8]
+    if ratios and ratios[-1] >= 8 and len(big) >= 3:
+        warns.append(f"type scale: {len(big)} of the last {len(ratios)} first viewports set display type at ≥ 8× body "
+                     f"({', '.join(f'{r:g}×' for r in ratios)}) — oversized type keeps coming back as the default bold move; "
+                     "make this one a photograph, a drawing, a colour field or the product itself")
+    # the UI dialect measured by shoot.py: control shape, dividers, labels, section headers, display face. Pages that
+    # differ in colour, photograph and idea still read as one studio's template when all five match.
+    dialects = [e["dialect"].split(";") for e in longer if e.get("dialect") and len(e["dialect"].split(";")) == 5]
+    if len(dialects) >= 2:
+        a, b = dialects[-2], dialects[-1]
+        same = [x for x, y in zip(a, b) if x == y]
+        if len(same) >= 4:
+            warns.append(f"dialect: the last two pages drew their UI the same way ({', '.join(same)}) — change the control "
+                         "shape, the dividers, the label style or the section-header layout so the components belong to this "
+                         "business, not to the skill")
+    if len(dialects) >= 3:
+        top, n = Counter(";".join(x) for x in dialects).most_common(1)[0]
+        if n >= 3 and ";".join(dialects[-1]) == top:
+            warns.append(f"dialect: '{top}' in {n} of the last {len(dialects)} pages — the skill's house UI")
+    # runs in progress at the same time converge together: two parallel runs read the same history and both turned dark
+    me = recent[-1] if recent else {}
+    if me.get("dir"):
+        for other in live(entries):
+            if other is me or other.get("status") != "planned" or not other.get("dir") or other["dir"] == me["dir"]:
+                continue
+            shared = [f"{k.replace('_', ' ')} {me[k]}" for k in ("surface", "composition", "result_form", "hue_family")
+                      if me.get(k) and me.get(k) == other.get(k)]
+            if shared:
+                warns.append(f"in progress: '{other.get('project')}' is being designed right now with the same {', '.join(shared)} "
+                             "— two runs reacting to the same history move the same way; take the other side on at least one")
+    # generated or stock imagery sharing one look: wooden table, soft window light, warm browns — or two top-down shots
+    # on pale stone. Facets come from a fixed vocabulary so "limestone" and "kiln-shelf-alumina" both read as stone.
+    looks = [e["image_look"].split(";") for e in recent
+             if e.get("image_look") and e["image_look"] != "none" and len(e["image_look"].split(";")) == 4]
+    if len(looks) >= 2:
+        a, b = looks[-2], looks[-1]
+        same = [f"{facet} {a[i]}" for i, facet in enumerate(LOOK) if a[i] == b[i]]
+        if len(same) >= 3 or (a[0] == b[0] and a[2] == b[2]):
+            warns.append(f"image look: the last two pages' imagery shared {', '.join(same)} — change the camera angle or "
+                         "the surface at least; derive both from this direction, not from the image tool's default")
+    # the opening and closing formula: hero then interaction, contact form last
+    if len(skels) >= 2 and skels[-1][0][:2] == skels[-2][0][:2] and len(skels[-1][0]) >= 2:
+        warns.append(f"opening: the last two pages opened the same way ({' > '.join(skels[-1][0][:2])}) — the interaction "
+                     "may sit later (after rooms, menu, doctors) or be the page's spine; open on what this business shows first")
+    if len(skels) >= 3 and all(s and s[-1] == "form" for s, _ in skels[-3:]):
+        warns.append("closing: the last three pages ended on a contact form — end on the next real step for this business "
+                     "(a map and hours, a booking, a phone number, a WhatsApp link, an order)")
+    # the design language (design-language.md): nine axes measured by shoot.py. Pages that differ in colour, idea and
+    # composition still come from one studio when they speak the same language for unrelated industries — the user's
+    # verdict on 1.21 ("50% alike across ten industries") was this. The market fingerprint says what the category speaks;
+    # a page far from it with no written departure is the skill's own language showing.
+    langs = [(e["language"], e.get("industry") or "?", e.get("project")) for e in longer if e.get("language")]
+    if len(langs) >= 2:
+        # compared with every recent page for another industry, not only the previous one: in the 1.22 test a dev tool
+        # and a documentation site matched on eight of nine axes three entries apart and nothing said so
+        b, ib, pb = langs[-1]
+        for a, ia, pa in langs[:-1]:
+            diff = language_distance(a, b)
+            known = [ax for ax, x, y in zip(LANGUAGE, a.split(";"), b.split(";")) if x != "?" and y != "?"]
+            if known and len(diff) <= 2 and ia != ib:
+                warns.append(f"design language: '{pb}' ({ib}) speaks the same language as '{pa}' ({ia}) — "
+                             f"{len(known) - len(diff)} of {len(known)} axes match ({b}); two industries that share a language "
+                             "share a studio, not a market. Re-read the market fingerprint and move the axes the market moves")
+                break
+    # the opening skeleton: heading;panel;image of the first viewport. Seven of ten 1.22 pages opened h-left;panel-right
+    # or h-left;panel-under whatever their market's opening was — the skill's skeleton under ten languages.
+    opens = [(e["opening"], e.get("industry") or "?", e.get("project"), e.get("market_opening")) for e in longer if e.get("opening")]
+    if opens:
+        o, io, po, mo = opens[-1]
+        others = [(x, i) for x, i, _, _ in opens[:-1] if i != io]
+        same_open = [i for x, i in others if x.split(";")[:2] == o.split(";")[:2]]
+        if len(same_open) >= 2:
+            warns.append(f"opening: '{po}' opens {';'.join(o.split(';')[:2])} like {len(same_open)} recent pages for other industries "
+                         f"({', '.join(sorted(set(same_open)))}) — the skill's skeleton; take the opening from the market line "
+                         "('opening' in shoot.py --profile) or write the departure")
+        if mo and o.split(";")[:2] != mo.split(";")[:2] and len(same_open) >= 1:
+            warns.append(f"opening: the market opens {mo} and this page {o}, the same way as another industry's recent page — "
+                         "a departure from the market that lands on the skill's habit needs a reason under 'Departs on:'")
+    if len(langs) >= 3:
+        top, n = Counter(l for l, _, _ in langs).most_common(1)[0]
+        if n >= 3 and langs[-1][0] == top and len({i for l, i, _ in langs if l == top}) >= 2:
+            warns.append(f"design language: '{top}' on {n} of the last {len(langs)} pages across "
+                         f"{len({i for l, i, _ in langs if l == top})} industries — the skill's house language")
+    me = recent[-1] if recent else {}
+    if me.get("language") and me.get("market_language"):
+        far = language_distance(me["language"], me["market_language"])
+        if len(far) >= 4:
+            warns.append(f"market fit: this page departs from its market fingerprint on {len(far)} axes ({', '.join(far)}) — "
+                         "one or two departures make a page stand out in its category; four or more put it in another "
+                         "category. Write each departure under 'Design language' in DESIGN.md with the brief's reason, or move back")
+    industries = [e.get("industry") for e in recent if e.get("industry")]
+    if len(set(industries)) >= 3 and len({e.get("surface") for e in recent if e.get("surface")}) == 1:
+        warns.append("three different industries came out with the same surface polarity — that is the skill's own tell, not a house style")
+    return warns
+
+
+def habits(entries: list[dict], limit: int) -> int:
+    """Per axis: the markets' words against the pages' words, and how often the page left the market — the table that
+    showed the 1.22 pages following their markets on surface and imagery and ignoring them on layout (7 of 10 'left'
+    against markets that said asymmetric or centred)."""
+    import itertools
+    pages = [e for e in entries if e.get("status") != "planned" and e.get("language") and e.get("market_language")][-limit:]
+    if len(pages) < 2:
+        print("habits needs at least two finished pages recorded with --language and --market-language")
+        return 2
+    print(f"the skill's hand across the last {len(pages)} pages ({', '.join(e.get('industry') or e.get('project') or '?' for e in pages)})\n")
+    print(f"{'axis':<10} {'markets said':<34} {'pages did':<34} departed")
+    for i, axis in enumerate(LANGUAGE):
+        mk = Counter(e["market_language"].split(";")[i] for e in pages)
+        pg = Counter(e["language"].split(";")[i] for e in pages)
+        dep = sum(e["language"].split(";")[i] != e["market_language"].split(";")[i] for e in pages)
+        fmt = lambda c: ", ".join(f"{k} {v}" for k, v in c.most_common(3))
+        flag = "  ← the skill's hand" if dep >= len(pages) / 2 and pg.most_common(1)[0][1] >= len(pages) * 0.6 else ""
+        print(f"{axis:<10} {fmt(mk):<34} {fmt(pg):<34} {dep}/{len(pages)}{flag}")
+    def shared(rows):
+        pairs = list(itertools.combinations(rows, 2))
+        return sum(sum(a == b for a, b in zip(x.split(";"), y.split(";"))) for x, y in pairs) / len(pairs) / len(LANGUAGE) if pairs else 0
+    sp, sm = shared([e["language"] for e in pages]), shared([e["market_language"] for e in pages])
+    print(f"\npages alike: {sp:.0%} of axes shared on average · their markets alike: {sm:.0%}")
+    print("pages more alike than their markets on an axis the markets split is the skill's language showing"
+          if sp > sm else "the pages are less alike than their markets: the variety comes from the categories, as it should")
+    opens = [e for e in pages if e.get("opening")]
+    if opens:
+        oc = Counter(";".join(e["opening"].split(";")[:2]) for e in opens)
+        mc = Counter(";".join((e.get("market_opening") or "?").split(";")[:2]) for e in opens)
+        print(f"opening   markets: {', '.join(f'{k} {v}' for k, v in mc.most_common(3))} · pages: {', '.join(f'{k} {v}' for k, v in oc.most_common(3))}")
+    return 0
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    sub = ap.add_subparsers(dest="cmd", required=True)
+
+    a = sub.add_parser("add", help="record a finished direction")
+    pl = sub.add_parser("plan", help="register a chosen direction before building, so runs in parallel see it")
+    for p in (a, pl):
+        for f in ("project", "register", "surface", "display", "text", "structure", "industry", "market", "anchor", "interaction"):
+            p.add_argument(f"--{f}", default=None)
+        p.add_argument("--result-form", dest="result_form", default=None, choices=RESULT_FORMS,
+                       help="the physical form of the interaction's answer: " + ", ".join(RESULT_FORMS))
+        p.add_argument("--display-ratio", dest="display_ratio", type=float, default=None,
+                       help="first-viewport display type ÷ body size, from shoot.py's 'first' line (planned: the intended ratio)")
+        p.add_argument("--language", default=None,
+                       help="this page's design language, nine words from design-language.md §2 as shoot.py's 'language' "
+                            "line prints them: " + ";".join(LANGUAGE))
+        p.add_argument("--market-language", dest="market_language", default=None,
+                       help="the market fingerprint from `shoot.py --profile <competitor urls>` (the 'market' line)")
+        p.add_argument("--opening", default=None,
+                       help="the first viewport's skeleton from shoot.py's 'opening' line: heading;panel;image, e.g. h-left;panel-right;img-none")
+        p.add_argument("--market-opening", dest="market_opening", default=None,
+                       help="the competitors' most common opening from `shoot.py --profile` (the 'opening' line)")
+        p.add_argument("--image-look", dest="image_look", default=None,
+                       help="angle;light;surface;palette from a fixed vocabulary, e.g. top-down;overcast;stone;neutral, "
+                            "or none. Angles: " + ", ".join(LOOK["angle"]) + ". Light: " + ", ".join(LOOK["light"])
+                            + ". Surface: " + ", ".join(LOOK["surface"]) + ". Palette: " + ", ".join(LOOK["palette"]))
+    pl.add_argument("--composition", default=None)
+    pl.add_argument("--skeleton", default=None)
+    pl.add_argument("--hue", type=float, default=None)
+    a.add_argument("--skeleton", default=None, help="section devices in order, as printed by shoot.py (e.g. interaction>steps>table>form)")
+    a.add_argument("--media", type=int, default=None, help="number of images/video on the page, as printed by shoot.py")
+    a.add_argument("--composition", default=None,
+                   help="first-viewport composition as printed by shoot.py: graphic-hero, result-poster, type-poster, "
+                        "field-and-heading, heading-and-panel")
+    a.add_argument("--hue", type=float, default=None)
+    a.add_argument("--dialect", default=None,
+                   help="the UI dialect from shoot.py's 'dialect' line: controls;dividers;labels;section headers;display face")
+    a.add_argument("--crit", type=int, default=None,
+                   help="Gate 14 studio-crit total (6 axes × 1–5, so 6–30) after the crit board; the best scores fill the next board")
+    a.add_argument("--page", default=None, help="the page file, for the crit board (default: <dir>/index.html)")
+    a.add_argument("--screenshot", nargs="+", default=None,
+                   help="full-page PNG(s); surface polarity is measured from the pixels and overrides --surface")
+
+    c = sub.add_parser("check", help="warn about convergence before choosing a direction")
+    c.add_argument("--json", action="store_true")
+    for p in (a, pl):
+        p.add_argument("--dir", default=None, help="project folder (default: the folder above --record's design/, else cwd)")
+    for p in (c, pl, a):
+        p.add_argument("--record", default=None, metavar="PATH",
+                       help="write the warnings to PATH (design/convergence-warnings.json); slop_lint then requires each one "
+                            "to be acted on or answered under 'Convergence overrides' in DESIGN.md")
+
+    ms = sub.add_parser("measure", help="measure the surface polarity of full-page screenshot(s)")
+    ms.add_argument("png", nargs="+")
+
+    l = sub.add_parser("list", help="show recent entries")
+    l.add_argument("--limit", type=int, default=10)
+
+    hb = sub.add_parser("habits", help="the skill's own hand: per axis, what the markets said and what the pages did")
+    hb.add_argument("--limit", type=int, default=12, help="how many recent finished pages with a market line to read (default 12)")
+
+    args = ap.parse_args()
+    entries = load()
+    if getattr(args, "image_look", None):
+        try:
+            args.image_look = parse_look(args.image_look)
+        except ValueError as err:
+            print(err)
+            return 2
+    for name, flag in (("language", "--language"), ("market_language", "--market-language")):
+        if getattr(args, name, None):
+            try:
+                setattr(args, name, parse_language(getattr(args, name), flag))
+            except ValueError as err:
+                print(err)
+                return 2
+
+    if args.cmd == "measure":
+        share = dark_share(args.png)
+        print(f"dark share {share:.2f} → surface polarity: {polarity(share)}")
+        return 0
+
+    keys = ("project", "register", "surface", "display", "text", "structure", "industry", "market", "anchor",
+            "interaction", "composition", "skeleton", "result_form", "display_ratio", "image_look", "dialect",
+            "language", "market_language", "opening", "market_opening")
+    if args.cmd == "plan":
+        import time
+        missing = [f"--{n.replace('_', '-')}" for n in ("project", "composition", "result_form") if not getattr(args, n, None)]
+        if missing:
+            print(f"plan needs {', '.join(missing)}: a plan without the composition and result form cannot warn the run "
+                  "beside it (1.14: two parallel runs both opened on poster type). Compositions: graphic-hero, "
+                  "result-poster, type-poster, field-and-heading, heading-and-panel")
+            return 2
+        entry = {k: getattr(args, k) for k in keys if getattr(args, k, None)}
+        if args.hue is not None:
+            entry["hue"], entry["hue_family"] = args.hue, hue_family(args.hue)
+        entry.update(status="planned", planned_at=time.time(), date=date.today().isoformat(), dir=project_dir(args))
+        # a re-plan replaces this project's earlier plan — matched by folder as well as name, since a 1.18 run renamed
+        # its project between plans and was warned against itself again
+        entries = [e for e in entries if not same_run(e, entry)]
+        warns = analyse(entries + [entry])
+        entries.append(entry)
+        save(entries)
+        record(args.record, entry.get("project"), warns)
+        print(f"planned: {json.dumps(entry, ensure_ascii=False)}")
+        for w in warns:
+            print("CONVERGENCE:", w)
+        return 0
+
+    if args.cmd == "add":
+        entry = {k: getattr(args, k) for k in keys if getattr(args, k, None)}
+        entry["dir"] = project_dir(args)
+        entries = [e for e in entries if not same_run(e, entry)]
+        if args.media is not None:
+            entry["media"] = args.media
+        if args.crit is not None:
+            if not 6 <= args.crit <= 30:
+                print("--crit is the Gate 14 total: six axes scored 1–5, so 6–30")
+                return 2
+            entry["crit"] = args.crit
+        else:
+            print("note: no --crit recorded; run scripts/crit_board.py and score Gate 14 — unscored pages never reach the board")
+        if args.page:
+            entry["page"] = os.path.abspath(args.page)
+        if not args.composition:
+            print("note: no --composition recorded; shoot.py prints it ('compose' line) — without it a repeated first "
+                  "viewport across industries goes unnoticed")
+        if not args.language:
+            print("note: no --language recorded; shoot.py prints it ('language' line) — without it the same design language "
+                  "across unrelated industries goes unnoticed")
+        if args.hue is not None:
+            entry["hue"] = args.hue
+            entry["hue_family"] = hue_family(args.hue)
+        if args.screenshot:
+            share = dark_share(args.screenshot)
+            measured = polarity(share)
+            if args.surface and args.surface != measured:
+                print(f"note: surface was declared '{args.surface}' but the screenshot is {share:.0%} dark; recording '{measured}'")
+            entry["surface"], entry["dark_share"], entry["surface_source"] = measured, round(share, 2), "measured"
+        elif args.surface:
+            entry["surface_source"] = "declared"
+        entry["date"] = date.today().isoformat()
+        entries.append(entry)
+        save(entries)
+        print(f"recorded: {json.dumps(entry, ensure_ascii=False)}")
+        warns = analyse(entries)
+        for w in warns:
+            print("note:", w)
+        if args.record:
+            # re-checked when the page is finished: a run planned alongside another only sees the collision now
+            earlier = []
+            if os.path.exists(args.record):
+                try:
+                    earlier = json.load(open(args.record, encoding="utf-8")).get("warnings", [])
+                except (ValueError, OSError):
+                    earlier = []
+            record(args.record, entry.get("project"), list(dict.fromkeys(earlier + warns)))
+        return 0
+
+    if args.cmd == "habits":
+        return habits(entries, args.limit)
+
+    if args.cmd == "list":
+        for e in entries[-args.limit:]:
+            print(f"  {e.get('date','?')}  {e.get('project','?'):<20} {e.get('register','?'):<3} "
+                  f"{e.get('surface','?'):<6} {e.get('hue_family','?'):<12} {e.get('display','?'):<22} {e.get('structure','')[:44]}")
+        if not entries:
+            print("  (no history yet)")
+        return 0
+
+    warns = analyse(entries)
+    record(args.record, None, warns)
+    registers = [e.get("register") for e in entries[-WINDOW:] if e.get("register")]
+    note = None
+    if len(registers) >= STREAK and len(set(registers[-STREAK:])) == 1:
+        note = (f"the last {STREAK} runs were all {registers[-1]}. That is not a warning: keep the register the brief "
+                "calls for, and make the difference on the axes above")
+    if args.json:
+        print(json.dumps({"entries": len(entries), "recent": entries[-WINDOW:], "warnings": warns, "register_note": note},
+                         indent=2, ensure_ascii=False))
+        return 0
+    view = live(entries)[-WINDOW:]
+    print(f"design history: {len(entries)} entries, looking at the last {len(view)} (planned runs in progress included)")
+    for e in view:
+        print(f"  {'[planned] ' if e.get('status') == 'planned' else ''}{e.get('date','?')}  {e.get('project','?')}: "
+              f"{e.get('register','?')} · {e.get('surface','?')} · {e.get('result_form', 'result ?')} · "
+              f"{e.get('hue_family','?')} · {e.get('display','?')} · {e.get('composition', 'composition ?')} · "
+              f"{e.get('language', 'language ?')} · {e.get('structure','')[:40]}")
+    if warns:
+        print()
+        for w in warns:
+            print("CONVERGENCE:", w)
+        print("\nBreak at least two axes: surface polarity, hue family, typeface class, first-viewport composition. "
+              "Never the register — it comes from the brief. And never break an axis the market fingerprint fixes: "
+              "the page converges on its market and diverges from this history (design-language.md §5).")
+    else:
+        print("\nno convergence warnings")
+    if note:
+        print("register:", note)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
