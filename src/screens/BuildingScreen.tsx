@@ -1,34 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
 import { Character } from "../components/art/Character.tsx";
+import { QuestionProgress } from "../components/chrome/QuestionProgress.tsx";
 import { ScreenIntro } from "../components/chrome/ScreenIntro.tsx";
 import { GlassLink } from "../components/glass/GlassLink.tsx";
-import { StepRow, type StepState } from "../components/kit/StepRow.tsx";
-import type { IconName } from "../components/ui/icon-names.ts";
+import { StepRow } from "../components/kit/StepRow.tsx";
+import { ONBOARDING_DOT_COUNT, onboardingProgress } from "../content/onboarding.ts";
+import { buildingReadyLabel, buildingSkipLabel } from "../content/screen-copy.ts";
 import { guideById } from "../data/guides.ts";
 import { buildAgentSteps } from "../lib/build-agent-steps.ts";
 import { formatHoursMinutes } from "../lib/format-duration.ts";
+import { buildingLiveText, stepState } from "../lib/step-state.ts";
 import { paths } from "../routing/paths.ts";
 import { useSession } from "../state/SessionContext.tsx";
 import { useReducedMotion } from "../hooks/use-reduced-motion.ts";
 import { motion } from "../tokens/tokens.ts";
-
-const stepIcons: Record<string, IconName> = {
-  resolve: "note",
-  match: "stack",
-  exclude: "aside",
-  pack: "clock",
-  check: "check",
-};
-
-function stepState(index: number, shown: number, total: number): StepState {
-  if (index < shown) {
-    return "done";
-  }
-  if (shown < total && index === shown) {
-    return "active";
-  }
-  return "pending";
-}
 
 export function BuildingScreen() {
   const { draft } = useSession();
@@ -57,8 +42,11 @@ export function BuildingScreen() {
   const elapsedSteps = Math.floor((now - startedAt) / motion.stepIntervalMs);
   const shown = reduced ? steps.length : Math.min(steps.length, elapsedSteps);
   const complete = shown >= steps.length;
-  const activeStep = steps[shown];
-  const liveText = complete ? "The kit is ready." : (activeStep?.title ?? "Starting");
+  const liveText = buildingLiveText(
+    steps.map((step) => step.title),
+    shown,
+  );
+  const progress = onboardingProgress.building;
 
   return (
     <div
@@ -66,6 +54,11 @@ export function BuildingScreen() {
       data-screen="building"
       data-state={complete ? "ready" : "working"}
     >
+      <QuestionProgress
+        step={progress.step}
+        total={ONBOARDING_DOT_COUNT}
+        backHref={progress.backHref}
+      />
       <ScreenIntro
         hero={formatHoursMinutes(draft.durationMinutes)}
         caption="the chair we are filling"
@@ -79,16 +72,11 @@ export function BuildingScreen() {
       </div>
       <ol className="m-0 flex list-none flex-col gap-4 p-0">
         {steps.map((step, index) => (
-          <StepRow
-            key={step.id}
-            title={step.title}
-            icon={stepIcons[step.id] ?? "check"}
-            state={stepState(index, shown, steps.length)}
-          />
+          <StepRow key={step.id} title={step.title} state={stepState(index, shown, steps.length)} />
         ))}
       </ol>
       <GlassLink href={paths.ready} tone={complete ? "solid" : "quiet"} className="w-full">
-        {complete ? "Your kit is ready" : "Skip for now"}
+        {complete ? buildingReadyLabel : buildingSkipLabel}
       </GlassLink>
     </div>
   );

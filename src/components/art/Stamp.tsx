@@ -8,25 +8,20 @@ export function Stamp({
   title,
   hue,
   kind = "movie",
-  caption,
-  detail,
+  line,
 }: {
   seed: string;
   title: string;
   hue: Hue;
   kind?: ContentKind;
-  caption: string;
-  detail: string;
+  line: string;
 }) {
   return (
     <figure className={glassClass({ thickness: "regular", shape: "card", className: "stamp" })}>
       <div className="stamp-art">
-        <CoverArt seed={seed} title={title} hue={hue} kind={kind} frame="square" />
+        <CoverArt seed={seed} title={title} hue={hue} kind={kind} frame="square" decorative />
       </div>
-      <figcaption className="mt-4 flex flex-col gap-1 text-center">
-        <span className="text-base font-bold">{caption}</span>
-        <span className="text-lg font-bold">{detail}</span>
-      </figcaption>
+      <figcaption className="mt-4 text-center text-lg font-bold">{line}</figcaption>
     </figure>
   );
 }

@@ -1,5 +1,6 @@
 import { QuestionFrame } from "../components/chrome/QuestionFrame.tsx";
 import { Dial } from "../components/ui/Dial.tsx";
+import { ONBOARDING_DOT_COUNT, onboardingProgress } from "../content/onboarding.ts";
 import { paths } from "../routing/paths.ts";
 import { useSession } from "../state/SessionContext.tsx";
 
@@ -15,6 +16,7 @@ export function ChairScreen() {
       primaryHref={paths.themes}
       secondary="You can change this anytime"
       secondaryHref={paths.themes}
+      progress={{ ...onboardingProgress.chair, total: ONBOARDING_DOT_COUNT }}
     >
       <Dial minutes={draft.durationMinutes} onChange={setDuration} />
     </QuestionFrame>

@@ -3,6 +3,7 @@ import { Character } from "../components/art/Character.tsx";
 import { QuestionFrame } from "../components/chrome/QuestionFrame.tsx";
 import { glassClass } from "../components/glass/glass-styles.ts";
 import { Icon } from "../components/ui/Icon.tsx";
+import { ONBOARDING_DOT_COUNT, onboardingProgress } from "../content/onboarding.ts";
 import { guideById, guides } from "../data/guides.ts";
 import { cn } from "../lib/cn.ts";
 import { paths } from "../routing/paths.ts";
@@ -24,6 +25,7 @@ export function CompanyScreen() {
       }}
       secondary="Skip for now"
       secondaryHref={paths.building}
+      progress={{ ...onboardingProgress.company, total: ONBOARDING_DOT_COUNT }}
     >
       <div className="guide-grid">
         {guides.map((choice) => {

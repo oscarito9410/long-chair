@@ -44,13 +44,24 @@ const glyphs: Record<IconName, LucideIcon> = {
   x: X,
 };
 
-export function Icon({ name }: { name: IconName }) {
+const strokeWidth = {
+  regular: 1.75,
+  bold: 2.5,
+} as const;
+
+export function Icon({
+  name,
+  weight = "regular",
+}: {
+  name: IconName;
+  weight?: keyof typeof strokeWidth;
+}) {
   const Glyph = glyphs[name];
   return (
     <Glyph
       aria-hidden
       focusable="false"
-      strokeWidth={1.75}
+      strokeWidth={strokeWidth[weight]}
       style={{ width: "var(--lc-icon)", height: "var(--lc-icon)" }}
     />
   );

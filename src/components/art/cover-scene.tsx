@@ -219,7 +219,3 @@ export function CoverScene({
   }
   return <Film box={box} hue={hue} accent={accent} a={a} b={b} />;
 }
-
-export function titleInk(kind: CoverKind): boolean {
-  return kind === "book" || kind === "bakery" || kind === "kitchen" || kind === "coffee";
-}

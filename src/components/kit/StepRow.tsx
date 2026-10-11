@@ -1,26 +1,10 @@
 import { cn } from "../../lib/cn.ts";
-import type { IconName } from "../ui/icon-names.ts";
+import type { StepState } from "../../lib/step-state.ts";
 import { glassClass } from "../glass/glass-styles.ts";
 import { Icon } from "../ui/Icon.tsx";
 import { IconWell } from "../ui/IconWell.tsx";
 
-export type StepState = "pending" | "active" | "done";
-
-const stateHue = {
-  pending: "wisteria",
-  active: "honey",
-  done: "seaglass",
-} as const;
-
-export function StepRow({
-  title,
-  icon,
-  state,
-}: {
-  title: string;
-  icon: IconName;
-  state: StepState;
-}) {
+export function StepRow({ title, state }: { title: string; state: StepState }) {
   return (
     <li
       className={cn(
@@ -30,17 +14,34 @@ export function StepRow({
           tint: state === "active" ? "honey" : undefined,
         }),
         "option-row step-row cursor-default",
-        state === "done" && "is-selected",
       )}
       aria-current={state === "active" ? "step" : undefined}
     >
-      <IconWell hue={stateHue[state]}>
-        <Icon name={state === "done" ? "check" : icon} />
-      </IconWell>
+      <StepMark state={state} />
       <p className="min-w-0 text-lg font-bold">
+        {state === "active" ? <span className="step-now-label">Now</span> : null}
         {state === "done" ? <span className="visually-hidden">Done. </span> : null}
+        {state === "pending" ? <span className="visually-hidden">Waiting. </span> : null}
         {title}
       </p>
     </li>
   );
+}
+
+function StepMark({ state }: { state: StepState }) {
+  if (state === "done") {
+    return (
+      <IconWell hue="seaglass">
+        <Icon name="check" />
+      </IconWell>
+    );
+  }
+  if (state === "active") {
+    return (
+      <span className="step-live-well">
+        <span className="step-pulse" />
+      </span>
+    );
+  }
+  return <span className="step-well-empty" />;
 }

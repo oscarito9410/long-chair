@@ -1,9 +1,16 @@
+import { createContext, useContext, useState } from "react";
 import type { ReactNode } from "react";
 import { cn } from "../../lib/cn.ts";
 import type { Route } from "../../routing/parse-route.ts";
 import { DotField } from "../background/DotField.tsx";
 import { SoftBlobs } from "../background/SoftBlobs.tsx";
 import { TabBar } from "./TabBar.tsx";
+
+const AppWindowContext = createContext<HTMLElement | null>(null);
+
+export function useAppWindow(): HTMLElement | null {
+  return useContext(AppWindowContext);
+}
 
 type AppShellProps = {
   children: ReactNode;
@@ -13,19 +20,25 @@ type AppShellProps = {
 };
 
 export function AppShell({ children, route, showTabs, showDots }: AppShellProps) {
+  const [windowEl, setWindowEl] = useState<HTMLDivElement | null>(null);
+
   return (
-    <div className="relative min-h-dvh bg-page text-ink">
-      <a className="skip-link" href="#main">
-        Skip to content
-      </a>
-      <div className="layer-bg">
-        <SoftBlobs />
-        {showDots ? <DotField mode="ambient" /> : null}
+    <AppWindowContext.Provider value={windowEl}>
+      <div className="app-stage">
+        <a className="skip-link" href="#main">
+          Skip to content
+        </a>
+        <div className="layer-bg">
+          <SoftBlobs />
+          {showDots ? <DotField mode="ambient" /> : null}
+        </div>
+        <div className="app-window" id="app-window" ref={setWindowEl}>
+          <div className={cn("layer-content page", showTabs ? "page-pad-tabs" : "page-pad")}>
+            <main id="main">{children}</main>
+          </div>
+          {showTabs ? <TabBar route={route} /> : null}
+        </div>
       </div>
-      <div className={cn("layer-content page", showTabs ? "page-pad-tabs" : "page-pad")}>
-        <main id="main">{children}</main>
-      </div>
-      {showTabs ? <TabBar route={route} /> : null}
-    </div>
+    </AppWindowContext.Provider>
   );
 }

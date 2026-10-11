@@ -51,10 +51,11 @@ export function TabBar({ route }: { route: Route }) {
                 href={tab.href}
                 aria-current={current ? "page" : undefined}
                 className={cn(
-                  "tab-link relative flex min-h-[var(--lc-target)] flex-1 flex-col items-center justify-center gap-1 rounded-full px-2 text-base font-bold sm:flex-row sm:gap-2 sm:text-lg",
+                  "tab-link relative flex min-h-[var(--lc-target)] flex-1 flex-col items-center justify-center gap-1 rounded-full px-2 text-base sm:flex-row sm:gap-2 sm:text-lg",
+                  current ? "font-extrabold" : "font-bold",
                 )}
               >
-                <Icon name={tab.icon} />
+                <Icon name={tab.icon} weight={current ? "bold" : "regular"} />
                 {tab.label}
               </a>
             );

@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
+import { cn } from "../../lib/cn.ts";
 import { GlassButton } from "../glass/GlassButton.tsx";
 import { GlassLink } from "../glass/GlassLink.tsx";
+import { QuestionProgress } from "./QuestionProgress.tsx";
 
 export function QuestionFrame({
   screen,
@@ -13,6 +15,8 @@ export function QuestionFrame({
   onPrimary,
   secondary,
   secondaryHref,
+  progress,
+  dock = false,
 }: {
   screen: string;
   title: string;
@@ -24,15 +28,24 @@ export function QuestionFrame({
   onPrimary?: () => void;
   secondary?: string;
   secondaryHref?: string;
+  progress?: { step: number; total: number; backHref: string };
+  dock?: boolean;
 }) {
   return (
-    <div className="question" data-screen={screen}>
+    <div className={cn("question", dock && "question-tight")} data-screen={screen}>
+      {progress ? (
+        <QuestionProgress
+          step={progress.step}
+          total={progress.total}
+          backHref={progress.backHref}
+        />
+      ) : null}
       <header className="flex flex-col items-center gap-4 text-center">
         <h1 className="text-4xl font-extrabold leading-tight">{title}</h1>
         {lede ? <p className="text-lg leading-relaxed">{lede}</p> : null}
       </header>
-      <div className="question-body">{children}</div>
-      <div className="flex flex-col items-center gap-2">
+      <div className={cn("question-body", dock && "question-body-tight")}>{children}</div>
+      <div className={cn("flex flex-col items-center gap-2", dock && "question-dock")}>
         {primaryHref && !primaryDisabled ? (
           <GlassLink href={primaryHref} className="w-full">
             {primary}

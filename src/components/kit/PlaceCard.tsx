@@ -1,9 +1,8 @@
 import { placeMeta } from "../../content/presentation.ts";
 import type { NearbyPlace } from "../../data/types.ts";
 import { CoverArt } from "../art/CoverArt.tsx";
-import { GlassSurface } from "../glass/GlassSurface.tsx";
+import { CoverBadge } from "../art/CoverBadge.tsx";
 import { glassClass } from "../glass/glass-styles.ts";
-import { Icon } from "../ui/Icon.tsx";
 
 export function PlaceCard({ place }: { place: NearbyPlace }) {
   const meta = placeMeta[place.kind];
@@ -18,14 +17,7 @@ export function PlaceCard({ place }: { place: NearbyPlace }) {
           frame="banner"
           decorative
         />
-        <GlassSurface
-          variant="badge"
-          thickness="regular"
-          className="cover-badge flex items-center gap-2 px-4 py-2"
-        >
-          <Icon name={meta.icon} />
-          <span className="text-base font-bold">{meta.label}</span>
-        </GlassSurface>
+        <CoverBadge icon={meta.icon} label={meta.label} />
       </div>
       <div
         className={glassClass({

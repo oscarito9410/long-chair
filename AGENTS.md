@@ -121,7 +121,7 @@ Use the character as the icon on an `OptionRow`, as the guide on `#/company` and
 
 Guides live in `src/data/guides.ts` (Pebble, Lumen, Nook, Brim). Each line is one adult sentence. Do not write a guide as if it were speaking to a child. The draft stores `companionId`. Packing ignores it. Do not copy another product's characters, names, or lines.
 
-`#/company` shows the four guides in a 2×2 grid of thin-glass cards. One tap selects a guide (`aria-pressed`). The selected cell shows a check, a 2px ink border, and the name. The primary button reads "Choose" plus that name and then writes `companionId`. Skip leaves the guide unchanged. The companion plan puts "Open nearby" directly under the headline, so the hero count is the places in view. The guide is a compact line under those places. An unknown hash uses `EmptyState`: "We couldn't find that page", the pebble, and "Back to the start". If a control uses an arrow, its hit area is at least 44px and it has an `aria-label`.
+`#/company` shows the four guides in a 2×2 grid of thin-glass cards. One tap selects a guide (`aria-pressed`). The selected cell shows a check, a 2px ink border, and the name. The primary button reads "Choose" plus that name and then writes `companionId`. Skip leaves the guide unchanged. The companion plan leads with the guide: the blob is the avatar, and the header bubble is the personality plus the first sentence of the quote. "Open nearby" is the section under that header. An unknown hash uses `EmptyState`: "We couldn't find that page", the pebble, and "Back to the start". If a control uses an arrow, its hit area is at least 44px and it has an `aria-label`.
 
 ### Option rows
 
@@ -129,13 +129,13 @@ Guides live in `src/data/guides.ts` (Pebble, Lumen, Nook, Brim). Each line is on
 
 ### Dial
 
-`Dial` is the chair length. The arc runs from 1 hour to 4 hours. A native range sits on the dial with `role="slider"`, `aria-valuemin` 60, `aria-valuemax` 240, `aria-valuenow` in minutes, and `aria-valuetext` that includes the hour figure and "This chair". Arrow keys step 30 minutes. Four thin-glass pills under the dial (1h, 2h, 3h, 4h) set the same value, so the screen can be finished without dragging. A selected pill uses `aria-pressed` and a 2px ink border. The center figure is the hour count (a half hour shows one decimal), the word "hours", and "This chair". Hour ticks mark 1, 2, 3, and 4. The subline is "Turn the dial or tap a length." Focus draws the ink ring on `.dial`. The themes screen keeps illness, hospitals, and cancer preselected and says so: "We left out three common ones. Change any."
+`Dial` is the chair length. The arc runs from 1 hour to 4 hours. A native range sits on the dial with `role="slider"`, `aria-valuemin` 60, `aria-valuemax` 240, `aria-valuenow` in minutes, and `aria-valuetext` that includes the hour figure and "This chair". Arrow keys step 30 minutes. Four thin-glass pills under the dial (1h, 2h, 3h, 4h) set the same value, so the screen can be finished without dragging. A selected pill uses `aria-pressed` and a 2px ink border. The center figure is the hour count (a half hour shows one decimal), the word "hours", and "This chair". Hour ticks mark 1, 2, 3, and 4. The subline is "Turn the dial or tap a length." Focus draws the ink ring on `.dial`. The themes screen keeps illness, hospitals, and cancer preselected and says so: "We left out three. Change any." Chair, themes, company, and building (steps 3 through 6, after welcome and tastes) show a back chevron and four progress dots.
 
 ### Stamp and cover art
 
-`CoverArt` paints a deterministic poster, square, or banner from a seed string plus a content or place kind. Each kind has its own composition in `cover-scene.tsx`: a film frame, stacked screens, a waveform, a book spine, a stage, or a table. A second hue (`accentHue`) shifts the motif so two items of the same kind still differ. Book and place titles are ink on a light field; other titles sit in the page color on a deep field. Pass `decorative` when the title is already in adjacent text. Filter ids use `useId`, because a kit card paints the same seed twice (the blurred bleed and the visible cover).
+`CoverArt` paints a deterministic poster, square, or banner from a seed string plus a content or place kind. Each kind has its own composition in `cover-scene.tsx`: a film frame, stacked screens, a waveform, a book spine, a stage, or a table. A second hue (`accentHue`) shifts the motif so two items of the same kind still differ. The illustration has no title drawn on it. A glass type pill (Film, Podcast, and the rest) sits on the cover, and the title is set once in the text under the art. Pass `decorative` when that title is already adjacent. Filter ids use `useId`, because a kit card paints the same seed twice (the blurred bleed and the visible cover).
 
-`Stamp` frames a square cover as perforated glass. The ready screen (`#/ready`) is the reward: "Your kit is ready", the stamp, and "Open my kit".
+`Stamp` frames a square cover as perforated glass. The ready screen (`#/ready`) is the reward: "Your kit is ready", a fan of two or three covers behind the stamp, one line with the piece count and the chair length (the sample is 5 pieces and 4h 00m), and "Open my kit" in a sticky glass dock.
 
 ### Glass
 
@@ -159,7 +159,7 @@ Welcome notes are paper (`.sticker`), a hue mixed into the card, with a light fr
 
 `prefers-reduced-transparency: reduce`, and a missing backdrop-filter, paint light glass as opaque card and the primary as opaque ink, with no blur and no sheen. The glows quiet down in that mode too.
 
-The tab bar is a floating glass capsule. The current tab is a glass lens with a 2px ink border that slides between the three links (`aria-current="page"`). Do not communicate the current tab by color alone.
+The tab bar is a floating glass capsule. The current tab is a frosted glass lens that slides between the three links in 180ms (`aria-current="page"`). The move is instant when the visitor prefers reduced motion. The current icon and label are bolder. There is no ink pill around the lens. Do not communicate the current tab by color alone.
 
 ### Tab clearance
 
@@ -196,7 +196,7 @@ Keep the field quiet. This screen sits beside a person for hours. Do not add tra
 - Screens compose. They do not fetch, and they do not own palette values.
 - Sample data stays in `src/data/` behind the interfaces in `types.ts`. Components receive plain props or call a pure helper in `src/lib/`.
 - `packSession` is the duration fitter. Change packing rules there, not inside `KitScreen`. It reads tastes, themes, and minutes. It does not read `companionId`.
-- Reuse `QuestionFrame`, `Character`, `CoverArt`, `Dial`, `Stamp`, `GlassSurface`, `GlassButton`, `GlassLink`, `OptionRow`, `IconWell`, `HeroNumber`, and `BecauseChip` instead of copying markup. A screen has a headline and at most one short subline. Kit cards show the cover, title, type, time range, and one "Because you love" chip. Item detail adds a one-line check. Compare is a title and one line on each panel. The fictional-sample tag is welcome only.
+- Reuse `QuestionFrame`, `Character`, `CoverArt`, `Dial`, `Stamp`, `GlassSurface`, `GlassButton`, `GlassLink`, `OptionRow`, `IconWell`, `HeroNumber`, and `BecauseChip` instead of copying markup. A screen has a headline and at most one short subline. Kit cards show the cover, title, type, time range, and one "Because you love" chip. Item detail is a bottom sheet over the dimmed kit and adds one check: "No illness, hospital, or cancer themes." Compare is a title and one line on each panel, and the plain-model panel lists the themes it would bring with the same chips as the kit header. The fictional-sample tag is welcome only.
 - Session state is the draft in `SessionContext` (tastes, themes, minutes, companion). The packed kit is derived with `usePackedSession`. Do not store a second copy of the kit.
 - Do not thread the draft through props from `App`. Call `useSession` in the screen that needs it.
 

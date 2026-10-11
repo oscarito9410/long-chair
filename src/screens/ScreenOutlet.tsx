@@ -31,7 +31,14 @@ export function ScreenOutlet({ route }: { route: Route }) {
     case "kit":
       return <KitScreen />;
     case "item":
-      return <ItemDetailScreen itemId={route.itemId} />;
+      return (
+        <>
+          <div inert>
+            <KitScreen />
+          </div>
+          <ItemDetailScreen itemId={route.itemId} />
+        </>
+      );
     case "companion":
       return <CompanionScreen />;
     case "compare":
