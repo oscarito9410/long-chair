@@ -5,7 +5,7 @@ import { IconWell } from "../ui/IconWell.tsx";
 export type StepState = "pending" | "active" | "done";
 
 const stateClass: Record<StepState, string> = {
-  pending: "glass",
+  pending: "solid-panel",
   active: "pastel-card wash-honey",
   done: "pastel-card wash-seaglass",
 };

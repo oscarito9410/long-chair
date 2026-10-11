@@ -6,8 +6,8 @@ import { EmptyState } from "../components/ui/EmptyState.tsx";
 import { kindMeta } from "../content/presentation.ts";
 import { avoidThemes } from "../data/avoid-themes.ts";
 import { itemById } from "../data/catalog.ts";
-import { formatClock, formatHoursMinutes } from "../lib/format-duration.ts";
-import { avoidedLabels, matchingSeedNames } from "../lib/match-taste.ts";
+import { formatHoursMinutes, formatRange } from "../lib/format-duration.ts";
+import { exceptionLabels, matchingSeedNames } from "../lib/match-taste.ts";
 import { PAUSE_NOTICE_MINUTES, QUIET_FILL_RATIO } from "../lib/pack-session.ts";
 import { paths } from "../routing/paths.ts";
 import { usePackedSession } from "../hooks/use-packed-session.ts";
@@ -28,14 +28,14 @@ export function KitScreen() {
         hero={formatHoursMinutes(packed.filledMinutes)}
         caption={`of a ${formatHoursMinutes(packed.durationMinutes)} chair`}
         title="Your session kit"
-        lede="Ordered to the length you chose. Each piece names why it is here and which themes were left out."
+        lede="Ordered to the length you chose. Each piece names why it is here, and that it was checked against the themes you left out."
       >
         <p className="text-lg">
           {themeLine.length > 0
             ? `Left out of the room: ${themeLine}.`
             : "No themes were set aside."}
         </p>
-        <p className="hand">Companion and Compare sit in the bar below.</p>
+        <p className="text-lg">Companion and Compare sit in the bar below.</p>
       </ScreenIntro>
       {packed.slots.length === 0 ? (
         <EmptyState
@@ -56,15 +56,15 @@ export function KitScreen() {
               <li key={item.id}>
                 <TimelineCard
                   href={paths.item(item.id)}
-                  startLabel={formatClock(slot.startMinute)}
-                  endLabel={formatClock(slot.endMinute)}
+                  rangeLabel={formatRange(slot.startMinute, slot.endMinute)}
                   kindLabel={meta.label}
                   title={item.title}
                   maker={item.maker}
                   hue={meta.hue}
                   icon={meta.icon}
                   because={matchingSeedNames(item, draft)}
-                  avoided={avoidedLabels(item, draft)}
+                  themeCount={draft.avoidIds.length}
+                  exceptions={exceptionLabels(item, draft)}
                 />
               </li>
             );

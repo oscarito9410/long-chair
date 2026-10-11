@@ -9,6 +9,10 @@ export function formatHoursMinutes(total: number): string {
   return `${hours}h ${padded}m`;
 }
 
+export function formatRange(start: number, end: number): string {
+  return `${formatClock(start)}\u2013${formatClock(end)}`;
+}
+
 export function formatClock(total: number): string {
   const safe = Math.max(0, Math.round(total));
   const hours = Math.floor(safe / 60);

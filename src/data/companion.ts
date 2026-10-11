@@ -60,7 +60,7 @@ export const nearbyPlaces: readonly NearbyPlace[] = [
     offer: "Soup, brown bread, and a quiet corner",
     walkMinutes: 6,
     openUntil: "4:30 pm",
-    priceLabel: "Light bill",
+    priceLabel: "Light meal, low price",
   },
   {
     id: "cedar-spoon",
@@ -69,7 +69,7 @@ export const nearbyPlaces: readonly NearbyPlace[] = [
     offer: "Broth and rice, and the room stays low",
     walkMinutes: 9,
     openUntil: "6:00 pm",
-    priceLabel: "Light bill",
+    priceLabel: "Light meal, low price",
   },
   {
     id: "little-harbor",
@@ -78,6 +78,6 @@ export const nearbyPlaces: readonly NearbyPlace[] = [
     offer: "Tea, and something small if that is enough",
     walkMinutes: 4,
     openUntil: "5:00 pm",
-    priceLabel: "Light bill",
+    priceLabel: "Light meal, low price",
   },
 ];

@@ -1,7 +1,7 @@
 import { ScreenIntro } from "../components/chrome/ScreenIntro.tsx";
 import { GlassLink } from "../components/glass/GlassLink.tsx";
-import { GlassPanel } from "../components/glass/GlassPanel.tsx";
 import { SectionHeading } from "../components/ui/SectionHeading.tsx";
+import { SolidPanel } from "../components/ui/SolidPanel.tsx";
 import { AvoidedRow } from "../components/ui/AvoidedRow.tsx";
 import { BecauseList } from "../components/ui/BecauseList.tsx";
 import { EmptyState } from "../components/ui/EmptyState.tsx";
@@ -43,20 +43,20 @@ export function ItemDetailScreen({ itemId }: { itemId: string }) {
         title={item.title}
         lede={item.maker}
       />
-      <GlassPanel>
+      <SolidPanel>
         <div className="flex flex-col gap-4">
           <SectionHeading>Why this one</SectionHeading>
           <BecauseList names={matchingSeedNames(item, draft)} />
           <p className="text-lg leading-relaxed">{item.why}</p>
         </div>
-      </GlassPanel>
-      <GlassPanel>
+      </SolidPanel>
+      <SolidPanel>
         <div className="flex flex-col gap-4">
           <SectionHeading>The piece</SectionHeading>
           <p className="text-lg leading-relaxed">{item.synopsis}</p>
         </div>
-      </GlassPanel>
-      <GlassPanel>
+      </SolidPanel>
+      <SolidPanel>
         <div className="flex flex-col gap-4">
           <SectionHeading>Checked again</SectionHeading>
           <p className="text-lg leading-relaxed">
@@ -64,7 +64,7 @@ export function ItemDetailScreen({ itemId }: { itemId: string }) {
           </p>
           <AvoidedRow labels={avoidedLabels(item, draft)} />
         </div>
-      </GlassPanel>
+      </SolidPanel>
     </div>
   );
 }

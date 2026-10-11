@@ -42,7 +42,7 @@ export function OnboardingScreen() {
               return (
                 <SelectCard
                   key={seed.id}
-                  inputType="checkbox"
+                  selection="toggle"
                   checked={draft.seedIds.includes(seed.id)}
                   onChange={() => {
                     toggleSeed(seed.id);
@@ -51,6 +51,7 @@ export function OnboardingScreen() {
                   icon={meta.icon}
                   title={seed.name}
                   detail={seed.detail}
+                  selectedLabel="In the room"
                 />
               );
             })}
@@ -62,7 +63,7 @@ export function OnboardingScreen() {
             {durationChoices.map((choice) => (
               <SelectCard
                 key={choice.minutes}
-                inputType="radio"
+                selection="single"
                 name="session-length"
                 value={String(choice.minutes)}
                 checked={draft.durationMinutes === choice.minutes}
@@ -73,6 +74,7 @@ export function OnboardingScreen() {
                 icon="clock"
                 title={choice.label}
                 detail={choice.detail}
+                selectedLabel="This chair"
               />
             ))}
           </div>
@@ -86,7 +88,7 @@ export function OnboardingScreen() {
             {avoidThemes.map((theme) => (
               <SelectCard
                 key={theme.id}
-                inputType="checkbox"
+                selection="toggle"
                 checked={draft.avoidIds.includes(theme.id)}
                 onChange={() => {
                   toggleAvoid(theme.id);
@@ -95,10 +97,11 @@ export function OnboardingScreen() {
                 icon="aside"
                 title={theme.label}
                 detail={theme.detail}
+                selectedLabel="Left out"
               />
             ))}
           </div>
-          <p className="hand">Names and medical details never leave this page.</p>
+          <p className="text-lg">Names and medical details never leave this page.</p>
         </fieldset>
         {canBuild ? null : (
           <p className="text-lg" role="status">

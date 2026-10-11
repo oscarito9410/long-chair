@@ -1,10 +1,22 @@
 import { ScreenIntro } from "../components/chrome/ScreenIntro.tsx";
-import { GlassPanel } from "../components/glass/GlassPanel.tsx";
 import { PlaceCard } from "../components/kit/PlaceCard.tsx";
 import { TopicCard } from "../components/kit/TopicCard.tsx";
 import { SectionHeading } from "../components/ui/SectionHeading.tsx";
+import { SolidPanel } from "../components/ui/SolidPanel.tsx";
+import { kindMeta } from "../content/presentation.ts";
 import { companionSetting, companionTopics, nearbyPlaces } from "../data/companion.ts";
+import { tasteSeeds } from "../data/taste-seeds.ts";
+import type { IconName } from "../components/ui/icon-names.ts";
+import type { Hue } from "../tokens/tokens.ts";
 import { useSession } from "../state/SessionContext.tsx";
+
+function topicAppearance(seedId: string): { hue: Hue; icon: IconName } {
+  const seed = tasteSeeds.find((entry) => entry.id === seedId);
+  if (!seed) {
+    return kindMeta.movie;
+  }
+  return kindMeta[seed.kind];
+}
 
 export function CompanionScreen() {
   const { draft } = useSession();
@@ -18,11 +30,11 @@ export function CompanionScreen() {
         title="For the person with you"
         lede="Topics come from the same tastes. The places are a sample of what a location search would return."
       />
-      <GlassPanel>
+      <SolidPanel>
         <p className="text-lg leading-relaxed">
           Near {companionSetting.placeName}. {companionSetting.disclaimer}
         </p>
-      </GlassPanel>
+      </SolidPanel>
       <section className="flex flex-col gap-6">
         <SectionHeading>Open nearby</SectionHeading>
         <div className="flex flex-col gap-6">
@@ -39,9 +51,18 @@ export function CompanionScreen() {
           </p>
         ) : (
           <div className="flex flex-col gap-6">
-            {topics.map((topic) => (
-              <TopicCard key={topic.id} title={topic.title} prompt={topic.prompt} />
-            ))}
+            {topics.map((topic) => {
+              const appearance = topicAppearance(topic.seedId);
+              return (
+                <TopicCard
+                  key={topic.id}
+                  title={topic.title}
+                  prompt={topic.prompt}
+                  hue={appearance.hue}
+                  icon={appearance.icon}
+                />
+              );
+            })}
           </div>
         )}
       </section>

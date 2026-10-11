@@ -5,17 +5,12 @@ import { showsTabBar, type Route } from "./routing/parse-route.ts";
 import { useRoute } from "./routing/use-route.ts";
 import { ScreenOutlet } from "./screens/ScreenOutlet.tsx";
 import { SessionProvider } from "./state/SessionContext.tsx";
-import type { DotMode } from "./tokens/tokens.ts";
 
 function routeKey(route: Route): string {
   if (route.name === "item") {
     return `item-${route.itemId}`;
   }
   return route.name;
-}
-
-function dotModeFor(route: Route): DotMode {
-  return route.name === "building" ? "gather" : "ambient";
 }
 
 export function App() {
@@ -28,7 +23,7 @@ export function App() {
 
   return (
     <SessionProvider>
-      <AppShell route={route} showTabs={showsTabBar(route)} dotMode={dotModeFor(route)}>
+      <AppShell route={route} showTabs={showsTabBar(route)} showDots={route.name !== "building"}>
         <div key={routeKey(route)} className="screen-enter">
           <ScreenOutlet route={route} />
         </div>

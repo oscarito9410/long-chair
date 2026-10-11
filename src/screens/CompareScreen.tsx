@@ -1,6 +1,7 @@
 import { ScreenIntro } from "../components/chrome/ScreenIntro.tsx";
-import { GlassPanel } from "../components/glass/GlassPanel.tsx";
 import { SectionHeading } from "../components/ui/SectionHeading.tsx";
+import { SolidPanel } from "../components/ui/SolidPanel.tsx";
+import { tagClass } from "../components/ui/tag-class.ts";
 import { AvoidedRow } from "../components/ui/AvoidedRow.tsx";
 import { BecauseList } from "../components/ui/BecauseList.tsx";
 import { kindMeta } from "../content/presentation.ts";
@@ -57,9 +58,7 @@ export function CompareScreen() {
               <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
                 {themes.map((label) => (
                   <li key={label}>
-                    <span className="inline-flex items-center rounded-full bg-wisteria-deep px-4 py-2 text-lg font-bold text-page">
-                      {label}
-                    </span>
+                    <span className={cn(tagClass, "bg-wisteria-deep text-page")}>{label}</span>
                   </li>
                 ))}
               </ul>
@@ -84,13 +83,13 @@ export function CompareScreen() {
             <AvoidedRow labels={avoidedLabels(kept, draft)} />
           </article>
         ) : (
-          <GlassPanel>
+          <SolidPanel>
             <SectionHeading>Nothing kept yet</SectionHeading>
             <p className="mt-4 text-lg">Add a film you love and the contrast will fill in.</p>
-          </GlassPanel>
+          </SolidPanel>
         )}
       </div>
-      <p className="hand">
+      <p className="text-lg">
         The unfiltered title is a real book, named only as the miss. Every Long Chair title is
         fictional.
       </p>

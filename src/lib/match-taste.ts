@@ -31,6 +31,20 @@ export function avoidedLabels(item: CatalogItem, draft: SessionDraft): string[] 
   return labels;
 }
 
+export function exceptionLabels(item: CatalogItem, draft: SessionDraft): string[] {
+  const labels: string[] = [];
+  for (const id of draft.avoidIds) {
+    if (item.avoidedThemeIds.includes(id)) {
+      continue;
+    }
+    const theme = avoidThemes.find((entry) => entry.id === id);
+    if (theme) {
+      labels.push(theme.label);
+    }
+  }
+  return labels;
+}
+
 export function plainThemeLabels(draft: SessionDraft): string[] {
   const labels: string[] = [];
   for (const id of plainModelExample.themeIds) {

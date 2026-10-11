@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { controlClass } from "./glass-styles.ts";
-import { Specular } from "./Specular.tsx";
 
 type GlassButtonProps = {
   children: ReactNode;
@@ -26,8 +25,7 @@ export function GlassButton({
       onClick={onClick}
       className={controlClass(tone, className)}
     >
-      <Specular />
-      <span className="relative">{children}</span>
+      {children}
     </button>
   );
 }

@@ -22,6 +22,8 @@
   --lc-radius-card: 28px;
   --lc-radius-panel: 32px;
   --lc-radius-pill: 999px;
+  --lc-radius-tag: 8px;
+  --lc-border: 1px;
   --lc-content: 800px;
   --lc-hero: clamp(3.5rem, 10vw, 5.75rem);
   --lc-hand: 1.75rem;
@@ -34,7 +36,15 @@
   --lc-space-24: 24px;
   --lc-space-32: 32px;
   --lc-space-64: 64px;
-  --lc-tab-clearance: calc(var(--lc-space-64) + var(--lc-space-32) + var(--lc-space-16));
+  /* Nav height: 48px control, 16px of nav padding, phone stack overflow, and the 1px glass border. */
+  --lc-tab-bar: calc(
+    var(--lc-target) + var(--lc-space-16) + var(--lc-space-4) + (var(--lc-border) * 2)
+  );
+  /* Content clearance is the bar, the dock's lower inset (or the home-indicator inset), and 24px of air. */
+  --lc-tab-clearance: calc(
+    var(--lc-tab-bar) + max(var(--lc-space-16), env(safe-area-inset-bottom, 0px)) +
+      var(--lc-space-24)
+  );
   --lc-glass: rgba(243, 238, 230, 0.8);
   --lc-glass-border: rgba(255, 255, 255, 0.72);
   --lc-glass-highlight: rgba(255, 252, 248, 0.95);
@@ -72,6 +82,7 @@
   --radius-card: var(--lc-radius-card);
   --radius-panel: var(--lc-radius-panel);
   --radius-pill: var(--lc-radius-pill);
+  --radius-tag: var(--lc-radius-tag);
 }
 
 html {
@@ -197,7 +208,7 @@ button:disabled {
 }
 
 .page-pad {
-  padding-bottom: var(--lc-space-64);
+  padding-bottom: calc(var(--lc-space-64) + env(safe-area-inset-bottom, 0px));
 }
 
 .page-pad-tabs {
@@ -231,13 +242,35 @@ button:disabled {
   transform: none;
 }
 
-.choice {
+.choice-tile {
   position: relative;
+  width: 100%;
+  border: var(--lc-focus-width) solid var(--lc-line);
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
 }
 
-.choice:has(:focus-visible) {
+.choice-tile[aria-pressed="true"],
+.choice-tile:has(:checked) {
+  border-color: var(--lc-ink);
+}
+
+.choice-tile:has(:focus-visible) {
   outline: var(--lc-focus-width) solid var(--lc-ink);
   outline-offset: var(--lc-space-4);
+}
+
+.solid-panel {
+  background-color: color-mix(in srgb, var(--lc-page) 96%, var(--lc-ink));
+  border: var(--lc-border) solid color-mix(in srgb, var(--lc-ink) 8%, transparent);
+}
+
+.action-quiet {
+  background: var(--lc-page);
+  color: var(--lc-ink);
+  border: var(--lc-border) solid var(--lc-ink);
 }
 
 .clip-input {
@@ -366,6 +399,23 @@ button:disabled {
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .glass {
+    background-color: var(--lc-page);
+    background-image: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass {
+    background-color: var(--lc-page);
+    background-image: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: none;
+  }
+
+  .solid-panel {
     background-color: var(--lc-page);
   }
 }

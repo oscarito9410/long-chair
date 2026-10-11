@@ -1,7 +1,8 @@
+import { cn } from "../../lib/cn.ts";
+import { tagClass } from "./tag-class.ts";
+
 export function BecauseChip({ name }: { name: string }) {
   return (
-    <span className="glass inline-flex items-center rounded-full px-4 py-2 text-lg font-bold text-ink">
-      Because of {name}
-    </span>
+    <span className={cn(tagClass, "border border-line bg-page text-ink")}>Because of {name}</span>
   );
 }
