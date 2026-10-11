@@ -18,7 +18,7 @@ type Handlers = {
 
 type ChromeContextValue = {
   store: OnboardingStore;
-  setStore: (store: OnboardingStore) => void;
+  setStore: (update: (previous: OnboardingStore) => OnboardingStore) => void;
   handlersRef: { current: Handlers };
 };
 
@@ -53,29 +53,23 @@ export function useOnboardingChrome(input: {
   const { handlersRef, setStore } = chrome;
   const primaryDisabled = input.primaryDisabled ?? false;
   const primaryHaptic = input.primaryHaptic ?? "press";
+  // Handlers change identity on every render, so they live in a ref and never
+  // drive a state update; only the primitive chrome fields do.
   useLayoutEffect(() => {
-    handlersRef.current = {
-      onPrimary: input.onPrimary,
-      onLink: input.onLink,
-    };
-    setStore({
-      primary: input.primary,
-      primaryDisabled,
-      primaryHaptic,
-      linkLabel: input.linkLabel,
-      footerNote: input.footerNote,
-    });
-  }, [
-    handlersRef,
-    input.footerNote,
-    input.linkLabel,
-    input.onLink,
-    input.onPrimary,
-    input.primary,
-    primaryDisabled,
-    primaryHaptic,
-    setStore,
-  ]);
+    handlersRef.current = { onPrimary: input.onPrimary, onLink: input.onLink };
+  });
+  const { primary, linkLabel, footerNote } = input;
+  useLayoutEffect(() => {
+    setStore((previous) =>
+      previous.primary === primary &&
+      previous.primaryDisabled === primaryDisabled &&
+      previous.primaryHaptic === primaryHaptic &&
+      previous.linkLabel === linkLabel &&
+      previous.footerNote === footerNote
+        ? previous
+        : { primary, primaryDisabled, primaryHaptic, linkLabel, footerNote },
+    );
+  }, [footerNote, linkLabel, primary, primaryDisabled, primaryHaptic, setStore]);
 }
 
 export function useOnboardingStore(): ChromeContextValue {

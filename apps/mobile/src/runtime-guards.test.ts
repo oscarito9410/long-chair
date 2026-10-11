@@ -38,6 +38,16 @@ describe("recovery boundary", () => {
   });
 });
 
+describe("studio background", () => {
+  it("clears the navigator gray that covers the canvas", () => {
+    const theme = source("src/theme/studio-theme.ts");
+    const layout = source("app/_layout.tsx");
+    expect(theme).toContain('background: "transparent"');
+    expect(layout).toContain("<ThemeProvider value={studioTheme}>");
+    expect(layout).toContain("<StudioBackground />");
+  });
+});
+
 describe("runtime guards", () => {
   it("keeps haptics off the web and inside a catch", () => {
     const haptics = source("src/motion/haptics.ts");

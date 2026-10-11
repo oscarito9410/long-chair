@@ -1,7 +1,7 @@
 import { Nunito_600SemiBold, Nunito_700Bold, Nunito_800ExtraBold } from "@expo-google-fonts/nunito";
 import { Caveat_600SemiBold } from "@expo-google-fonts/caveat";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Stack, ThemeProvider } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
@@ -14,6 +14,7 @@ import { QuietBoundary } from "../src/components/background/QuietBoundary";
 import { StudioBackground } from "../src/components/background/StudioBackground";
 import { SessionProvider } from "../src/state/session";
 import { palette } from "../src/theme/palette";
+import { studioTheme } from "../src/theme/studio-theme";
 
 export { ErrorBoundary } from "../src/components/chrome/RecoveryScreen";
 
@@ -52,50 +53,58 @@ export default function RootLayout() {
   }
 
   return (
-    <GestureHandlerRootView style={styles.root}>
-      <SafeAreaProvider>
-        <SessionProvider>
-          <View style={styles.root}>
-            <QuietBoundary>
-              <StudioBackground />
-            </QuietBoundary>
-            <StatusBar style="dark" />
-            <Stack
-              screenOptions={{
-                headerShown: false,
-                contentStyle: { backgroundColor: "transparent" },
-                animation: "slide_from_right",
-              }}
-            >
-              <Stack.Screen name="index" />
-              <Stack.Screen name="(onboarding)" options={{ animation: "fade" }} />
-              <Stack.Screen name="(tabs)" />
-              <Stack.Screen
-                name="settings"
-                options={{
-                  presentation: Platform.OS === "ios" ? "formSheet" : "modal",
-                  sheetGrabberVisible: true,
-                  // fitToContents against a flex:1 scaffold never settles and throws.
-                  sheetAllowedDetents: [0.68, 1],
-                  contentStyle: { backgroundColor: palette.page },
-                }}
-              />
-              <Stack.Screen
-                name="item/[id]"
-                options={{
-                  presentation: Platform.OS === "ios" ? "formSheet" : "transparentModal",
-                  // iOS rejects a custom slide animation on a form sheet.
-                  animation: Platform.OS === "ios" ? "default" : "slide_from_bottom",
-                  sheetGrabberVisible: true,
-                  sheetAllowedDetents: [SHEET_HALF, 1],
-                  contentStyle: { backgroundColor: palette.page },
-                }}
-              />
-            </Stack>
-          </View>
-        </SessionProvider>
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
+    <ThemeProvider value={studioTheme}>
+      <GestureHandlerRootView style={styles.root}>
+        <SafeAreaProvider>
+          <SessionProvider>
+            <View style={styles.root}>
+              <QuietBoundary>
+                <StudioBackground />
+              </QuietBoundary>
+              <StatusBar style="dark" />
+              <AppStack />
+            </View>
+          </SessionProvider>
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
+    </ThemeProvider>
+  );
+}
+
+function AppStack() {
+  return (
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: "transparent" },
+        animation: "slide_from_right",
+      }}
+    >
+      <Stack.Screen name="index" />
+      <Stack.Screen name="(onboarding)" options={{ animation: "fade" }} />
+      <Stack.Screen name="(tabs)" />
+      <Stack.Screen
+        name="settings"
+        options={{
+          presentation: Platform.OS === "ios" ? "formSheet" : "modal",
+          sheetGrabberVisible: true,
+          // fitToContents against a flex:1 scaffold never settles and throws.
+          sheetAllowedDetents: [0.68, 1],
+          contentStyle: { backgroundColor: palette.page },
+        }}
+      />
+      <Stack.Screen
+        name="item/[id]"
+        options={{
+          presentation: Platform.OS === "ios" ? "formSheet" : "transparentModal",
+          // iOS rejects a custom slide animation on a form sheet.
+          animation: Platform.OS === "ios" ? "default" : "slide_from_bottom",
+          sheetGrabberVisible: true,
+          sheetAllowedDetents: [SHEET_HALF, 1],
+          contentStyle: { backgroundColor: palette.page },
+        }}
+      />
+    </Stack>
   );
 }
 
