@@ -20,7 +20,7 @@ THEMES: tuple[AvoidTheme, ...] = (
     AvoidTheme("illness", "Illness", "Stories built around being sick"),
     AvoidTheme("hospitals", "Hospitals", "Wards, clinics, and waiting rooms"),
     AvoidTheme("cancer", "Cancer", "Diagnosis and treatment as the plot"),
-    AvoidTheme("parent-death", "Death of a parent", "Losing a mother or a father"),
+    AvoidTheme("parent-death", "Losing a parent", "Losing a mother or a father"),
     AvoidTheme("grief", "Grief", "Mourning as the main thread"),
 )
 

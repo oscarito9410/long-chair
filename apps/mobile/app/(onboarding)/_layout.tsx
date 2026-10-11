@@ -1,4 +1,4 @@
-import { ONBOARDING_DOT_COUNT, themesLede } from "@long-chair/core";
+import { ONBOARDING_DOT_COUNT, themesLede, themesNote } from "@long-chair/core";
 import { router, Slot, usePathname } from "expo-router";
 import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
@@ -49,6 +49,7 @@ const frames = [
     path: "/themes",
     title: THEMES_TITLE,
     lede: themesLede,
+    note: themesNote,
     mark: THEMES_MARK,
     step: 2,
     back: "/chair",
@@ -95,6 +96,7 @@ function OnboardingFrame() {
   }
 
   const lede = "lede" in meta ? meta.lede : undefined;
+  const note = "note" in meta ? meta.note : undefined;
   const mark = "mark" in meta ? meta.mark : undefined;
   const hideTitle = "hideTitle" in meta && meta.hideTitle;
 
@@ -107,7 +109,9 @@ function OnboardingFrame() {
         style={styles.body}
       >
         <ScrollView contentContainerStyle={styles.scroll}>
-          {hideTitle ? null : <StepTitle title={meta.title} lede={lede} mark={mark} />}
+          {hideTitle ? null : (
+            <StepTitle title={meta.title} lede={lede} note={note} mark={mark} />
+          )}
           <Slot />
         </ScrollView>
       </Animated.View>

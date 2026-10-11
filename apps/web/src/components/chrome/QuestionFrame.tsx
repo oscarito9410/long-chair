@@ -8,6 +8,7 @@ export function QuestionFrame({
   screen,
   title,
   lede,
+  note,
   children,
   primary,
   primaryHref,
@@ -21,6 +22,7 @@ export function QuestionFrame({
   screen: string;
   title: string;
   lede?: string;
+  note?: string;
   children: ReactNode;
   primary: string;
   primaryHref?: string;
@@ -43,6 +45,7 @@ export function QuestionFrame({
       <header className="flex flex-col items-center gap-4 text-center">
         <h1 className="text-4xl font-extrabold leading-tight">{title}</h1>
         {lede ? <p className="text-lg leading-relaxed">{lede}</p> : null}
+        {note ? <p className="text-base leading-relaxed">{note}</p> : null}
       </header>
       <div className={cn("question-body", dock && "question-body-tight")}>{children}</div>
       <div className={cn("flex flex-col items-center gap-2", dock && "question-dock")}>

@@ -40,6 +40,7 @@ export {
   notMedicalAdvice,
   sampleShelfNote,
   themesLede,
+  themesNote,
 } from "./content/screen-copy.ts";
 export { buildAgentSteps } from "./lib/build-agent-steps.ts";
 export { compareBroughtLabels } from "./lib/compare-brought.ts";

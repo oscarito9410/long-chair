@@ -2,7 +2,7 @@ import { QuestionFrame } from "../components/chrome/QuestionFrame.tsx";
 import { OptionRow } from "../components/ui/OptionRow.tsx";
 import { ONBOARDING_DOT_COUNT, onboardingProgress } from "../content/onboarding.ts";
 import { themeCharacter } from "../content/presentation.ts";
-import { themesLede } from "@long-chair/core";
+import { themesLede, themesNote } from "@long-chair/core";
 import { avoidThemes } from "@long-chair/core";
 import { paths } from "../routing/paths.ts";
 import { useSession } from "../state/SessionContext.tsx";
@@ -15,6 +15,7 @@ export function ThemesScreen() {
       screen="themes"
       title="What should stay out of the room?"
       lede={themesLede}
+      note={themesNote}
       primary="Continue"
       primaryHref={paths.company}
       secondary="Skip for now"

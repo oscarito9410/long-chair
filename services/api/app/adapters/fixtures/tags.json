@@ -22,7 +22,7 @@
       },
       {
         "id": "urn:tag:keyword:media:fictional_parent_death",
-        "name": "Death of a parent",
+        "name": "Losing a parent",
         "type": "urn:tag:keyword:media",
         "x-long-chair-theme-id": "parent-death"
       },

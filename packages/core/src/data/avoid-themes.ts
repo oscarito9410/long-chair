@@ -18,7 +18,7 @@ export const avoidThemes: readonly AvoidTheme[] = [
   },
   {
     id: "parent-death",
-    label: "Death of a parent",
+    label: "Losing a parent",
     detail: "Losing a mother or a father",
   },
   {

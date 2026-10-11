@@ -5,11 +5,13 @@ import {
   buildingSkipLabel,
   itemThemeCheck,
   themesLede,
+  themesNote,
 } from "./screen-copy.ts";
 
 describe("screen copy", () => {
   it("uses the shorter themes line", () => {
     expect(themesLede).toBe("We left out three. Change any.");
+    expect(themesNote).toBe("Only if it helps. You can change this anytime.");
   });
 
   it("states the themes a piece does not carry", () => {

@@ -3,17 +3,19 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import Svg, { Path } from "react-native-svg";
 
 import { useReducedMotion } from "../../motion/use-reduced-motion";
-import { FONT_BODY, FONT_TITLE, palette, SPACE_8 } from "../../theme/palette";
+import { FONT_BODY, FONT_SECONDARY, FONT_TITLE, palette, SPACE_8 } from "../../theme/palette";
 
 const TITLE_MS = 280;
 
 export function StepTitle({
   title,
   lede,
+  note,
   mark,
 }: {
   title: string;
   lede?: string;
+  note?: string;
   mark?: string;
 }) {
   const reduced = useReducedMotion();
@@ -37,6 +39,7 @@ export function StepTitle({
         )}
       </View>
       {lede ? <Text style={styles.lede}>{lede}</Text> : null}
+      {note ? <Text style={styles.note}>{note}</Text> : null}
     </Animated.View>
   );
 }
@@ -87,6 +90,12 @@ const styles = StyleSheet.create({
     marginTop: SPACE_8,
     fontFamily: "Nunito_600SemiBold",
     fontSize: FONT_BODY,
+    color: palette.inkSoft,
+  },
+  note: {
+    marginTop: SPACE_8,
+    fontFamily: "Nunito_600SemiBold",
+    fontSize: FONT_SECONDARY,
     color: palette.inkSoft,
   },
 });
