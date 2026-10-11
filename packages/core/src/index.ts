@@ -29,6 +29,7 @@ export { guideById, guides } from "./data/guides.ts";
 export type { Guide } from "./data/guides.ts";
 export { hues } from "./data/hues.ts";
 export type { Hue } from "./data/hues.ts";
+export { motion, palette, radius, space, stickerTilt, typeScale } from "./theme/tokens.ts";
 export { tasteSeeds } from "./data/taste-seeds.ts";
 export { kindLabels, placeLabels } from "./content/kind-labels.ts";
 export { ONBOARDING_DOT_COUNT, onboardingStepIndex } from "./content/onboarding-steps.ts";

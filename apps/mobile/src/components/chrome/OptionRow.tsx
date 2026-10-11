@@ -1,13 +1,14 @@
 import type { CharacterVariant } from "@long-chair/core";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { CharacterMark } from "../art/CharacterMark";
 import { GlassSurface } from "../glass/GlassSurface";
-import { selectionHaptic } from "../../haptics";
+import { PressableScale } from "../../motion/PressableScale";
 import {
   AVATAR,
   FONT_BODY,
   FONT_SECONDARY,
+  hueFill,
   palette,
   RADIUS_CARD,
   SPACE_16,
@@ -30,15 +31,18 @@ export function OptionRow({
   onPress: () => void;
 }) {
   return (
-    <Pressable
-      accessibilityRole="button"
+    <PressableScale
+      haptic="tick"
+      onPress={onPress}
       accessibilityState={{ selected }}
-      onPress={() => {
-        selectionHaptic();
-        onPress();
-      }}
+      style={styles.stretch}
     >
-      <GlassSurface style={[styles.card, selected && styles.selected]} interactive={selected}>
+      <GlassSurface
+        style={styles.card}
+        tint={hueFill[character.hue]}
+        selected={selected}
+        interactive={selected}
+      >
         <View style={styles.row}>
           <CharacterMark variant={character} size={AVATAR} animate={selected} />
           <View style={styles.copy}>
@@ -48,13 +52,13 @@ export function OptionRow({
           </View>
         </View>
       </GlassSurface>
-    </Pressable>
+    </PressableScale>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { borderRadius: RADIUS_CARD, overflow: "hidden" },
-  selected: { borderWidth: 2, borderColor: palette.ink },
+  stretch: { alignSelf: "stretch" },
+  card: { borderRadius: RADIUS_CARD },
   row: { flexDirection: "row", gap: SPACE_16, padding: SPACE_16, alignItems: "center" },
   copy: { flex: 1, gap: SPACE_8 },
   title: { fontFamily: "Nunito_800ExtraBold", fontSize: FONT_BODY, color: palette.ink },

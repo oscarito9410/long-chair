@@ -1,6 +1,6 @@
-import type { CharacterVariant } from "@long-chair/core";
+import type { CharacterMood, CharacterVariant, Hue } from "@long-chair/core";
 import { useEffect } from "react";
-import Svg, { Circle, Path } from "react-native-svg";
+import Svg, { Circle, Ellipse, G, Path } from "react-native-svg";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -21,9 +21,24 @@ const bodies: Record<CharacterVariant["shape"], string> = {
     "M60 48a24 24 0 1 1 0 48 24 24 0 0 1 0-48zM84 30c16 2 22 16 16 26-10-4-18 2-24 10 4-16 0-30 8-36z",
 };
 
-const pulseMs = 1600;
-const restScale = 1;
-const liveScale = 1.04;
+const eyeY: Record<CharacterVariant["shape"], number> = {
+  pebble: 58,
+  bean: 62,
+  drop: 68,
+  bun: 64,
+  arch: 62,
+  sprout: 74,
+};
+
+const bellyHue: Record<Hue, Hue> = {
+  apricot: "honey",
+  seaglass: "apricot",
+  honey: "apricot",
+  wisteria: "seaglass",
+};
+
+const PULSE_MS = 1600;
+const LIVE_SCALE = 1.04;
 
 export function CharacterMark({
   variant,
@@ -35,25 +50,151 @@ export function CharacterMark({
   animate?: boolean;
 }) {
   const reduced = useReducedMotion();
-  const scale = useSharedValue(restScale);
+  const scale = useSharedValue(1);
   const moving = animate && !reduced;
 
   useEffect(() => {
-    scale.value = moving
-      ? withRepeat(withTiming(liveScale, { duration: pulseMs }), -1, true)
-      : restScale;
+    scale.value = moving ? withRepeat(withTiming(LIVE_SCALE, { duration: PULSE_MS }), -1, true) : 1;
   }, [moving, scale]);
 
   const style = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+  const y = eyeY[variant.shape];
+  const mood = variant.mood ?? "smile";
   const fill = hueFill[variant.hue];
+  const belly = hueFill[bellyHue[variant.hue]];
 
   return (
     <Animated.View style={style} accessibilityElementsHidden importantForAccessibility="no">
       <Svg width={size} height={size} viewBox="0 0 120 120">
         <Path d={bodies[variant.shape]} fill={fill} />
-        <Circle cx={48} cy={62} r={5} fill={palette.ink} />
-        <Circle cx={74} cy={62} r={5} fill={palette.ink} />
+        <Ellipse cx={62} cy={y + 18} rx={16} ry={12} fill={belly} opacity={0.9} />
+        <Ellipse cx={46} cy={y + 16} rx={7} ry={5} fill={palette.card} opacity={0.8} />
+        <Ellipse cx={48} cy={y - 14} rx={10} ry={6} fill={palette.card} opacity={0.35} />
+        <Eyes mood={mood} y={y} />
+        <Mouth mood={mood} y={y} />
+        <Accessory name={variant.accessory ?? "none"} accent={belly} y={y} />
       </Svg>
     </Animated.View>
   );
+}
+
+function Eyes({ mood, y }: { mood: CharacterMood; y: number }) {
+  if (mood === "content") {
+    return (
+      <G>
+        <Path
+          d={`M40 ${y + 2} q8 -9 16 0`}
+          fill="none"
+          stroke={palette.ink}
+          strokeWidth={3}
+          strokeLinecap="round"
+        />
+        <Path
+          d={`M66 ${y + 2} q8 -9 16 0`}
+          fill="none"
+          stroke={palette.ink}
+          strokeWidth={3}
+          strokeLinecap="round"
+        />
+      </G>
+    );
+  }
+  if (mood === "wink") {
+    return (
+      <G>
+        <Path
+          d={`M40 ${y} q8 7 16 0`}
+          fill="none"
+          stroke={palette.ink}
+          strokeWidth={3}
+          strokeLinecap="round"
+        />
+        <Circle cx={76} cy={y} r={4.6} fill={palette.ink} />
+      </G>
+    );
+  }
+  if (mood === "curious") {
+    return (
+      <G>
+        <Circle cx={48} cy={y} r={6} fill={palette.card} />
+        <Circle cx={76} cy={y - 1} r={6} fill={palette.card} />
+        <Circle cx={49} cy={y - 2.5} r={2.4} fill={palette.ink} />
+        <Circle cx={78} cy={y - 3.5} r={2.4} fill={palette.ink} />
+      </G>
+    );
+  }
+  return (
+    <G>
+      <Circle cx={48} cy={y} r={4.6} fill={palette.ink} />
+      <Circle cx={76} cy={y} r={4.6} fill={palette.ink} />
+    </G>
+  );
+}
+
+function Mouth({ mood, y }: { mood: CharacterMood; y: number }) {
+  if (mood === "grin") {
+    return <Path d={`M44 ${y + 14} Q62 ${y + 32} 80 ${y + 14}`} fill={palette.ink} />;
+  }
+  if (mood === "curious") {
+    return <Ellipse cx={62} cy={y + 16} rx={5} ry={6} fill={palette.ink} />;
+  }
+  if (mood === "content") {
+    return (
+      <Path
+        d={`M50 ${y + 14} Q62 ${y + 22} 74 ${y + 14}`}
+        fill="none"
+        stroke={palette.ink}
+        strokeWidth={3}
+        strokeLinecap="round"
+      />
+    );
+  }
+  return (
+    <Path
+      d={`M46 ${y + 14} Q62 ${y + 28} 78 ${y + 14}`}
+      fill="none"
+      stroke={palette.ink}
+      strokeWidth={3}
+      strokeLinecap="round"
+    />
+  );
+}
+
+function Accessory({
+  name,
+  accent,
+  y,
+}: {
+  name: CharacterVariant["accessory"];
+  accent: string;
+  y: number;
+}) {
+  if (name === "bow") {
+    return (
+      <G>
+        <Path d="M78 18c8-10 20-8 22 2-8 2-14 8-16 12-2-4-8-10-6-14z" fill={accent} />
+        <Path d="M70 20c-10-8-20-2-18 8 6 0 12 4 14 8 2-6 6-12 4-16z" fill={accent} />
+        <Circle cx={78} cy={28} r={3.5} fill={palette.ink} />
+      </G>
+    );
+  }
+  if (name === "glasses") {
+    return (
+      <G fill="none" stroke={palette.ink} strokeWidth={2.5}>
+        <Circle cx={48} cy={y} r={10} />
+        <Circle cx={76} cy={y} r={10} />
+        <Path d={`M58 ${y}h8`} />
+      </G>
+    );
+  }
+  if (name === "leaf") {
+    return <Path d="M86 24c14 2 18 16 8 22-8-6-16-6-22-2 2-10 6-18 14-20z" fill={accent} />;
+  }
+  if (name === "scarf") {
+    return <Path d="M34 78c10 8 42 10 54-2 2 10-8 16-20 16H48c-10 0-16-6-14-14z" fill={accent} />;
+  }
+  if (name === "star") {
+    return <Path d="M90 28l3 7 7 1-5 5 1 7-6-4-6 4 1-7-5-5 7-1z" fill={accent} />;
+  }
+  return null;
 }

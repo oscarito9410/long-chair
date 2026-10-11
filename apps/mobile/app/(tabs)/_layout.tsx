@@ -1,25 +1,23 @@
-import { Tabs } from "expo-router";
+import { NativeTabs } from "expo-router/unstable-native-tabs";
 
-import { GlassTabBar } from "../../src/components/chrome/GlassTabBar";
+import { tabs } from "../../src/copy/phrases";
+import { palette } from "../../src/theme/palette";
 
 export default function TabLayout() {
   return (
-    <Tabs
-      screenOptions={{ headerShown: false }}
-      tabBar={(props) => (
-        <GlassTabBar
-          state={props.state}
-          navigation={{
-            navigate: (name) => {
-              props.navigation.navigate(name);
-            },
-          }}
-        />
-      )}
-    >
-      <Tabs.Screen name="kit" />
-      <Tabs.Screen name="companion" />
-      <Tabs.Screen name="compare" />
-    </Tabs>
+    <NativeTabs tintColor={palette.ink} disableIndicator>
+      <NativeTabs.Trigger name="kit">
+        <NativeTabs.Trigger.Label>{tabs.kit}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="square.stack.3d.up.fill" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="companion">
+        <NativeTabs.Trigger.Label>{tabs.companion}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="person.2.fill" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="compare">
+        <NativeTabs.Trigger.Label>{tabs.compare}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="rectangle.split.2x1" />
+      </NativeTabs.Trigger>
+    </NativeTabs>
   );
 }

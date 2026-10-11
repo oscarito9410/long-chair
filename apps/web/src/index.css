@@ -1,12 +1,14 @@
 @import "tailwindcss";
 
 /*
-  Paint tokens. Hex values live only in this file.
-  Tailwind utilities read them through @theme inline.
+  Paint tokens for the browser. The same hex values live in
+  packages/core/src/theme/tokens.ts. Keep the two in step.
+  Tailwind utilities read these through @theme inline.
 */
 :root {
   --lc-page: #f3eee6;
   --lc-card: #fffcf8;
+  --lc-white: #ffffff;
   --lc-ink: #1c1916;
   --lc-ink-soft: #4a433c;
   --lc-line: #d9d0c6;

@@ -1,15 +1,24 @@
 import { guideById, guides, notMedicalAdvice, onboardingStepIndex } from "@long-chair/core";
 import { router } from "expo-router";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { CharacterMark } from "../src/components/art/CharacterMark";
+import { Aside } from "../src/components/chrome/HandNote";
 import { GlassSurface } from "../src/components/glass/GlassSurface";
 import { ScreenScaffold } from "../src/components/chrome/ScreenScaffold";
 import { chooseGuide, companyTitle, skipLabel } from "../src/copy/phrases";
-import { selectionHaptic } from "../src/haptics";
+import { PressableScale } from "../src/motion/PressableScale";
 import { useSession } from "../src/state/session";
-import { AVATAR, FONT_BODY, palette, RADIUS_CARD, SPACE_16, SPACE_8 } from "../src/theme/palette";
+import {
+  AVATAR,
+  FONT_BODY,
+  hueFill,
+  palette,
+  RADIUS_CARD,
+  SPACE_16,
+  SPACE_8,
+} from "../src/theme/palette";
 import { screenTints } from "../src/theme/screen-tints";
 
 export default function CompanyScreen() {
@@ -27,6 +36,7 @@ export default function CompanyScreen() {
       }}
       footerNote={notMedicalAdvice}
       primary={chooseGuide(guide.name)}
+      primaryHaptic="firm"
       onPrimary={() => {
         setCompanion(guide.id);
         router.push("/building");
@@ -40,27 +50,29 @@ export default function CompanyScreen() {
         {guides.map((choice) => {
           const selected = choice.id === guide.id;
           return (
-            <Pressable
+            <PressableScale
               key={choice.id}
-              accessibilityRole="button"
-              accessibilityState={{ selected }}
+              haptic="tick"
               onPress={() => {
-                selectionHaptic();
                 setCompanionId(choice.id);
               }}
+              accessibilityState={{ selected }}
               style={styles.cell}
             >
-              <GlassSurface style={styles.card} interactive={selected}>
+              <GlassSurface
+                style={styles.card}
+                tint={hueFill[choice.variant.hue]}
+                selected={selected}
+                interactive={selected}
+              >
                 <CharacterMark variant={choice.variant} size={AVATAR} animate={selected} />
                 <Text style={styles.name}>{choice.name}</Text>
               </GlassSurface>
-            </Pressable>
+            </PressableScale>
           );
         })}
       </View>
-      <Text accessibilityLiveRegion="polite" style={styles.quote}>
-        {guide.quote}
-      </Text>
+      <Aside text={guide.quote} />
     </ScreenScaffold>
   );
 }
@@ -70,16 +82,9 @@ const styles = StyleSheet.create({
   cell: { width: "47%" },
   card: {
     borderRadius: RADIUS_CARD,
-    overflow: "hidden",
     alignItems: "center",
     padding: SPACE_16,
     gap: SPACE_8,
   },
   name: { fontFamily: "Nunito_800ExtraBold", fontSize: FONT_BODY, color: palette.ink },
-  quote: {
-    fontFamily: "Nunito_600SemiBold",
-    fontSize: FONT_BODY,
-    color: palette.ink,
-    textAlign: "center",
-  },
 });

@@ -26,7 +26,7 @@ export const selectedLeftOut = "Left out";
 
 export const chairTitle = "How long is the session?";
 
-export const chairLede = "Tap a length. You can change it anytime.";
+export const chairLede = "Drag the dial. You can change it anytime.";
 
 export const longAfternoon = "A long afternoon";
 

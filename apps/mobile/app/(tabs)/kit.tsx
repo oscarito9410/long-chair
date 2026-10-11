@@ -6,14 +6,19 @@ import {
   matchingSeedNames,
   PAUSE_NOTICE_MINUTES,
 } from "@long-chair/core";
+import type { CatalogItem, PackedSession, SessionDraft } from "@long-chair/core";
 import { router } from "expo-router";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CoverArt } from "../../src/components/art/CoverArt";
-import { GlassSurface } from "../../src/components/glass/GlassSurface";
+import { GlassChip } from "../../src/components/chrome/GlassChip";
+import { IconWell } from "../../src/components/chrome/IconWell";
 import { PillButton } from "../../src/components/chrome/PillButton";
 import { SampleBanner } from "../../src/components/chrome/SampleBanner";
+import { GlassSurface } from "../../src/components/glass/GlassSurface";
+import { PressableScale } from "../../src/motion/PressableScale";
+import { Shimmer } from "../../src/motion/Shimmer";
 import {
   editTastes,
   emptyKitAction,
@@ -27,7 +32,7 @@ import {
   settingsLabel,
   trySampleAgain,
 } from "../../src/copy/phrases";
-import { kindHue, kindLabel } from "../../src/presentation";
+import { kindHue, kindIcon, kindLabel } from "../../src/presentation";
 import { useSession } from "../../src/state/session";
 import { usePlan } from "../../src/state/use-plan";
 import {
@@ -36,15 +41,14 @@ import {
   FONT_HERO,
   FONT_SECONDARY,
   FONT_TITLE,
+  hueFill,
   palette,
   RADIUS_CARD,
-  RADIUS_TAG,
   SPACE_16,
   SPACE_24,
   SPACE_8,
+  TARGET,
 } from "../../src/theme/palette";
-import { ScrollView } from "react-native";
-import type { CatalogItem, PackedSession, SessionDraft } from "@long-chair/core";
 
 const tabClearance = 120;
 
@@ -64,7 +68,7 @@ export default function KitScreen() {
         {kitTitle}
       </Text>
       <ThemeChips labels={themes.map((theme) => theme.label)} />
-      {loading ? <Text style={styles.body}>{packingSample}</Text> : null}
+      {loading ? <Shimmer label={packingSample} /> : null}
       {error ? (
         <View style={styles.stack}>
           <Text style={styles.body}>{error || planFailed}</Text>
@@ -89,6 +93,8 @@ export default function KitScreen() {
       <PillButton
         label={editTastes}
         quiet
+        tint={palette.honey}
+        icon="arrow"
         onPress={() => {
           router.push("/love");
         }}
@@ -96,6 +102,8 @@ export default function KitScreen() {
       <PillButton
         label={settingsLabel}
         quiet
+        tint={palette.seaglass}
+        icon="gear"
         onPress={() => {
           router.push("/settings");
         }}
@@ -111,9 +119,7 @@ function ThemeChips({ labels }: { labels: readonly string[] }) {
   return (
     <View accessibilityLabel={leftOutLabel} style={styles.chips}>
       {labels.map((label) => (
-        <Text key={label} style={styles.chip}>
-          {label}
-        </Text>
+        <GlassChip key={label} label={label} tint={palette.wisteria} />
       ))}
     </View>
   );
@@ -154,13 +160,14 @@ function KitCard({
 }) {
   const because = matchingSeedNames(item, draft)[0];
   return (
-    <Pressable
-      accessibilityRole="button"
+    <PressableScale
+      haptic="tick"
       onPress={() => {
         router.push(`/item/${item.id}`);
       }}
+      style={styles.stretch}
     >
-      <GlassSurface style={styles.card}>
+      <GlassSurface style={styles.card} tint={hueFill[kindHue[item.kind]]}>
         <CoverArt
           seed={item.id}
           hue={kindHue[item.kind]}
@@ -168,12 +175,15 @@ function KitCard({
           width={COVER}
           height={COVER}
         />
-        <Text style={styles.kind}>{kindLabel[item.kind]}</Text>
+        <View style={styles.meta}>
+          <IconWell hue={kindHue[item.kind]} name={kindIcon[item.kind]} size={TARGET} />
+          <Text style={styles.kind}>{kindLabel[item.kind]}</Text>
+        </View>
         <Text style={styles.cardTitle}>{item.title}</Text>
         <Text style={styles.body}>{formatRange(start, end)}</Text>
         {because ? <Text style={styles.body}>{`Because you love ${because}.`}</Text> : null}
       </GlassSurface>
-    </Pressable>
+    </PressableScale>
   );
 }
 
@@ -183,17 +193,10 @@ const styles = StyleSheet.create({
   caption: { fontFamily: "Nunito_600SemiBold", fontSize: FONT_SECONDARY, color: palette.inkSoft },
   title: { fontFamily: "Nunito_800ExtraBold", fontSize: FONT_TITLE, color: palette.ink },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: SPACE_8 },
-  chip: {
-    fontFamily: "Nunito_700Bold",
-    fontSize: FONT_SECONDARY,
-    color: palette.ink,
-    backgroundColor: palette.card,
-    paddingHorizontal: SPACE_8,
-    paddingVertical: SPACE_8,
-    borderRadius: RADIUS_TAG,
-  },
   stack: { gap: SPACE_8 },
-  card: { borderRadius: RADIUS_CARD, overflow: "hidden", padding: SPACE_16, gap: SPACE_8 },
+  stretch: { alignSelf: "stretch" },
+  card: { borderRadius: RADIUS_CARD, padding: SPACE_16, gap: SPACE_8 },
+  meta: { flexDirection: "row", alignItems: "center", gap: SPACE_8 },
   kind: { fontFamily: "Nunito_700Bold", fontSize: FONT_SECONDARY, color: palette.inkSoft },
   cardTitle: { fontFamily: "Nunito_800ExtraBold", fontSize: FONT_BODY, color: palette.ink },
   body: { fontFamily: "Nunito_600SemiBold", fontSize: FONT_BODY, color: palette.ink },

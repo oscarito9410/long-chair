@@ -5,6 +5,7 @@ import {
   buildingSkipLabel,
   formatHoursMinutes,
   guideById,
+  motion,
   notMedicalAdvice,
   onboardingStepIndex,
   stepState,
@@ -14,14 +15,21 @@ import { useEffect, useMemo, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { CharacterMark } from "../src/components/art/CharacterMark";
+import { IconWell } from "../src/components/chrome/IconWell";
 import { ScreenScaffold } from "../src/components/chrome/ScreenScaffold";
 import { buildingCaption, buildingTitle, nowLabel } from "../src/copy/phrases";
 import { useReducedMotion } from "../src/motion/use-reduced-motion";
 import { useSession } from "../src/state/session";
-import { AVATAR, FONT_BODY, FONT_HERO, palette, SPACE_16, WELL } from "../src/theme/palette";
+import {
+  AVATAR,
+  FONT_BODY,
+  FONT_HERO,
+  FONT_SECONDARY,
+  palette,
+  SPACE_16,
+  WELL,
+} from "../src/theme/palette";
 import { screenTints } from "../src/theme/screen-tints";
-
-const stepMs = 700;
 
 export default function BuildingScreen() {
   const { draft } = useSession();
@@ -37,7 +45,7 @@ export default function BuildingScreen() {
     }
     const timer = setInterval(() => {
       setShown((current) => (current >= steps.length ? current : current + 1));
-    }, stepMs);
+    }, motion.stepIntervalMs);
     return () => {
       clearInterval(timer);
     };
@@ -54,6 +62,7 @@ export default function BuildingScreen() {
       }}
       footerNote={notMedicalAdvice}
       primary={complete ? buildingReadyLabel : buildingSkipLabel}
+      primaryHaptic={complete ? "firm" : "press"}
       onPrimary={() => {
         router.push("/ready");
       }}
@@ -84,18 +93,15 @@ export default function BuildingScreen() {
 }
 
 function StepLine({ title, state }: { title: string; state: "pending" | "active" | "done" }) {
-  const mark = state === "done" ? "OK" : state === "active" ? nowLabel : "";
   return (
     <View style={styles.step}>
-      <View
-        style={[
-          styles.well,
-          state === "done" && styles.done,
-          state === "pending" && styles.pending,
-        ]}
-      >
-        <Text style={styles.mark}>{mark}</Text>
-      </View>
+      {state === "pending" ? <View style={styles.empty} /> : null}
+      {state === "done" ? <IconWell hue="seaglass" name="check" /> : null}
+      {state === "active" ? (
+        <View style={styles.now}>
+          <Text style={styles.nowLabel}>{nowLabel}</Text>
+        </View>
+      ) : null}
       <Text style={styles.stepTitle}>{title}</Text>
     </View>
   );
@@ -106,7 +112,14 @@ const styles = StyleSheet.create({
   live: { fontFamily: "Nunito_800ExtraBold", fontSize: FONT_HERO, color: palette.ink },
   center: { alignItems: "center" },
   step: { flexDirection: "row", alignItems: "center", gap: SPACE_16 },
-  well: {
+  empty: {
+    width: WELL,
+    height: WELL,
+    borderRadius: WELL,
+    borderWidth: 2,
+    borderColor: palette.line,
+  },
+  now: {
     width: WELL,
     height: WELL,
     borderRadius: WELL,
@@ -114,8 +127,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  done: { backgroundColor: palette.seaglass },
-  pending: { backgroundColor: "transparent", borderWidth: 2, borderColor: palette.line },
-  mark: { fontFamily: "Nunito_800ExtraBold", fontSize: FONT_BODY, color: palette.ink },
+  nowLabel: { fontFamily: "Nunito_800ExtraBold", fontSize: FONT_SECONDARY, color: palette.ink },
   stepTitle: { flex: 1, fontFamily: "Nunito_700Bold", fontSize: FONT_BODY, color: palette.ink },
 });

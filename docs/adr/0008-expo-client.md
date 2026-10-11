@@ -25,7 +25,9 @@ services/api/    FastAPI. Unchanged by this decision.
 
 `packages/core` exposes a `KitService` port. The fixture adapter packs the sample shelf. The HTTP adapter calls `POST /v1/sessions` and `POST /v1/sessions/{id}/plan` when `EXPO_PUBLIC_API_URL` is set. The review build leaves that variable empty, so nothing leaves the phone.
 
-Glass on iOS uses `GlassView` from `expo-glass-effect` when `isLiquidGlassAvailable()` is true. Every other case uses `BlurView`. Characters, covers, and the dot field are original drawings. Covers contain no text.
+Glass on iOS uses `GlassView` from `expo-glass-effect` with `glassEffectStyle` `clear` when `isLiquidGlassAvailable()` is true. Otherwise the style is `none` and a `BlurView` supplies the frost. Characters, covers, and the Skia dot field are original drawings. Covers contain no text.
+
+Xcode 27 and the iOS 27 SDK refuse to launch an app that still creates its `UIWindow` inside `application(_:didFinishLaunchingWithOptions:)`. Expo 57 prebuild still emits that AppDelegate. `apps/mobile/plugins/with-scene-lifecycle.js` removes the launch-time window and adds a `SceneDelegate` plus `UIApplicationSceneManifest`, so a later `expo prebuild` or EAS build keeps the fix. The generated `ios/` tree stays gitignored.
 
 App Store category is Entertainment, with Lifestyle as the secondary. The app is not Medical and not Health & Fitness. It does not use HealthKit, an account, or an analytics SDK. Avoided themes are content preferences kept on the device. "Not medical advice" stays visible in onboarding and in Settings. Sample data stays labeled until a live catalog is connected.
 

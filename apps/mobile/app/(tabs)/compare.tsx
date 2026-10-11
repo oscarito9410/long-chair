@@ -11,8 +11,10 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CoverArt } from "../../src/components/art/CoverArt";
-import { GlassSurface } from "../../src/components/glass/GlassSurface";
+import { GlassChip } from "../../src/components/chrome/GlassChip";
+import { IconWell } from "../../src/components/chrome/IconWell";
 import { SampleBanner } from "../../src/components/chrome/SampleBanner";
+import { GlassSurface } from "../../src/components/glass/GlassSurface";
 import {
   addFilm,
   becauseYouLove,
@@ -23,7 +25,7 @@ import {
   plainStory,
   wouldBring,
 } from "../../src/copy/phrases";
-import { kindHue, kindLabel } from "../../src/presentation";
+import { kindHue, kindIcon, kindLabel } from "../../src/presentation";
 import { useSession } from "../../src/state/session";
 import { usePlan } from "../../src/state/use-plan";
 import {
@@ -31,13 +33,17 @@ import {
   FONT_BODY,
   FONT_HERO,
   FONT_SECONDARY,
+  FONT_TITLE,
+  hueFill,
   palette,
   RADIUS_CARD,
-  RADIUS_TAG,
   SPACE_16,
   SPACE_24,
   SPACE_8,
+  TARGET,
 } from "../../src/theme/palette";
+
+const tabClearance = 120;
 
 function keptItem(packed: PackedSession | undefined): CatalogItem | undefined {
   if (!packed) {
@@ -70,14 +76,15 @@ export default function CompareScreen() {
         {compareTitle}
       </Text>
       <GlassSurface style={styles.card} tint={palette.wisteria}>
-        <Text style={styles.cardTitle}>{plainModelExample.title}</Text>
+        <View style={styles.meta}>
+          <IconWell hue="wisteria" name="split" size={TARGET} />
+          <Text style={styles.cardTitle}>{plainModelExample.title}</Text>
+        </View>
         <Text style={styles.body}>{plainStory}</Text>
         <Text style={styles.body}>{wouldBring}</Text>
         <View style={styles.chips}>
           {brought.map((label) => (
-            <Text key={label} style={styles.chip}>
-              {label}
-            </Text>
+            <GlassChip key={label} label={label} tint={palette.honey} />
           ))}
         </View>
       </GlassSurface>
@@ -95,14 +102,14 @@ function KeptCard({
 }) {
   if (!item) {
     return (
-      <GlassSurface style={styles.card}>
+      <GlassSurface style={styles.card} tint={palette.seaglass}>
         <Text style={styles.cardTitle}>{nothingKept}</Text>
         <Text style={styles.body}>{addFilm}</Text>
       </GlassSurface>
     );
   }
   return (
-    <GlassSurface style={styles.card}>
+    <GlassSurface style={styles.card} tint={hueFill[kindHue[item.kind]]}>
       <CoverArt
         seed={item.id}
         hue={kindHue[item.kind]}
@@ -110,7 +117,10 @@ function KeptCard({
         width={COVER}
         height={COVER}
       />
-      <Text style={styles.kind}>{kindLabel[item.kind]}</Text>
+      <View style={styles.meta}>
+        <IconWell hue={kindHue[item.kind]} name={kindIcon[item.kind]} size={TARGET} />
+        <Text style={styles.kind}>{kindLabel[item.kind]}</Text>
+      </View>
       <Text style={styles.cardTitle}>{item.title}</Text>
       <Text style={styles.body}>{because ? becauseYouLove(because) : keptForTaste}</Text>
     </GlassSurface>
@@ -118,22 +128,19 @@ function KeptCard({
 }
 
 const styles = StyleSheet.create({
-  page: { paddingHorizontal: SPACE_24, gap: SPACE_16, paddingBottom: 120 },
+  page: { paddingHorizontal: SPACE_24, gap: SPACE_16, paddingBottom: tabClearance },
   hero: { fontFamily: "Nunito_800ExtraBold", fontSize: FONT_HERO, color: palette.ink },
   caption: { fontFamily: "Nunito_600SemiBold", fontSize: FONT_SECONDARY, color: palette.inkSoft },
-  title: { fontFamily: "Nunito_800ExtraBold", fontSize: 32, color: palette.ink },
+  title: { fontFamily: "Nunito_800ExtraBold", fontSize: FONT_TITLE, color: palette.ink },
   card: { borderRadius: RADIUS_CARD, padding: SPACE_16, gap: SPACE_8 },
+  meta: { flexDirection: "row", alignItems: "center", gap: SPACE_8 },
   kind: { fontFamily: "Nunito_700Bold", fontSize: FONT_SECONDARY, color: palette.inkSoft },
-  cardTitle: { fontFamily: "Nunito_800ExtraBold", fontSize: FONT_BODY, color: palette.ink },
+  cardTitle: {
+    flex: 1,
+    fontFamily: "Nunito_800ExtraBold",
+    fontSize: FONT_BODY,
+    color: palette.ink,
+  },
   body: { fontFamily: "Nunito_600SemiBold", fontSize: FONT_BODY, color: palette.ink },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: SPACE_8 },
-  chip: {
-    fontFamily: "Nunito_700Bold",
-    fontSize: FONT_SECONDARY,
-    color: palette.ink,
-    backgroundColor: palette.card,
-    borderRadius: RADIUS_TAG,
-    paddingHorizontal: SPACE_8,
-    paddingVertical: SPACE_8,
-  },
 });

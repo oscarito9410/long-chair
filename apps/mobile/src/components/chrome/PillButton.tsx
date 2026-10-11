@@ -1,54 +1,83 @@
-import { Pressable, StyleSheet, Text } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
-import { selectionHaptic } from "../../haptics";
+import { GlassSurface } from "../glass/GlassSurface";
+import { AppIcon } from "./AppIcon";
+import type { IconName } from "./icon-names";
+import type { HapticWeight } from "../../motion/haptics";
+import { PressableScale } from "../../motion/PressableScale";
 import { FONT_BODY, palette, RADIUS_PILL, SPACE_16, SPACE_8, TARGET } from "../../theme/palette";
+
+const ICON = 20;
 
 export function PillButton({
   label,
   onPress,
   disabled = false,
   quiet = false,
+  tint = palette.honey,
+  haptic,
+  icon,
 }: {
   label: string;
   onPress: () => void;
   disabled?: boolean;
   quiet?: boolean;
+  tint?: string;
+  haptic?: HapticWeight;
+  icon?: IconName;
 }) {
+  const weight = haptic ?? (quiet ? "tick" : "press");
+  const ink = !quiet;
+  const labelColor = ink ? palette.page : palette.ink;
+  const body = (
+    <View style={[styles.row, ink && styles.ink, disabled && styles.disabled]}>
+      {ink ? <View style={styles.sheen} /> : null}
+      {icon ? <AppIcon name={icon} color={labelColor} size={ICON} /> : null}
+      <Text style={[styles.label, { color: labelColor }]}>{label}</Text>
+    </View>
+  );
+
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityState={{ disabled }}
+    <PressableScale
+      haptic={disabled ? null : weight}
       disabled={disabled}
-      onPress={() => {
-        selectionHaptic();
-        onPress();
-      }}
-      style={({ pressed }) => [
-        styles.pill,
-        quiet ? styles.quiet : styles.solid,
-        disabled && styles.disabled,
-        pressed && styles.pressed,
-      ]}
+      onPress={onPress}
+      accessibilityState={{ disabled }}
+      style={styles.stretch}
     >
-      <Text style={[styles.label, quiet ? styles.quietLabel : styles.solidLabel]}>{label}</Text>
-    </Pressable>
+      {quiet ? (
+        <GlassSurface tint={tint} style={styles.glass}>
+          {body}
+        </GlassSurface>
+      ) : (
+        body
+      )}
+    </PressableScale>
   );
 }
 
 const styles = StyleSheet.create({
-  pill: {
+  stretch: { alignSelf: "stretch" },
+  glass: { borderRadius: RADIUS_PILL },
+  row: {
     minHeight: TARGET,
     borderRadius: RADIUS_PILL,
     alignItems: "center",
     justifyContent: "center",
+    flexDirection: "row",
+    gap: SPACE_8,
     paddingHorizontal: SPACE_16,
-    paddingVertical: SPACE_8,
+    overflow: "hidden",
   },
-  solid: { backgroundColor: palette.ink },
-  quiet: { backgroundColor: "transparent" },
+  ink: { backgroundColor: palette.ink },
   disabled: { backgroundColor: palette.line },
-  pressed: { transform: [{ scale: 0.98 }] },
+  sheen: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 18,
+    backgroundColor: palette.glassSheen,
+  },
   label: { fontFamily: "Nunito_800ExtraBold", fontSize: FONT_BODY },
-  solidLabel: { color: palette.page },
-  quietLabel: { color: palette.ink },
 });

@@ -1,6 +1,8 @@
 import type { CharacterVariant, ContentKind, Hue, PlaceKind } from "@long-chair/core";
 import { kindLabels, placeLabels } from "@long-chair/core";
 
+import type { IconName } from "./components/chrome/icon-names";
+
 export const kindHue: Record<ContentKind, Hue> = {
   movie: "apricot",
   tv_show: "seaglass",
@@ -10,6 +12,20 @@ export const kindHue: Record<ContentKind, Hue> = {
 };
 
 export const kindLabel = kindLabels;
+
+export const kindIcon: Record<ContentKind, IconName> = {
+  movie: "film",
+  tv_show: "screen",
+  podcast: "headphones",
+  book: "book",
+  artist: "note",
+};
+
+export const placeIcon: Record<PlaceKind, IconName> = {
+  bakery: "bread",
+  kitchen: "bowl",
+  coffee: "cup",
+};
 
 const fallbackCharacter: CharacterVariant = {
   shape: "pebble",
