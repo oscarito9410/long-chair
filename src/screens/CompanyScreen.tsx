@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Character } from "../components/art/Character.tsx";
 import { QuestionFrame } from "../components/chrome/QuestionFrame.tsx";
 import { GlassSurface } from "../components/glass/GlassSurface.tsx";
+import { glassClass, onGlassPointerMove } from "../components/glass/glass-styles.ts";
 import { Icon } from "../components/ui/Icon.tsx";
 import { guideById, guides } from "../data/guides.ts";
 import { paths } from "../routing/paths.ts";
@@ -33,23 +34,56 @@ export function CompanyScreen() {
       secondary="Skip for now"
       secondaryHref={paths.building}
     >
-      <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
+      <div className="guide-layout flex flex-1 flex-col items-center justify-center gap-4 text-center">
         <div className="flex items-center gap-4">
           <button
             type="button"
-            className="icon-hit glass-accent glass-accent-badge"
+            className={glassClass({
+              thickness: "thin",
+              shape: "pill",
+              press: true,
+              className: "icon-hit",
+            })}
             aria-label="Previous guide"
+            onPointerMove={onGlassPointerMove}
             onClick={() => {
               shift(-1);
             }}
           >
             <Icon name="arrow" />
           </button>
-          <Character variant={guide.variant} size="lg" animate />
+          <div className="guide-stack">
+            <Character variant={guide.variant} size="lg" animate />
+            <GlassSurface
+              variant="card"
+              thickness="regular"
+              className="guide-card flex flex-col items-center gap-2 px-6 pb-6"
+            >
+              <p className="text-base" aria-live="polite">
+                {index + 1} of {guides.length}
+              </p>
+              <h2 className="text-2xl font-bold">{guide.name}</h2>
+              <GlassSurface
+                variant="chip"
+                thickness="thin"
+                tint={guide.variant.hue}
+                className="px-4 py-2"
+              >
+                <span className="text-base font-bold">{guide.personality}</span>
+              </GlassSurface>
+              <p className="text-lg leading-relaxed">{guide.quote}</p>
+            </GlassSurface>
+          </div>
           <button
             type="button"
-            className="icon-hit glass-accent glass-accent-badge"
+            className={glassClass({
+              thickness: "thin",
+              shape: "pill",
+              press: true,
+              className: "icon-hit",
+            })}
             aria-label="Next guide"
+            onPointerMove={onGlassPointerMove}
             onClick={() => {
               shift(1);
             }}
@@ -59,14 +93,6 @@ export function CompanyScreen() {
             </span>
           </button>
         </div>
-        <p className="text-base text-ink-soft" aria-live="polite">
-          {index + 1} of {guides.length}
-        </p>
-        <h2 className="text-2xl font-bold">{guide.name}</h2>
-        <GlassSurface variant="chip" className="px-4 py-2">
-          <span className="text-base font-bold">{guide.personality}</span>
-        </GlassSurface>
-        <p className="text-lg leading-relaxed">{guide.quote}</p>
       </div>
     </QuestionFrame>
   );

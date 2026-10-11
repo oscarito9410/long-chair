@@ -59,6 +59,7 @@ export function KitScreen() {
                   seed={item.id}
                   rangeLabel={formatRange(slot.startMinute, slot.endMinute)}
                   kindLabel={meta.label}
+                  kind={item.kind}
                   title={item.title}
                   maker={item.maker}
                   hue={meta.hue}

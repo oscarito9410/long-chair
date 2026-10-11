@@ -1,23 +1,30 @@
+import type { ContentKind } from "../../data/types.ts";
 import type { Hue } from "../../tokens/tokens.ts";
+import { glassClass, onGlassPointerMove } from "../glass/glass-styles.ts";
 import { CoverArt } from "./CoverArt.tsx";
 
 export function Stamp({
   seed,
   title,
   hue,
+  kind = "movie",
   caption,
   detail,
 }: {
   seed: string;
   title: string;
   hue: Hue;
+  kind?: ContentKind;
   caption: string;
   detail: string;
 }) {
   return (
-    <figure className="stamp">
+    <figure
+      className={glassClass({ thickness: "regular", shape: "card", className: "stamp" })}
+      onPointerMove={onGlassPointerMove}
+    >
       <div className="stamp-art">
-        <CoverArt seed={seed} title={title} hue={hue} frame="square" />
+        <CoverArt seed={seed} title={title} hue={hue} kind={kind} frame="square" />
       </div>
       <figcaption className="mt-4 flex flex-col gap-1 text-center">
         <span className="text-base font-bold">{caption}</span>

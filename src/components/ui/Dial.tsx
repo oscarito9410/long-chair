@@ -1,3 +1,5 @@
+import { glassClass } from "../glass/glass-styles.ts";
+
 const radius = 92;
 const sweep = 270;
 const start = 135;
@@ -13,13 +15,17 @@ export function Dial({ hours, onChange }: { hours: number; onChange: (hours: num
   const dash = full * (hours / 4);
   return (
     <div className="dial">
+      <div
+        className={glassClass({ thickness: "thick", shape: "disc", className: "dial-ring" })}
+        aria-hidden="true"
+      />
       <svg viewBox="0 0 240 240" className="dial-svg" aria-hidden="true">
         <circle
           cx="120"
           cy="120"
           r={radius}
           fill="none"
-          stroke="var(--lc-line)"
+          stroke="color-mix(in srgb, var(--lc-card) 55%, transparent)"
           strokeWidth="14"
           strokeLinecap="round"
           strokeDasharray={`${full} ${circumference}`}
@@ -52,7 +58,9 @@ export function Dial({ hours, onChange }: { hours: number; onChange: (hours: num
           );
         })}
       </svg>
-      <div className="dial-readout">
+      <div
+        className={glassClass({ thickness: "regular", shape: "disc", className: "dial-readout" })}
+      >
         <p className="hero-figure">{hours}</p>
         <p className="text-lg font-bold">hours</p>
         <p className="text-lg font-bold">This chair</p>

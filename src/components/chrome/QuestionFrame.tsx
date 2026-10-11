@@ -31,7 +31,7 @@ export function QuestionFrame({
       <header className="flex flex-col items-center gap-4 text-center">
         <SampleNote />
         <h1 className="text-4xl font-extrabold leading-tight">{title}</h1>
-        <p className="text-lg leading-relaxed text-ink-soft">{lede}</p>
+        <p className="text-lg leading-relaxed">{lede}</p>
       </header>
       <div className="question-body">{children}</div>
       <div className="flex flex-col items-center gap-2">

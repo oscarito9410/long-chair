@@ -1,13 +1,15 @@
 import { GlassLink } from "../components/glass/GlassLink.tsx";
+import { glassClass } from "../components/glass/glass-styles.ts";
 import { SampleNote } from "../components/ui/SampleNote.tsx";
+import type { Hue } from "../tokens/tokens.ts";
 import { paths } from "../routing/paths.ts";
 
-const notes = [
-  { text: "jazz on Sundays", className: "note-a" },
-  { text: "cozy mysteries", className: "note-b" },
-  { text: "slow bread", className: "note-c" },
-  { text: "window light", className: "note-d" },
-] as const;
+const notes: readonly { text: string; className: string; tint: Hue }[] = [
+  { text: "jazz on Sundays", className: "note-a", tint: "honey" },
+  { text: "cozy mysteries", className: "note-b", tint: "apricot" },
+  { text: "slow bread", className: "note-c", tint: "seaglass" },
+  { text: "window light", className: "note-d", tint: "wisteria" },
+];
 
 export function WelcomeScreen() {
   return (
@@ -15,7 +17,16 @@ export function WelcomeScreen() {
       <SampleNote />
       <div className="welcome-stage">
         {notes.map((note) => (
-          <p key={note.text} className={`sticker hand ${note.className}`} aria-hidden="true">
+          <p
+            key={note.text}
+            className={glassClass({
+              thickness: "thin",
+              shape: "sticker",
+              tint: note.tint,
+              className: `sticker hand ${note.className}`,
+            })}
+            aria-hidden="true"
+          >
             {note.text}
           </p>
         ))}

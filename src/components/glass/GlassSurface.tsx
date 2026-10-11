@@ -1,23 +1,35 @@
 import type { ReactNode } from "react";
-import { cn } from "../../lib/cn.ts";
+import type { Hue } from "../../tokens/tokens.ts";
+import {
+  glassClass,
+  onGlassPointerMove,
+  type GlassShape,
+  type GlassThickness,
+} from "./glass-styles.ts";
 
-const variantClass = {
-  badge: "glass-accent-badge",
-  chip: "glass-accent-chip",
-  bar: "glass-accent-bar",
-  sheet: "glass-accent-sheet",
-} as const;
-
-export type GlassVariant = keyof typeof variantClass;
+export type GlassVariant = GlassShape;
 
 export function GlassSurface({
   children,
   className,
-  variant = "badge",
+  variant = "card",
+  thickness = "regular",
+  tint,
+  press = false,
 }: {
   children: ReactNode;
   className?: string;
-  variant?: GlassVariant;
+  variant?: GlassShape;
+  thickness?: GlassThickness;
+  tint?: Hue;
+  press?: boolean;
 }) {
-  return <div className={cn("glass-accent", variantClass[variant], className)}>{children}</div>;
+  return (
+    <div
+      className={glassClass({ thickness, shape: variant, tint, press, className })}
+      onPointerMove={onGlassPointerMove}
+    >
+      {children}
+    </div>
+  );
 }

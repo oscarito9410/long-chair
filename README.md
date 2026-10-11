@@ -57,7 +57,7 @@ src/
     art/          Characters, generated covers, and the stamp.
     background/   A quiet dot field and soft blobs.
     chrome/       Shell, tab bar, question frame, and screen intro.
-    glass/        Glass accents, and the action buttons and links.
+    glass/        Glass surfaces, and the action buttons and links.
     kit/          Timeline, pause, places, topics, agent steps.
     ui/           Dial, option rows, icon, well, hero number, chips.
   content/        Hue, icon, and character roles. Not sample records.
@@ -100,7 +100,7 @@ There are no environment variables. The app does not read a `.env` file.
 
 ## Design
 
-The interface is meant to be readable at arm's length, in a chair, on a phone first. Body type is 18px or larger. A four-hue palette (apricot, sea glass, honey, wisteria) plus ink and a warm page color. Podcasts use sea glass, with episodes. Honey is food and a pause. Each onboarding question is its own screen, with a black primary pill and a quiet text link. Original blob characters mark choices, keep company, and sit in empty states. Glass is only the tab bar, badges on covers, personality chips, and the sheet on a piece. Welcome leads with the promise, scattered notes, and no oversized number. Building, the kit, the companion plan, and the contrast each keep one figure.
+The interface is meant to be readable at arm's length, in a chair, on a phone first. Body type is 18px or larger. A four-hue palette (apricot, sea glass, honey, wisteria) plus ink and a warm page color. Podcasts use sea glass, with episodes. Honey is food and a pause. Each onboarding question is its own screen, with a dark glass primary pill and a quiet text link. Original blob characters mark choices, keep company, and sit in empty states. Saturated color drifts behind the screens so the glass has something to bend. Rows, the dial, covers, the stamp, and the tab bar are that glass. Welcome leads with the promise, frosted notes, and no oversized number. Building, the kit, the companion plan, and the contrast each keep one figure.
 
 The background is a faint canvas of dots. They ease toward a pointer, then settle. The field pauses when the tab is hidden and draws once, still, when the visitor prefers reduced motion. Nunito carries the UI. Caveat is only the welcome stickers. Both are open fonts (SIL Open Font License) loaded through Fontsource.
 

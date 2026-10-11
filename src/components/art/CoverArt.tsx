@@ -1,10 +1,12 @@
-import { hueVar, type Hue } from "../../tokens/tokens.ts";
+import { useId } from "react";
+import type { Hue } from "../../tokens/tokens.ts";
 import { coverLines, coverNumbers } from "./cover-seed.ts";
+import { accentHue, CoverScene, titleInk, type CoverKind } from "./cover-scene.tsx";
 
 const frames = {
-  poster: { w: 300, h: 420, max: 16, font: 28 },
-  square: { w: 320, h: 320, max: 14, font: 26 },
-  banner: { w: 640, h: 280, max: 22, font: 36 },
+  poster: { w: 300, h: 420, max: 14, font: 32 },
+  square: { w: 320, h: 320, max: 12, font: 30 },
+  banner: { w: 640, h: 280, max: 18, font: 40 },
 } as const;
 
 export type CoverFrame = keyof typeof frames;
@@ -14,21 +16,25 @@ export function CoverArt({
   title,
   hue,
   frame,
+  kind = "movie",
   decorative = false,
 }: {
   seed: string;
   title: string;
   hue: Hue;
   frame: CoverFrame;
+  kind?: CoverKind;
   decorative?: boolean;
 }) {
   const box = frames[frame];
-  const [a, b, c, d] = coverNumbers(seed);
+  const nums = coverNumbers(`${seed}:${kind}`);
   const lines = coverLines(title, box.max);
-  const color = `var(${hueVar[hue]})`;
-  const deep = `var(${hueVar[hue]}-deep)`;
-  const filterId = `grain-${seed}`;
-  const start = box.h - 36 - lines.length * (box.font + 4);
+  const accent = accentHue(hue, nums[1]);
+  const filterId = `grain-${useId().replace(/:/g, "")}`;
+  const ink = titleInk(kind);
+  const font = box.font + (nums[2] % 6) - 2;
+  const alignMiddle = kind === "podcast" || kind === "artist";
+  const start = box.h - 28 - lines.length * (font + 6);
 
   return (
     <svg
@@ -40,44 +46,23 @@ export function CoverArt({
     >
       <defs>
         <filter id={filterId}>
-          <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" />
+          <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="2" />
           <feColorMatrix type="saturate" values="0" />
         </filter>
       </defs>
-      <rect width={box.w} height={box.h} fill={deep} />
-      <circle cx={40 + (a % 180)} cy={30 + (b % 140)} r={50 + (c % 70)} fill={color} />
-      <rect
-        x={-20 + (d % 40)}
-        y={box.h * 0.35}
-        width={box.w + 40}
-        height={28 + (a % 24)}
-        fill="var(--lc-page)"
-        opacity="0.22"
-        transform={`rotate(${(b % 16) - 8} ${box.w / 2} ${box.h / 2})`}
-      />
-      <circle
-        cx={box.w - 36 - (c % 40)}
-        cy={box.h * 0.22}
-        r={10 + (d % 16)}
-        fill="var(--lc-card)"
-      />
-      <rect width={box.w} height={box.h} filter={`url(#${filterId})`} opacity="0.18" />
-      <rect
-        y={start - 16}
-        width={box.w}
-        height={box.h - start + 16}
-        fill="var(--lc-ink)"
-        opacity="0.4"
-      />
+      <CoverScene box={box} hue={hue} accent={accent} kind={kind} nums={nums} />
+      <rect width={box.w} height={box.h} filter={`url(#${filterId})`} opacity="0.16" />
       {lines.map((line, index) => (
         <text
-          key={line}
-          x="20"
-          y={start + index * (box.font + 6)}
-          fill="var(--lc-card)"
+          key={`${line}-${index}`}
+          x={alignMiddle ? box.w / 2 : 22}
+          y={start + index * (font + 8)}
+          textAnchor={alignMiddle ? "middle" : "start"}
+          fill={ink ? "var(--lc-ink)" : "var(--lc-card)"}
           fontFamily="Nunito, sans-serif"
-          fontSize={box.font}
+          fontSize={font}
           fontWeight="800"
+          letterSpacing={kind === "book" ? 1.5 : kind === "podcast" ? 0.5 : -0.4}
         >
           {line}
         </text>

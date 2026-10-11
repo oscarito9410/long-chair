@@ -1,4 +1,5 @@
 import { cn } from "../../lib/cn.ts";
+import { glassClass, onGlassPointerMove } from "../glass/glass-styles.ts";
 import { Icon } from "../ui/Icon.tsx";
 import { IconWell } from "../ui/IconWell.tsx";
 
@@ -24,10 +25,15 @@ export function StepRow({
   return (
     <li
       className={cn(
+        glassClass({
+          thickness: "regular",
+          shape: "row",
+          tint: state === "active" ? "honey" : undefined,
+        }),
         "option-row cursor-default",
         state === "done" && "is-selected",
-        state === "active" && "wash-honey",
       )}
+      onPointerMove={onGlassPointerMove}
       aria-current={state === "active" ? "step" : undefined}
     >
       <IconWell hue={stateHue[state]}>

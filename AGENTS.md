@@ -76,9 +76,9 @@ Washes are `color-mix` of a hue into the page (`wash-apricot`, `wash-seaglass`, 
 
 Spacing is the scale 4, 8, 16, 24, 32, 64. In Tailwind that is `1`, `2`, `4`, `6`, `8`, `16`. Do not use the steps in between (`p-3`, `gap-5`, `mt-10`, and the rest).
 
-Body copy is `text-lg` (18px) or larger. Secondary copy is `text-base` (16px) or larger. Do not use `text-sm` or `text-xs`. The tab label may be `text-base` under `sm` so the word "Companion" fits a phone, and `text-lg` from `sm` up. Card titles may stay at `text-2xl`. Secondary ink (`text-ink-soft`) has to clear 4.5:1 on the page and on every wash. Measure before darkening `--lc-ink-soft`. It already clears that bar on the current washes.
+Body copy is `text-lg` (18px) or larger. Secondary copy is `text-base` (16px) or larger. Do not use `text-sm` or `text-xs`. The tab label may be `text-base` under `sm` so the word "Companion" fits a phone, and `text-lg` from `sm` up. Card titles may stay at `text-2xl`. Secondary ink (`text-ink-soft`) has to clear 4.5:1 on every glass fill. It does not clear that bar on a raw vivid blob, so open-field secondary copy uses ink. Measure before darkening `--lc-ink-soft`.
 
-Radii: `rounded-card` for rows and covers, `rounded-panel` for the detail sheet, `rounded-tag` for chips and stickers, `rounded-full` only for real actions (the black primary pill, the quiet text link still uses the pill hit area), the tab bar, and icon wells. Do not put a pill, a shadow, or a fill behind a label that is not an action. The sample line is flat text. The column is `--lc-content` (800px), applied by the `.page` class. Question screens narrow further to `--lc-question` (440px).
+Radii: `rounded-card` for rows and covers, `rounded-panel` for the detail sheet, `rounded-tag` for chips and stickers, `rounded-full` only for real actions (the dark glass primary pill, the quiet text link still uses the pill hit area), the tab bar, and icon wells. Do not put a pill, a shadow, or a fill behind a label that is not an action. The sample line is flat text. The column is `--lc-content` (800px), applied by the `.page` class. Question screens narrow further to `--lc-question` (440px).
 
 Nunito is the UI font. Caveat (the `.hand` class) is only the decorative welcome stickers, which are `aria-hidden`. Privacy notes, footnotes, instructions, and every other line use Nunito. Do not set `.hand` on a sentence a person needs to read to use the app.
 
@@ -86,13 +86,13 @@ The layout is mobile-first. Design and capture at a 390×844 phone, and let the 
 
 ### One question per screen
 
-Onboarding is four hash screens, not one form: `#/love`, `#/chair`, `#/themes`, `#/company`. Each uses `QuestionFrame`: a centered bold `h1`, a short subline, one job in the body, then a full-width black primary pill and a quiet text link under it ("Skip for now" or "You can change this anytime"). The quiet link is still a real control (`GlassLink` tone `quiet`) at the 48px target and the 16px type floor. Continue on tastes stays disabled until one title is selected. Skip advances without requiring a change.
+Onboarding is four hash screens, not one form: `#/love`, `#/chair`, `#/themes`, `#/company`. Each uses `QuestionFrame`: a centered bold `h1`, a short subline, one job in the body, then a full-width dark glass primary pill and a quiet text link under it ("Skip for now" or "You can change this anytime"). The quiet link is still a real control (`GlassLink` tone `quiet`) at the 48px target and the 16px type floor. Continue on tastes stays disabled until one title is selected. Skip advances without requiring a change.
 
 `#/onboarding` is an alias of `#/love`.
 
 ### Characters
 
-`Character` draws an original blob mascot from a `CharacterVariant` (`shape` plus `hue`) in `src/data/character-kinds.ts`. Shapes are pebble, bean, drop, bun, arch, and sprout. Data files may import that type. They must not import a component.
+`Character` draws an original blob mascot from a `CharacterVariant` in `src/data/character-kinds.ts`: `shape`, `hue`, optional `mood` (smile, grin, wink, content, curious), and optional `accessory` (bow, glasses, leaf, scarf, star). Shapes are pebble, bean, drop, bun, arch, and sprout. Each mascot pairs a shape with a second hue for the belly. Data files may import that type. They must not import a component.
 
 Use the character as the icon on an `OptionRow`, as the guide on `#/company` and the companion plan, and in empty and loading states (including the building screen). Sizes are `sm`, `md`, and `lg`. `animate` adds a bob and a blink. Both keyframes are collapsed by the global `prefers-reduced-motion` rule, which leaves the open-eye pose.
 
@@ -100,7 +100,7 @@ Guides live in `src/data/guides.ts` (Pebble, Lumen, Nook, Brim). The draft store
 
 ### Option rows
 
-`OptionRow` is the taste and theme control. A selected row shows a check, a 2px ink border, and a status word ("In the room" or "Left out"). An unselected row is the card color with the quiet line border. Both are toggle buttons with `aria-pressed`. Do not rely on color alone. The character sits on the right.
+`OptionRow` is the taste and theme control, drawn as regular glass. A selected row shows a check, a 2px ink border, and a status word ("In the room" or "Left out"). An unselected row keeps the quiet line border. Both are toggle buttons with `aria-pressed`. Do not rely on color alone. The character sits on the right.
 
 ### Dial
 
@@ -108,28 +108,35 @@ Guides live in `src/data/guides.ts` (Pebble, Lumen, Nook, Brim). The draft store
 
 ### Stamp and cover art
 
-`CoverArt` paints a deterministic poster, square, or banner from a seed string. Pass `decorative` when the title is already in adjacent text. `Stamp` frames a square cover as a postage card with a perforated mask. The ready screen (`#/ready`) is the reward: "Your kit is ready", the stamp, and "Open my kit".
+`CoverArt` paints a deterministic poster, square, or banner from a seed string plus a content or place kind. Each kind has its own composition in `cover-scene.tsx`: a film frame, stacked screens, a waveform, a book spine, a stage, or a table. A second hue (`accentHue`) shifts the motif so two items of the same kind still differ. Book and place titles are ink on a light field; other titles sit in the page color on a deep field. Pass `decorative` when the title is already in adjacent text. Filter ids use `useId`, because a kit card paints the same seed twice (the blurred bleed and the visible cover).
+
+`Stamp` frames a square cover as perforated glass. The ready screen (`#/ready`) is the reward: "Your kit is ready", the stamp, and "Open my kit".
 
 ### Glass
 
-Glass is an accent, not the page. `GlassSurface` is the only glass primitive. Variants:
+Liquid glass is the surface, and the color field is what it refracts. `SoftBlobs` paints four saturated steps of the same hues (`--lc-*-vivid`) behind every screen. They drift slowly. Do not flatten the page back to solid cream, or the glass disappears.
 
-| Variant | Where                           |
-| ------- | ------------------------------- |
-| bar     | The floating tab bar            |
-| badge   | A chip over cover art           |
-| chip    | A personality label on a guide  |
-| sheet   | The bottom sheet on item detail |
+`GlassSurface` and `glassClass` are the only glass recipe. Thickness sets blur, saturation, and fill:
 
-The recipe is `.glass-accent`: a mostly opaque card fill, blur, a sheen, a light border, and a soft shadow. Primary actions are solid ink with page-colored type (`bg-ink text-page`), not glass. Quiet actions use `.action-quiet`: transparent, ink-soft type, no border and no shadow.
+| Thickness | Blur | Saturate | Fill | Use when                                       |
+| --------- | ---- | -------- | ---- | ---------------------------------------------- |
+| thin      | 20px | 180%     | 46%  | Badges, chips, stickers, arrow buttons         |
+| regular   | 28px | 190%     | 52%  | Rows, the dial disc, compare, places, stamp    |
+| thick     | 36px | 200%     | 62%  | Kit cards and the item sheet, over deep covers |
 
-`prefers-reduced-transparency: reduce`, and a missing backdrop-filter, paint `.glass-accent` as opaque card with no blur and no sheen.
+Shapes are `badge`, `chip`, `bar`, `sheet`, `card`, `pill`, `row`, `disc`, and `sticker`. A tint (`glass-tint-*`) lays a hue across the top. The recipe is a translucent card fill, `backdrop-filter`, a 1px light edge with a brighter top inset, a top specular gradient, a faint inner shadow, a layered drop shadow, and a pointer-following sheen. Pressable glass scales to 0.98.
+
+Primary actions are dark tinted glass (`.glass-ink`, about 72% ink) with page-colored type and the same sheen. Quiet actions stay `.action-quiet`: transparent, ink-soft is not used there, no border and no shadow.
+
+Text on the open color field uses ink. `text-ink-soft` is only for secondary copy that sits on glass, where the fill keeps it at or above 4.5:1 even over a deep cover. Do not put ink-soft directly on a vivid blob.
+
+`prefers-reduced-transparency: reduce`, and a missing backdrop-filter, paint light glass as opaque card and dark glass as opaque ink, with no blur and no sheen. The blobs quiet down in that mode too.
+
+The tab bar is a floating glass capsule. The current tab is a glass lens with a 2px ink border that slides between the three links (`aria-current="page"`). Do not communicate the current tab by color alone.
 
 ### Tab clearance
 
 Screens with the tab bar use `.page-pad-tabs`. That column is its own scrollport, `100dvh` minus `--lc-tab-dock` (the bar plus the dock inset or `env(safe-area-inset-bottom)`), with 24px of padding inside the scroller. Content moves above the bar. It does not slide underneath it. Screens without the bar use `.page-pad` and scroll the document, including the safe-area inset. The phone tab stacks the icon over the label, so the bar token includes the extra stack height. Route changes reset scroll on `.page`.
-
-The current tab is a cream pill with a 2px ink border inside the glass bar (`aria-current="page"`). Do not communicate the current tab by color alone.
 
 ### Icon wells
 
@@ -141,7 +148,7 @@ Building, Kit, Companion, and Compare each have one `HeroNumber`: the figure tha
 
 ### Motion
 
-Blobs drift slowly, at low opacity. Characters bob and blink when `animate` is set. Screen changes use `.screen-enter`. The building steps check off on `motion.stepIntervalMs`. All of this is covered by the global `prefers-reduced-motion: reduce` rule in `index.css`, which collapses animation and transition time. Do not add a motion effect that ignores that query.
+Blobs drift slowly. They stay saturated enough that glass has color to refract. Characters bob and blink when `animate` is set. Screen changes use `.screen-enter`. The building steps check off on `motion.stepIntervalMs`. All of this is covered by the global `prefers-reduced-motion: reduce` rule in `index.css`, which collapses animation and transition time. Do not add a motion effect that ignores that query.
 
 ### Dot field
 
@@ -174,7 +181,7 @@ Keep the field quiet. This screen sits beside a person for hours. Do not add tra
 - Tastes and themes are toggle buttons with `aria-pressed`. Duration is the dial's range input, not a set of radios.
 - The building sequence checks steps off one by one. `prefers-reduced-motion: reduce` shows every step already done. The sequence exposes the current step and a polite live region, and it offers a way forward before the timer finishes.
 - Focus uses the visible `:focus-visible` ring. Do not remove outlines.
-- Ink on the page, page-colored type on the black primary, and page-colored glyphs on deep wells are the contrast pairs. Do not put ink-soft text on a deep hue. Do not fade text with opacity to mean "disabled". Disabled buttons use the `line` token.
+- Ink on the page and on glass, page-colored type on the dark glass primary, and page-colored glyphs on deep wells are the contrast pairs. Do not put ink-soft text on a vivid blob or a deep hue. Do not fade text with opacity to mean "disabled". Disabled buttons use the `line` token.
 
 ## Commands
 

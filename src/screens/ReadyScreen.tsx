@@ -26,6 +26,7 @@ export function ReadyScreen() {
         seed={item?.id ?? "quiet-chair"}
         title={item?.title ?? "A quiet chair"}
         hue={hue}
+        kind={item?.kind ?? "movie"}
         caption="For the chair"
         detail={formatHoursMinutes(packed.durationMinutes)}
       />

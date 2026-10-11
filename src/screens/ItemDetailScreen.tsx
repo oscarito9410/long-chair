@@ -41,12 +41,23 @@ export function ItemDetailScreen({ itemId }: { itemId: string }) {
         Back to the kit
       </GlassLink>
       <div className="cover-frame">
-        <CoverArt seed={item.id} title={item.title} hue={meta.hue} frame="poster" decorative />
-        <GlassSurface variant="badge" className="cover-badge px-4 py-2">
+        <CoverArt
+          seed={item.id}
+          title={item.title}
+          hue={meta.hue}
+          kind={item.kind}
+          frame="poster"
+          decorative
+        />
+        <GlassSurface variant="badge" thickness="thin" className="cover-badge px-4 py-2">
           <span className="text-lg font-bold">{formatHoursMinutes(item.minutes)}</span>
         </GlassSurface>
       </div>
-      <GlassSurface variant="sheet" className="detail-sheet flex flex-col gap-6 p-6">
+      <GlassSurface
+        variant="sheet"
+        thickness="thick"
+        className="detail-sheet flex flex-col gap-6 p-6"
+      >
         <SampleNote />
         <div>
           <p className="text-lg font-bold">{meta.label}</p>

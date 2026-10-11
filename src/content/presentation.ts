@@ -17,23 +17,28 @@ export const kindMeta: Record<ContentKind, { hue: Hue; icon: IconName; label: st
   artist: { hue: "apricot", icon: "note", label: "Listening" },
 };
 
-const fallbackCharacter: CharacterVariant = { shape: "pebble", hue: "apricot" };
+const fallbackCharacter: CharacterVariant = {
+  shape: "pebble",
+  hue: "apricot",
+  mood: "smile",
+  accessory: "none",
+};
 
 export const tasteCharacters: Record<string, CharacterVariant> = {
-  "mira-solano": { shape: "bun", hue: "apricot" },
-  "harbor-lights": { shape: "drop", hue: "seaglass" },
-  "paper-kite": { shape: "bean", hue: "apricot" },
-  "salt-windowlight": { shape: "arch", hue: "wisteria" },
-  "slow-kitchen": { shape: "pebble", hue: "honey" },
-  "sunday-engines": { shape: "sprout", hue: "seaglass" },
+  "mira-solano": { shape: "bun", hue: "apricot", mood: "grin", accessory: "bow" },
+  "harbor-lights": { shape: "drop", hue: "seaglass", mood: "curious", accessory: "star" },
+  "paper-kite": { shape: "bean", hue: "apricot", mood: "wink", accessory: "glasses" },
+  "salt-windowlight": { shape: "arch", hue: "wisteria", mood: "content", accessory: "scarf" },
+  "slow-kitchen": { shape: "pebble", hue: "honey", mood: "smile", accessory: "none" },
+  "sunday-engines": { shape: "sprout", hue: "seaglass", mood: "grin", accessory: "leaf" },
 };
 
 export const themeCharacters: Record<string, CharacterVariant> = {
-  illness: { shape: "pebble", hue: "apricot" },
-  hospitals: { shape: "arch", hue: "seaglass" },
-  cancer: { shape: "bean", hue: "wisteria" },
-  "parent-death": { shape: "bun", hue: "honey" },
-  grief: { shape: "drop", hue: "wisteria" },
+  illness: { shape: "pebble", hue: "apricot", mood: "content", accessory: "none" },
+  hospitals: { shape: "arch", hue: "seaglass", mood: "smile", accessory: "glasses" },
+  cancer: { shape: "bean", hue: "wisteria", mood: "wink", accessory: "star" },
+  "parent-death": { shape: "bun", hue: "honey", mood: "content", accessory: "scarf" },
+  grief: { shape: "drop", hue: "wisteria", mood: "curious", accessory: "leaf" },
 };
 
 export function tasteCharacter(id: string): CharacterVariant {

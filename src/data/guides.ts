@@ -14,28 +14,28 @@ export const guides: readonly Guide[] = [
     name: "Pebble",
     personality: "Steady",
     quote: "I'll sit with you. We can be quiet.",
-    variant: { shape: "pebble", hue: "seaglass" },
+    variant: { shape: "pebble", hue: "seaglass", mood: "content", accessory: "scarf" },
   },
   {
     id: "lumen",
     name: "Lumen",
     personality: "Warm",
     quote: "We'll keep the afternoon soft.",
-    variant: { shape: "bun", hue: "honey" },
+    variant: { shape: "bun", hue: "honey", mood: "grin", accessory: "bow" },
   },
   {
     id: "nook",
     name: "Nook",
     personality: "Close",
     quote: "A small corner is a good place to land.",
-    variant: { shape: "arch", hue: "apricot" },
+    variant: { shape: "arch", hue: "apricot", mood: "smile", accessory: "glasses" },
   },
   {
     id: "brim",
     name: "Brim",
     personality: "Curious",
     quote: "Tell me one small thing you noticed.",
-    variant: { shape: "sprout", hue: "wisteria" },
+    variant: { shape: "sprout", hue: "wisteria", mood: "curious", accessory: "leaf" },
   },
 ];
 

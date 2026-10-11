@@ -2,6 +2,7 @@ import { cn } from "../../lib/cn.ts";
 import type { Route } from "../../routing/parse-route.ts";
 import { paths } from "../../routing/paths.ts";
 import { GlassSurface } from "../glass/GlassSurface.tsx";
+import { glassClass } from "../glass/glass-styles.ts";
 import type { IconName } from "../ui/icon-names.ts";
 import { Icon } from "../ui/Icon.tsx";
 
@@ -24,10 +25,19 @@ function tabIsCurrent(route: Route, name: (typeof tabs)[number]["name"]): boolea
 }
 
 export function TabBar({ route }: { route: Route }) {
+  const currentIndex = Math.max(
+    0,
+    tabs.findIndex((tab) => tabIsCurrent(route, tab.name)),
+  );
   return (
     <div className="layer-tab tab-dock">
-      <GlassSurface variant="bar" className="w-full max-w-[var(--lc-content)]">
+      <GlassSurface variant="bar" thickness="thick" className="w-full max-w-[var(--lc-content)]">
         <nav className="relative flex gap-2 p-2" aria-label="Session">
+          <span
+            className={glassClass({ thickness: "thin", shape: "pill", className: "tab-lens" })}
+            style={{ transform: `translateX(calc(${currentIndex} * (100% + var(--lc-space-8))))` }}
+            aria-hidden="true"
+          />
           {tabs.map((tab) => {
             const current = tabIsCurrent(route, tab.name);
             return (

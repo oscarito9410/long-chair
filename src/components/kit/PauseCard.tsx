@@ -1,13 +1,18 @@
-import { cn } from "../../lib/cn.ts";
 import { formatHoursMinutes } from "../../lib/format-duration.ts";
-import { hueWashClass } from "../../tokens/hue-styles.ts";
+import { glassClass, onGlassPointerMove } from "../glass/glass-styles.ts";
 import { Icon } from "../ui/Icon.tsx";
 import { IconWell } from "../ui/IconWell.tsx";
 
 export function PauseCard({ minutes }: { minutes: number }) {
   return (
     <article
-      className={cn("pastel-card flex items-center gap-4 rounded-card p-6", hueWashClass.honey)}
+      className={glassClass({
+        thickness: "regular",
+        shape: "card",
+        tint: "honey",
+        className: "flex items-center gap-4 p-6",
+      })}
+      onPointerMove={onGlassPointerMove}
     >
       <IconWell hue="honey">
         <Icon name="pause" />
