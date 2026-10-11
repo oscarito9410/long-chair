@@ -5,7 +5,7 @@
 
 ## Context
 
-The prototype is a Vite and TypeScript UI with no server. The hackathon build needs a server that holds the Qloo key, runs the pipeline, and stays up for judges. The team is small. Oscar, who is leading it, builds Swift and iOS, React Native, and Python backends.
+The prototype is a Vite and TypeScript UI with no server. The hackathon build needs a server that holds the Qloo key, runs the pipeline, and stays up for judges. The team is small. Oscar, who is leading it, builds Flutter, Swift and iOS, and Python backends.
 
 A Node server would share the TypeScript types with the UI. That is the strongest argument against Python. The pipeline is a handful of HTTP calls, a pure packer, and a checker. It is not a large domain that will suffer from a second copy of five interfaces.
 
@@ -13,7 +13,7 @@ A Node server would share the TypeScript types with the UI. That is the stronges
 
 The session API is Python 3.12 and FastAPI.
 
-- FastAPI publishes the OpenAPI document the web client will be generated from, so the duplicated types have a source. The source is the schema in `docs/architecture/ARCHITECTURE.md`, then the FastAPI models, then a generated TypeScript client. Hand-copied interfaces are a bug.
+- FastAPI publishes the OpenAPI document the clients follow. The source is the schema in `docs/architecture/ARCHITECTURE.md`, then the FastAPI models. The Flutter app mirrors them with freezed models. The Vite prototype keeps the TypeScript types in `src/data/types.ts` as the design reference. Hand-copied fields that drift are a bug.
 - `httpx` is enough for the Qloo GET calls. Pydantic models are the shared `InsightsDocument` the contract tests already assume.
 - The packer moves as a pure function. Its rules stay the ones in `src/lib/pack-session.ts`. A Python port of that function is tested against the same fixture sessions as the TypeScript one, so the two implementations cannot diverge while both exist. Once the API owns packing, the UI stops packing and renders the server's `PackedSession`.
 - Oscar can review and extend a Python service without the team adopting a backend language nobody owns.

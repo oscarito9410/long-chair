@@ -18,7 +18,7 @@ The prototype already shows that story. The hackathon build replaces the fiction
 | Language model | Optional, prose only, off by default                              | [ADR 0002](../adr/0002-llm-optional.md)    |
 | Hosting        | Static web app plus a small always-on API with a private disk     | [ADR 0003](../adr/0003-hosting.md)         |
 | Repo layout    | Monorepo. The prototype stays at the root until the API milestone | [ADR 0004](../adr/0004-monorepo.md)        |
-| Clients        | Expo app: iOS, Android, and the hosted web export                 | [ADR 0005](../adr/0005-client-strategy.md) |
+| Clients        | Flutter for iOS, Android, and the hosted web build                | [ADR 0006](../adr/0006-flutter-client.md)  |
 | Qloo access    | `QlooPort`, three adapters, shared contract tests                 | [qloo-port.md](qloo-port.md)               |
 
 ## System context
@@ -49,7 +49,7 @@ title Long Chair, containers
 
 Person(visitor, "Visitor")
 
-Container(client, "Client", "Expo, React Native, Expo Router", "One codebase: iOS, Android, and the hosted web export")
+Container(client, "Client", "Flutter", "One codebase: iOS, Android, and the web build. Calls our API only")
 Container(api, "Session API", "Python, FastAPI", "Pipeline, packing, privacy boundary, demo cache")
 ContainerDb(cache, "Demo cache", "Private volume, gitignored", "Recorded Qloo responses for replay. Not in git")
 Container_Ext(qloo, "Qloo", "hackathon.api.qloo.com", "Taste graph")

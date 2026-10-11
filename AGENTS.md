@@ -6,9 +6,21 @@ Long Chair is a static design prototype. Read this before editing. The product s
 
 A Vite + React + TypeScript UI with fictional sample data. Visitors can plan a chair, watch an illustrated agent sequence, and open the kit, the companion plan, and the plain-model contrast.
 
-The hackathon architecture is written and not yet implemented. Read `docs/architecture/ARCHITECTURE.md`, `docs/architecture/qloo-port.md`, `docs/adr/`, and `docs/plan/ROADMAP.md` before adding a server or a mobile app. Do not start either until a person asks for the implementation milestone. Until then, do not add a Qloo client, an LLM SDK, authentication, or a database to the Vite app, and do not scaffold `apps/mobile`.
+The hackathon architecture is written and not yet implemented. Read `docs/architecture/ARCHITECTURE.md`, `docs/architecture/qloo-port.md`, `docs/adr/`, and `docs/plan/ROADMAP.md` before adding a server or a client app. Do not start either until a person asks for the implementation milestone. Until then, do not add a Qloo client, an LLM SDK, authentication, or a database to the Vite app, and do not scaffold `apps/client`.
 
-The client decision is Expo with Expo Router and react-native-web: one codebase for iOS, Android, and the hosted demo. The Vite app is the design reference until that export replaces it. Liquid glass on iOS 26 goes through `expo-glass-effect`, with the opaque-card fallback on Android, web, and older iOS. The Qloo key never ships inside the binary.
+The client decision is Flutter ([ADR 0006](docs/adr/0006-flutter-client.md)). [ADR 0005](docs/adr/0005-client-strategy.md) is superseded. Do not add a React Native toolchain. The Vite app in `src/` is the design reference and the fallback judge URL. The Qloo key never ships inside a binary. Clients call the Python API only.
+
+## Flutter rules
+
+These apply to `apps/client` once it exists. The Vite prototype keeps the rules further down in this file.
+
+- **Analyze.** `very_good_analysis` is the lint set. Do not weaken a lint to land a screen. `flutter analyze` is part of done, alongside the existing `npm run lint` for the prototype.
+- **Layers.** Feature-first folders. Each feature has `domain`, `data`, and `presentation`. Domain does not import Flutter. Repository interfaces live in domain. Data implements them against `/v1`. Presentation talks to the interface.
+- **State.** Riverpod. A provider returns `AsyncValue` for a plan request. Do not add Bloc events for a single HTTP call.
+- **Models.** `freezed` and `json_serializable` for anything that crosses the wire. Match `SessionDraft`, `CatalogItem`, `PackedSession`, `CompanionTopic`, and `NearbyPlace`. Change them in the same commit as the OpenAPI change.
+- **Tokens.** Colors, space, radius, and type floors live on a `ThemeExtension`. Widgets read the theme. Do not hard-code a hex in a screen.
+- **Glass.** `GlassSurface` is the only blur. It uses `BackdropFilter` and `ImageFilter.blur`, and the opaque card when the visitor wants less transparency or when web scroll cannot afford the blur. Do not add a shader liquid-glass package.
+- **SOLID and DRY.** One theme, one glass widget, one HTTP client, one repository per feature. Screens compose. They do not pack a session or parse a Qloo document. The packer stays in the API.
 
 Do not invent live API responses. Do not commit API keys, `.env` files, `.qloo-cache/`, or real Qloo payloads. Hackathon rules forbid Qloo data in the public repo. Fictional fixtures that match the documented JSON shape are allowed. A recording of a real response is not a fixture.
 

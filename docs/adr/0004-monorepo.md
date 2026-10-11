@@ -14,8 +14,11 @@ Moving `src/` into `apps/web` on the same day as this document would churn every
 Target layout, created when implementation starts:
 
 ```text
-src/                         Vite prototype, design reference until the Expo web export replaces it
-apps/mobile/                 Expo Router client: iOS, Android, and web export
+src/                         Vite prototype. Design reference, and the fallback judge URL
+apps/client/                 Flutter app: iOS, Android, and web
+  lib/core/theme/            ThemeExtension tokens
+  lib/core/glass/            GlassSurface
+  lib/features/              feature-first domain, data, presentation
 services/api/                FastAPI
   app/ports/qloo.py          QlooPort
   app/adapters/http.py
@@ -29,9 +32,9 @@ services/api/                FastAPI
 docs/                        this tree
 ```
 
-The first implementation milestone adds `apps/mobile` and `services/api` without moving `src/`. The Vite app keeps running until the Expo web export is the hosted demo. A move of `src/` into `apps/` is optional and, if it happens, is a commit that only moves files.
+The first implementation milestone adds `apps/client` and `services/api` without moving `src/`. The Vite app keeps running as the design reference. A move of `src/` into `apps/` is optional and, if it happens, is a commit that only moves files.
 
-`apps/mobile` has its own `package.json`. Root `package.json` stays the prototype toolchain until that handoff. The API has its own `pyproject.toml`.
+`apps/client` has its own `pubspec.yaml`. Root `package.json` stays the prototype toolchain. The API has its own `pyproject.toml`.
 
 `.gitignore` ignores `.env`, `.env.*`, and `.qloo-cache/` from this document onward, so a recording cannot be added by accident.
 
@@ -39,4 +42,4 @@ The first implementation milestone adds `apps/mobile` and `services/api` without
 
 - One public repository, one MIT license, one Devpost link.
 - Developers run two processes. The README will say so when the API exists. Until then, `npm run dev` is still the whole prototype.
-- Shared types flow from OpenAPI to TypeScript, not from `src/data/types.ts` into Python by hand. When the API is added, those TypeScript types stay the UI's view of the schema, and a test checks they still match.
+- Shared types flow from OpenAPI to the FastAPI models and the Flutter freezed models. The TypeScript types in `src/data/types.ts` stay the design reference. A drift between those three is a bug.

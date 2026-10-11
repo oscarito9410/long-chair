@@ -115,7 +115,7 @@ The judging build is a hosted web app plus a small API. This prototype is the UI
 - [ADRs](docs/adr/): FastAPI, an optional prose model, hosting, the monorepo, and the client strategy.
 - [Roadmap](docs/plan/ROADMAP.md): gates from 11 October through submission on 30 October 2026, 21:45 America/Mexico_City.
 
-The client is one Expo app: iOS, Android, and a hosted web export from the same code. Judges get a URL they can finish in the browser, a TestFlight link once Apple approves the beta, and an APK. The API is Python and FastAPI. The Qloo key stays on the server. Until the key arrives, the pipeline runs on the fake adapter. After the key is turned off, judges hit a private replay cache that is not in this repository.
+The client is one Flutter app: iOS, Android, and a web build from the same code. Judges get a URL they can finish in the browser, a TestFlight link once Apple approves the beta, and an APK. The Vite prototype stays the design reference, and it is the fallback URL if the Flutter web build is unpleasant to use. The API is Python and FastAPI. Clients call that API and never call Qloo. The key stays on the server. Until the key arrives, the pipeline runs on the fake adapter. After the key is turned off, judges hit a private replay cache that is not in this repository.
 
 Do not commit Qloo responses, keys, or a copy of the replay cache. The Devpost page needs a public repo, the MIT license in the About field, the hosted demo URL, and an English description. The product is not medical advice, and the request to Qloo carries titles and a neighborhood, not a name or a diagnosis.
 
