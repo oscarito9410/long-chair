@@ -49,7 +49,7 @@ export function ItemDetailScreen({ itemId }: { itemId: string }) {
           frame="poster"
           decorative
         />
-        <GlassSurface variant="badge" thickness="thin" className="cover-badge px-4 py-2">
+        <GlassSurface variant="badge" thickness="regular" className="cover-badge px-4 py-2">
           <span className="text-lg font-bold">{formatHoursMinutes(item.minutes)}</span>
         </GlassSurface>
       </div>

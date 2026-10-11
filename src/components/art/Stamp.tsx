@@ -1,6 +1,6 @@
 import type { ContentKind } from "../../data/types.ts";
 import type { Hue } from "../../tokens/tokens.ts";
-import { glassClass, onGlassPointerMove } from "../glass/glass-styles.ts";
+import { glassClass } from "../glass/glass-styles.ts";
 import { CoverArt } from "./CoverArt.tsx";
 
 export function Stamp({
@@ -19,10 +19,7 @@ export function Stamp({
   detail: string;
 }) {
   return (
-    <figure
-      className={glassClass({ thickness: "regular", shape: "card", className: "stamp" })}
-      onPointerMove={onGlassPointerMove}
-    >
+    <figure className={glassClass({ thickness: "regular", shape: "card", className: "stamp" })}>
       <div className="stamp-art">
         <CoverArt seed={seed} title={title} hue={hue} kind={kind} frame="square" />
       </div>

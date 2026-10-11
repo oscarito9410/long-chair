@@ -1,7 +1,7 @@
 import { cn } from "../../lib/cn.ts";
 import type { CharacterVariant } from "../../data/character-kinds.ts";
 import { Character } from "../art/Character.tsx";
-import { glassClass, onGlassPointerMove } from "../glass/glass-styles.ts";
+import { glassClass } from "../glass/glass-styles.ts";
 import { Icon } from "./Icon.tsx";
 
 export function OptionRow({
@@ -23,12 +23,11 @@ export function OptionRow({
     <button
       type="button"
       className={cn(
-        glassClass({ thickness: "regular", shape: "row", press: true }),
+        glassClass({ thickness: "thin", shape: "row", press: true }),
         "option-row",
         checked && "is-selected",
       )}
       aria-pressed={checked}
-      onPointerMove={onGlassPointerMove}
       onClick={onChange}
     >
       <span className="min-w-0">

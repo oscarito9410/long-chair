@@ -16,6 +16,7 @@ export function GlassSurface({
   thickness = "regular",
   tint,
   press = false,
+  follow = false,
 }: {
   children: ReactNode;
   className?: string;
@@ -23,11 +24,12 @@ export function GlassSurface({
   thickness?: GlassThickness;
   tint?: Hue;
   press?: boolean;
+  follow?: boolean;
 }) {
   return (
     <div
-      className={glassClass({ thickness, shape: variant, tint, press, className })}
-      onPointerMove={onGlassPointerMove}
+      className={glassClass({ thickness, shape: variant, tint, press, follow, className })}
+      onPointerMove={follow ? onGlassPointerMove : undefined}
     >
       {children}
     </div>

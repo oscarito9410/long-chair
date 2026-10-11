@@ -38,7 +38,7 @@ export function TimelineCard({
   exceptions,
 }: TimelineCardProps) {
   return (
-    <a href={href} className="kit-shell" onPointerMove={onGlassPointerMove}>
+    <a href={href} className="kit-shell">
       <span className="kit-bleed" aria-hidden="true">
         <CoverArt seed={seed} title={title} hue={hue} kind={kind} frame="square" decorative />
       </span>
@@ -47,14 +47,16 @@ export function TimelineCard({
           thickness: "thick",
           shape: "card",
           press: true,
+          follow: true,
           className: "kit-face",
         })}
+        onPointerMove={onGlassPointerMove}
       >
         <div className="cover-frame kit-cover">
           <CoverArt seed={seed} title={title} hue={hue} kind={kind} frame="square" decorative />
           <GlassSurface
             variant="badge"
-            thickness="thin"
+            thickness="regular"
             className="cover-badge flex items-center gap-2 px-4 py-2"
           >
             <Icon name={icon} />

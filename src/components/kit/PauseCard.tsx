@@ -1,5 +1,5 @@
 import { formatHoursMinutes } from "../../lib/format-duration.ts";
-import { glassClass, onGlassPointerMove } from "../glass/glass-styles.ts";
+import { glassClass } from "../glass/glass-styles.ts";
 import { Icon } from "../ui/Icon.tsx";
 import { IconWell } from "../ui/IconWell.tsx";
 
@@ -7,12 +7,11 @@ export function PauseCard({ minutes }: { minutes: number }) {
   return (
     <article
       className={glassClass({
-        thickness: "regular",
+        thickness: "thin",
         shape: "card",
         tint: "honey",
         className: "flex items-center gap-4 p-6",
       })}
-      onPointerMove={onGlassPointerMove}
     >
       <IconWell hue="honey">
         <Icon name="pause" />

@@ -16,7 +16,7 @@ export function Dial({ hours, onChange }: { hours: number; onChange: (hours: num
   return (
     <div className="dial">
       <div
-        className={glassClass({ thickness: "thick", shape: "disc", className: "dial-ring" })}
+        className={glassClass({ thickness: "thin", shape: "disc", className: "dial-ring" })}
         aria-hidden="true"
       />
       <svg viewBox="0 0 240 240" className="dial-svg" aria-hidden="true">

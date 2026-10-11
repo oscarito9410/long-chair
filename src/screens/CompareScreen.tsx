@@ -1,6 +1,6 @@
 import { CoverArt } from "../components/art/CoverArt.tsx";
 import { ScreenIntro } from "../components/chrome/ScreenIntro.tsx";
-import { glassClass, onGlassPointerMove } from "../components/glass/glass-styles.ts";
+import { glassClass } from "../components/glass/glass-styles.ts";
 import { AvoidedRow } from "../components/ui/AvoidedRow.tsx";
 import { BecauseList } from "../components/ui/BecauseList.tsx";
 import { Icon } from "../components/ui/Icon.tsx";
@@ -44,12 +44,11 @@ export function CompareScreen() {
       <div className="grid gap-6 md:grid-cols-2">
         <article
           className={glassClass({
-            thickness: "regular",
+            thickness: "thin",
             shape: "card",
             tint: "wisteria",
             className: "flex flex-col gap-4 p-6",
           })}
-          onPointerMove={onGlassPointerMove}
         >
           <IconWell hue="wisteria">
             <Icon name="x" />
@@ -74,8 +73,14 @@ export function CompareScreen() {
           </div>
         </article>
         {kept && keptMeta ? (
-          <article className="kit-shell" onPointerMove={onGlassPointerMove}>
-            <span className="kit-bleed" aria-hidden="true">
+          <article
+            className={glassClass({
+              thickness: "thin",
+              shape: "card",
+              className: "flex flex-col gap-4 p-6",
+            })}
+          >
+            <div className="cover-frame">
               <CoverArt
                 seed={kept.id}
                 title={kept.title}
@@ -84,37 +89,19 @@ export function CompareScreen() {
                 frame="banner"
                 decorative
               />
-            </span>
-            <div
-              className={glassClass({
-                thickness: "thick",
-                shape: "card",
-                className: "kit-face flex flex-col gap-4",
-              })}
-            >
-              <div className="cover-frame">
-                <CoverArt
-                  seed={kept.id}
-                  title={kept.title}
-                  hue={keptMeta.hue}
-                  kind={kept.kind}
-                  frame="banner"
-                  decorative
-                />
-              </div>
-              <IconWell hue="seaglass">
-                <Icon name="check" />
-              </IconWell>
-              <p className="text-lg font-bold">Long Chair kept</p>
-              <h2 className="text-2xl font-bold">{kept.title}</h2>
-              <p className="text-lg">{kept.maker}</p>
-              <p className="text-lg leading-relaxed">{kept.why}</p>
-              <BecauseList names={matchingSeedNames(kept, draft)} />
-              <AvoidedRow labels={avoidedLabels(kept, draft)} />
             </div>
+            <IconWell hue="seaglass">
+              <Icon name="check" />
+            </IconWell>
+            <p className="text-lg font-bold">Long Chair kept</p>
+            <h2 className="text-2xl font-bold">{kept.title}</h2>
+            <p className="text-lg">{kept.maker}</p>
+            <p className="text-lg leading-relaxed">{kept.why}</p>
+            <BecauseList names={matchingSeedNames(kept, draft)} />
+            <AvoidedRow labels={avoidedLabels(kept, draft)} />
           </article>
         ) : (
-          <div className={glassClass({ thickness: "regular", shape: "card", className: "p-6" })}>
+          <div className={glassClass({ thickness: "thin", shape: "card", className: "p-6" })}>
             <SectionHeading>Nothing kept yet</SectionHeading>
             <p className="mt-4 text-lg">Add a film you love and the contrast will fill in.</p>
           </div>

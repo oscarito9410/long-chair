@@ -31,10 +31,15 @@ export function TabBar({ route }: { route: Route }) {
   );
   return (
     <div className="layer-tab tab-dock">
-      <GlassSurface variant="bar" thickness="thick" className="w-full max-w-[var(--lc-content)]">
+      <GlassSurface
+        variant="bar"
+        thickness="thick"
+        follow
+        className="w-full max-w-[var(--lc-content)]"
+      >
         <nav className="relative flex gap-2 p-2" aria-label="Session">
           <span
-            className={glassClass({ thickness: "thin", shape: "pill", className: "tab-lens" })}
+            className={glassClass({ thickness: "regular", shape: "pill", className: "tab-lens" })}
             style={{ transform: `translateX(calc(${currentIndex} * (100% + var(--lc-space-8))))` }}
             aria-hidden="true"
           />

@@ -24,7 +24,7 @@ export function CompanionScreen() {
       />
       <div className="flex flex-col items-center gap-4 text-center">
         <Character variant={guide.variant} size="lg" animate />
-        <GlassSurface variant="chip" className="px-4 py-2">
+        <GlassSurface variant="chip" thickness="thin" className="px-4 py-2">
           <span className="text-base font-bold">{guide.personality}</span>
         </GlassSurface>
         <p className="text-lg leading-relaxed">{guide.quote}</p>

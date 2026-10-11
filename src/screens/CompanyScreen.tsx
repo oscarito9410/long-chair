@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Character } from "../components/art/Character.tsx";
 import { QuestionFrame } from "../components/chrome/QuestionFrame.tsx";
 import { GlassSurface } from "../components/glass/GlassSurface.tsx";
-import { glassClass, onGlassPointerMove } from "../components/glass/glass-styles.ts";
+import { glassClass } from "../components/glass/glass-styles.ts";
 import { Icon } from "../components/ui/Icon.tsx";
 import { guideById, guides } from "../data/guides.ts";
 import { paths } from "../routing/paths.ts";
@@ -45,7 +45,6 @@ export function CompanyScreen() {
               className: "icon-hit",
             })}
             aria-label="Previous guide"
-            onPointerMove={onGlassPointerMove}
             onClick={() => {
               shift(-1);
             }}
@@ -83,7 +82,6 @@ export function CompanyScreen() {
               className: "icon-hit",
             })}
             aria-label="Next guide"
-            onPointerMove={onGlassPointerMove}
             onClick={() => {
               shift(1);
             }}

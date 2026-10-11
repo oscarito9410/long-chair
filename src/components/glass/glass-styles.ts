@@ -29,12 +29,14 @@ export function glassClass({
   shape = "card",
   tint,
   press = false,
+  follow = false,
   className,
 }: {
   thickness?: GlassThickness;
   shape?: GlassShape;
   tint?: Hue;
   press?: boolean;
+  follow?: boolean;
   className?: string;
 } = {}): string {
   return cn(
@@ -43,6 +45,7 @@ export function glassClass({
     shapeClass[shape],
     tint && `glass-tint-${tint}`,
     press && "glass-press",
+    follow && "glass-follow",
     className,
   );
 }

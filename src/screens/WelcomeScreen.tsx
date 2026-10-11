@@ -1,5 +1,4 @@
 import { GlassLink } from "../components/glass/GlassLink.tsx";
-import { glassClass } from "../components/glass/glass-styles.ts";
 import { SampleNote } from "../components/ui/SampleNote.tsx";
 import type { Hue } from "../tokens/tokens.ts";
 import { paths } from "../routing/paths.ts";
@@ -19,12 +18,7 @@ export function WelcomeScreen() {
         {notes.map((note) => (
           <p
             key={note.text}
-            className={glassClass({
-              thickness: "thin",
-              shape: "sticker",
-              tint: note.tint,
-              className: `sticker hand ${note.className}`,
-            })}
+            className={`sticker sticker-${note.tint} hand ${note.className}`}
             aria-hidden="true"
           >
             {note.text}

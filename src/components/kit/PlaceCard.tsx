@@ -2,13 +2,13 @@ import { placeMeta } from "../../content/presentation.ts";
 import type { NearbyPlace } from "../../data/types.ts";
 import { CoverArt } from "../art/CoverArt.tsx";
 import { GlassSurface } from "../glass/GlassSurface.tsx";
-import { glassClass, onGlassPointerMove } from "../glass/glass-styles.ts";
+import { glassClass } from "../glass/glass-styles.ts";
 import { Icon } from "../ui/Icon.tsx";
 
 export function PlaceCard({ place }: { place: NearbyPlace }) {
   const meta = placeMeta[place.kind];
   return (
-    <article className="place-shell" onPointerMove={onGlassPointerMove}>
+    <article className="place-shell">
       <div className="cover-frame">
         <CoverArt
           seed={place.id}
@@ -20,7 +20,7 @@ export function PlaceCard({ place }: { place: NearbyPlace }) {
         />
         <GlassSurface
           variant="badge"
-          thickness="thin"
+          thickness="regular"
           className="cover-badge flex items-center gap-2 px-4 py-2"
         >
           <Icon name={meta.icon} />
@@ -29,7 +29,7 @@ export function PlaceCard({ place }: { place: NearbyPlace }) {
       </div>
       <div
         className={glassClass({
-          thickness: "regular",
+          thickness: "thin",
           shape: "card",
           tint: meta.hue,
           className: "place-body flex flex-col gap-2",

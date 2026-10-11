@@ -18,10 +18,6 @@
   --lc-honey-deep: #7a5e16;
   --lc-wisteria: #c5b0d6;
   --lc-wisteria-deep: #564472;
-  --lc-apricot-vivid: #ff7a45;
-  --lc-seaglass-vivid: #14c8b0;
-  --lc-honey-vivid: #ffc233;
-  --lc-wisteria-vivid: #c084fc;
   --lc-font-sans: "Nunito", ui-rounded, "SF Pro Rounded", system-ui, sans-serif;
   --lc-font-hand: "Caveat", "Segoe Print", cursive;
   --lc-radius-card: 28px;
@@ -51,23 +47,23 @@
   );
   /* Kept for scroll-padding on the document. The dock owns the overlay; the scroller adds 24px of air. */
   --lc-tab-clearance: calc(var(--lc-tab-dock) + var(--lc-space-24));
-  --lc-glass-fill-thin: 46%;
+  --lc-glass-fill-thin: 86%;
   --lc-glass-fill-regular: 52%;
-  --lc-glass-fill-thick: 62%;
-  --lc-glass-ink: 72%;
-  --lc-glass-blur-thin: 20px;
-  --lc-glass-blur-regular: 28px;
-  --lc-glass-blur-thick: 36px;
-  --lc-glass-sat-thin: 1.8;
-  --lc-glass-sat-regular: 1.9;
-  --lc-glass-sat-thick: 2;
-  --lc-glass-edge: rgba(255, 255, 255, 0.62);
-  --lc-glass-edge-top: rgba(255, 255, 255, 0.95);
-  --lc-glass-sheen: rgba(255, 255, 255, 0.55);
-  --lc-glass-shade: rgba(28, 25, 22, 0.07);
-  --lc-glass-shadow: rgba(28, 25, 22, 0.16);
+  --lc-glass-fill-thick: 68%;
+  --lc-glass-blur-thin: 12px;
+  --lc-glass-blur-regular: 24px;
+  --lc-glass-blur-thick: 32px;
+  --lc-glass-sat-thin: 1.12;
+  --lc-glass-sat-regular: 1.45;
+  --lc-glass-sat-thick: 1.6;
+  --lc-glass-edge: rgba(255, 255, 255, 0.72);
+  --lc-glass-edge-top: rgba(255, 255, 255, 0.92);
+  --lc-glass-sheen: rgba(255, 255, 255, 0.28);
+  --lc-glass-shade: rgba(28, 25, 22, 0.04);
+  --lc-glass-shadow: rgba(28, 25, 22, 0.08);
   --lc-glass-tint: white;
-  --lc-shadow: rgba(28, 25, 22, 0.1);
+  --lc-glass-tint-mix: 12%;
+  --lc-shadow: rgba(28, 25, 22, 0.06);
   --lc-blur: var(--lc-glass-blur-regular);
   --lc-question: 440px;
   --lc-character: 64px;
@@ -279,45 +275,44 @@ button:disabled {
   color: var(--lc-page);
 }
 
+.blob-field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  /* Keep the column of body text on the cream. Glows stay in the corners. */
+  mask-image: radial-gradient(ellipse 92% 78% at 50% 46%, transparent 52%, #000 88%);
+}
+
 .blob {
   position: absolute;
-  width: 68vw;
-  height: 68vw;
-  min-width: 320px;
-  min-height: 320px;
+  width: 92vw;
+  height: 92vw;
+  min-width: 460px;
+  min-height: 460px;
   border-radius: var(--lc-radius-pill);
-  opacity: 0.82;
-  filter: blur(36px);
+  opacity: 0.42;
+  filter: blur(72px);
 }
 
 .blob-apricot {
-  top: -18%;
-  left: -24%;
-  background: var(--lc-apricot-vivid);
+  top: -46%;
+  left: -48%;
+  background: var(--lc-apricot);
   animation: drift-a var(--lc-drift-a) ease-in-out infinite;
 }
 
 .blob-seaglass {
-  top: 8%;
-  right: -28%;
-  background: var(--lc-seaglass-vivid);
+  top: -42%;
+  right: -52%;
+  background: var(--lc-seaglass);
   animation: drift-b var(--lc-drift-b) ease-in-out infinite;
 }
 
 .blob-honey {
-  bottom: -24%;
-  left: -8%;
-  background: var(--lc-honey-vivid);
+  right: -40%;
+  bottom: -48%;
+  background: var(--lc-honey);
   animation: drift-c var(--lc-drift-c) ease-in-out infinite;
-}
-
-.blob-wisteria {
-  right: -6%;
-  bottom: -8%;
-  width: 54vw;
-  height: 54vw;
-  background: var(--lc-wisteria-vivid);
-  animation: drift-b var(--lc-drift-a) ease-in-out infinite reverse;
 }
 
 @keyframes drift-a {
@@ -326,7 +321,7 @@ button:disabled {
     transform: translate3d(0, 0, 0) scale(1);
   }
   50% {
-    transform: translate3d(6%, 4%, 0) scale(1.06);
+    transform: translate3d(2%, 2%, 0) scale(1.03);
   }
 }
 
@@ -336,7 +331,7 @@ button:disabled {
     transform: translate3d(0, 0, 0) scale(1);
   }
   50% {
-    transform: translate3d(-5%, 6%, 0) scale(1.05);
+    transform: translate3d(-2%, 2%, 0) scale(1.03);
   }
 }
 
@@ -346,7 +341,7 @@ button:disabled {
     transform: translate3d(0, 0, 0) scale(1);
   }
   50% {
-    transform: translate3d(4%, -5%, 0) scale(1.08);
+    transform: translate3d(2%, -2%, 0) scale(1.03);
   }
 }
 
@@ -401,17 +396,24 @@ button:disabled {
   background-color: color-mix(in srgb, var(--lc-card) var(--lc-glass-fill), transparent);
   background-image: linear-gradient(
     180deg,
-    color-mix(in srgb, var(--lc-glass-tint) 22%, transparent),
-    transparent 46%
+    color-mix(in srgb, var(--lc-glass-tint) var(--lc-glass-tint-mix), transparent),
+    transparent 42%
   );
   backdrop-filter: blur(var(--lc-glass-blur)) saturate(var(--lc-glass-sat));
   -webkit-backdrop-filter: blur(var(--lc-glass-blur)) saturate(var(--lc-glass-sat));
   border: var(--lc-border) solid var(--lc-glass-edge);
   box-shadow:
     inset 0 1px 0 var(--lc-glass-edge-top),
-    inset 0 -14px 18px var(--lc-glass-shade),
-    0 12px 28px var(--lc-glass-shadow),
-    0 2px 6px var(--lc-shadow);
+    inset 0 -8px 12px var(--lc-glass-shade),
+    0 6px 14px var(--lc-glass-shadow);
+}
+
+.glass-surface.glass-thin {
+  --lc-glass-sheen: rgba(255, 255, 255, 0.14);
+  --lc-glass-tint-mix: 6%;
+  box-shadow:
+    inset 0 1px 0 var(--lc-glass-edge-top),
+    0 1px 4px rgba(28, 25, 22, 0.05);
 }
 
 .glass-surface::before,
@@ -434,9 +436,9 @@ button:disabled {
   inset: 0;
   opacity: 0;
   background: radial-gradient(
-    140px circle at var(--sheen-x, 30%) var(--sheen-y, 0%),
-    rgba(255, 255, 255, 0.55),
-    transparent 68%
+    120px circle at var(--sheen-x, 50%) var(--sheen-y, 0%),
+    rgba(255, 255, 255, 0.28),
+    transparent 70%
   );
   transition: opacity 0.25s ease;
 }
@@ -447,7 +449,7 @@ button:disabled {
 }
 
 @media (hover: hover) {
-  .glass-surface:hover::after {
+  .glass-follow:hover::after {
     opacity: 1;
   }
 }
@@ -462,29 +464,33 @@ button:disabled {
 
 .glass-ink {
   color: var(--lc-page);
-  background-color: color-mix(in srgb, var(--lc-ink) var(--lc-glass-ink), transparent);
-  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.32), transparent 44%);
-  border-color: rgba(255, 255, 255, 0.38);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 0 -10px 16px rgba(0, 0, 0, 0.28),
-    0 12px 28px var(--lc-glass-shadow);
+  background-color: var(--lc-ink);
+  background-image: none;
+  border-color: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+.glass-ink::before,
+.glass-ink::after {
+  display: none;
 }
 
 .glass-tint-apricot {
-  --lc-glass-tint: var(--lc-apricot-vivid);
+  --lc-glass-tint: var(--lc-apricot);
 }
 
 .glass-tint-seaglass {
-  --lc-glass-tint: var(--lc-seaglass-vivid);
+  --lc-glass-tint: var(--lc-seaglass);
 }
 
 .glass-tint-honey {
-  --lc-glass-tint: var(--lc-honey-vivid);
+  --lc-glass-tint: var(--lc-honey);
 }
 
 .glass-tint-wisteria {
-  --lc-glass-tint: var(--lc-wisteria-vivid);
+  --lc-glass-tint: var(--lc-wisteria);
 }
 
 .glass-badge,
@@ -651,6 +657,27 @@ button:disabled {
   max-width: 132px;
   margin: 0;
   padding: var(--lc-space-8) var(--lc-space-16);
+  background: color-mix(in srgb, var(--lc-card) 78%, var(--sticker-tint, var(--lc-honey)));
+  border: 1px solid color-mix(in srgb, white 72%, var(--sticker-tint, var(--lc-honey)));
+  box-shadow: 0 2px 6px rgba(28, 25, 22, 0.06);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.sticker-apricot {
+  --sticker-tint: var(--lc-apricot);
+}
+
+.sticker-seaglass {
+  --sticker-tint: var(--lc-seaglass);
+}
+
+.sticker-honey {
+  --sticker-tint: var(--lc-honey);
+}
+
+.sticker-wisteria {
+  --sticker-tint: var(--lc-wisteria);
 }
 
 .note-a {
@@ -845,7 +872,7 @@ button:disabled {
   inset: -10%;
   overflow: hidden;
   border-radius: var(--lc-radius-card);
-  filter: blur(18px) saturate(1.5);
+  filter: blur(14px) saturate(1.25);
   transform: scale(1.08);
 }
 
@@ -940,7 +967,12 @@ button:disabled {
     display: none;
   }
 
+  .sticker {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
   .blob {
-    opacity: 0.28;
+    opacity: 0.14;
   }
 }

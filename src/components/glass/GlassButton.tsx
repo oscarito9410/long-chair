@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { controlClass, onGlassPointerMove } from "./glass-styles.ts";
+import { controlClass } from "./glass-styles.ts";
 
 type GlassButtonProps = {
   children: ReactNode;
@@ -24,7 +24,6 @@ export function GlassButton({
       disabled={disabled}
       onClick={onClick}
       className={controlClass(tone, className)}
-      onPointerMove={tone === "solid" ? onGlassPointerMove : undefined}
     >
       {children}
     </button>

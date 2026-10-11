@@ -76,9 +76,9 @@ Washes are `color-mix` of a hue into the page (`wash-apricot`, `wash-seaglass`, 
 
 Spacing is the scale 4, 8, 16, 24, 32, 64. In Tailwind that is `1`, `2`, `4`, `6`, `8`, `16`. Do not use the steps in between (`p-3`, `gap-5`, `mt-10`, and the rest).
 
-Body copy is `text-lg` (18px) or larger. Secondary copy is `text-base` (16px) or larger. Do not use `text-sm` or `text-xs`. The tab label may be `text-base` under `sm` so the word "Companion" fits a phone, and `text-lg` from `sm` up. Card titles may stay at `text-2xl`. Secondary ink (`text-ink-soft`) has to clear 4.5:1 on every glass fill. It does not clear that bar on a raw vivid blob, so open-field secondary copy uses ink. Measure before darkening `--lc-ink-soft`.
+Body copy is `text-lg` (18px) or larger. Secondary copy is `text-base` (16px) or larger. Do not use `text-sm` or `text-xs`. The tab label may be `text-base` under `sm` so the word "Companion" fits a phone, and `text-lg` from `sm` up. Card titles may stay at `text-2xl`. Secondary ink (`text-ink-soft`) has to clear 4.5:1 on the cream page and on every glass fill. Glows stay in the corners, off the text column. Measure before darkening `--lc-ink-soft`.
 
-Radii: `rounded-card` for rows and covers, `rounded-panel` for the detail sheet, `rounded-tag` for chips and stickers, `rounded-full` only for real actions (the dark glass primary pill, the quiet text link still uses the pill hit area), the tab bar, and icon wells. Do not put a pill, a shadow, or a fill behind a label that is not an action. The sample line is flat text. The column is `--lc-content` (800px), applied by the `.page` class. Question screens narrow further to `--lc-question` (440px).
+Radii: `rounded-card` for rows and covers, `rounded-panel` for the detail sheet, `rounded-tag` for chips and stickers, `rounded-full` only for real actions (the near-black primary pill, the quiet text link still uses the pill hit area), the tab bar, and icon wells. Do not put a pill, a shadow, or a fill behind a label that is not an action. The sample line is flat text. The column is `--lc-content` (800px), applied by the `.page` class. Question screens narrow further to `--lc-question` (440px).
 
 Nunito is the UI font. Caveat (the `.hand` class) is only the decorative welcome stickers, which are `aria-hidden`. Privacy notes, footnotes, instructions, and every other line use Nunito. Do not set `.hand` on a sentence a person needs to read to use the app.
 
@@ -86,7 +86,7 @@ The layout is mobile-first. Design and capture at a 390×844 phone, and let the 
 
 ### One question per screen
 
-Onboarding is four hash screens, not one form: `#/love`, `#/chair`, `#/themes`, `#/company`. Each uses `QuestionFrame`: a centered bold `h1`, a short subline, one job in the body, then a full-width dark glass primary pill and a quiet text link under it ("Skip for now" or "You can change this anytime"). The quiet link is still a real control (`GlassLink` tone `quiet`) at the 48px target and the 16px type floor. Continue on tastes stays disabled until one title is selected. Skip advances without requiring a change.
+Onboarding is four hash screens, not one form: `#/love`, `#/chair`, `#/themes`, `#/company`. Each uses `QuestionFrame`: a centered bold `h1`, a short subline, one job in the body, then a full-width near-black primary pill and a quiet text link under it ("Skip for now" or "You can change this anytime"). The quiet link is still a real control (`GlassLink` tone `quiet`) at the 48px target and the 16px type floor. Continue on tastes stays disabled until one title is selected. Skip advances without requiring a change.
 
 `#/onboarding` is an alias of `#/love`.
 
@@ -114,23 +114,25 @@ Guides live in `src/data/guides.ts` (Pebble, Lumen, Nook, Brim). The draft store
 
 ### Glass
 
-Liquid glass is the surface, and the color field is what it refracts. `SoftBlobs` paints four saturated steps of the same hues (`--lc-*-vivid`) behind every screen. They drift slowly. Do not flatten the page back to solid cream, or the glass disappears.
+The page stays warm off-white. `SoftBlobs` paints three large, soft glows in the palette hues, parked in the corners and masked out of the text column. They drift a little. Do not bring them back to full-bleed saturated color. Do not put body text on a glow.
 
-`GlassSurface` and `glassClass` are the only glass recipe. Thickness sets blur, saturation, and fill:
+Glass is reserved. `GlassSurface` and `glassClass` are the only recipe. Thickness sets blur, saturation, and fill:
 
-| Thickness | Blur | Saturate | Fill | Use when                                       |
-| --------- | ---- | -------- | ---- | ---------------------------------------------- |
-| thin      | 20px | 180%     | 46%  | Badges, chips, stickers, arrow buttons         |
-| regular   | 28px | 190%     | 52%  | Rows, the dial disc, compare, places, stamp    |
-| thick     | 36px | 200%     | 62%  | Kit cards and the item sheet, over deep covers |
+| Thickness | Blur | Saturate | Fill | Use when                                                                |
+| --------- | ---- | -------- | ---- | ----------------------------------------------------------------------- |
+| thin      | 12px | 112%     | 86%  | Rows, building steps, companion cards, compare panels, arrow buttons    |
+| regular   | 24px | 145%     | 52%  | Dial disc, guide card, stamp, cover badges, the tab lens                |
+| thick     | 32px | 160%     | 68%  | Tab bar, kit cards over a blurred cover, the item sheet over the poster |
 
-Shapes are `badge`, `chip`, `bar`, `sheet`, `card`, `pill`, `row`, `disc`, and `sticker`. A tint (`glass-tint-*`) lays a hue across the top. The recipe is a translucent card fill, `backdrop-filter`, a 1px light edge with a brighter top inset, a top specular gradient, a faint inner shadow, a layered drop shadow, and a pointer-following sheen. Pressable glass scales to 0.98.
+Shapes are `badge`, `chip`, `bar`, `sheet`, `card`, `pill`, `row`, `disc`, and `sticker`. A tint (`glass-tint-*`) is a light wash of the palette hue, not the saturated step. Strong glass keeps a 1px light edge, a short top sheen, a faint inner shadow, and a small drop shadow. Thin glass keeps the edge and a softer sheen, and almost no shadow. Pressable glass scales to 0.98.
 
-Primary actions are dark tinted glass (`.glass-ink`, about 72% ink) with page-colored type and the same sheen. Quiet actions stay `.action-quiet`: transparent, ink-soft is not used there, no border and no shadow.
+Pointer-following sheen is only on the tab bar and kit cards (`follow` on `glassClass`). Do not add it to rows, steps, or panels.
 
-Text on the open color field uses ink. `text-ink-soft` is only for secondary copy that sits on glass, where the fill keeps it at or above 4.5:1 even over a deep cover. Do not put ink-soft directly on a vivid blob.
+Primary actions are solid near-black (`.glass-ink`) with a 1px top highlight. They are not tinted glass and they do not pick up the page color. Quiet actions stay `.action-quiet`: transparent, ink, no border and no shadow.
 
-`prefers-reduced-transparency: reduce`, and a missing backdrop-filter, paint light glass as opaque card and dark glass as opaque ink, with no blur and no sheen. The blobs quiet down in that mode too.
+Welcome notes are paper (`.sticker`), a hue mixed into the card, with a light frost. They are not glass surfaces.
+
+`prefers-reduced-transparency: reduce`, and a missing backdrop-filter, paint light glass as opaque card and the primary as opaque ink, with no blur and no sheen. The glows quiet down in that mode too.
 
 The tab bar is a floating glass capsule. The current tab is a glass lens with a 2px ink border that slides between the three links (`aria-current="page"`). Do not communicate the current tab by color alone.
 
@@ -148,7 +150,7 @@ Building, Kit, Companion, and Compare each have one `HeroNumber`: the figure tha
 
 ### Motion
 
-Blobs drift slowly. They stay saturated enough that glass has color to refract. Characters bob and blink when `animate` is set. Screen changes use `.screen-enter`. The building steps check off on `motion.stepIntervalMs`. All of this is covered by the global `prefers-reduced-motion: reduce` rule in `index.css`, which collapses animation and transition time. Do not add a motion effect that ignores that query.
+Corner glows drift slowly and stay off the text. Characters bob and blink when `animate` is set. Screen changes use `.screen-enter`. The building steps check off on `motion.stepIntervalMs`. All of this is covered by the global `prefers-reduced-motion: reduce` rule in `index.css`, which collapses animation and transition time. Do not add a motion effect that ignores that query.
 
 ### Dot field
 
@@ -181,7 +183,7 @@ Keep the field quiet. This screen sits beside a person for hours. Do not add tra
 - Tastes and themes are toggle buttons with `aria-pressed`. Duration is the dial's range input, not a set of radios.
 - The building sequence checks steps off one by one. `prefers-reduced-motion: reduce` shows every step already done. The sequence exposes the current step and a polite live region, and it offers a way forward before the timer finishes.
 - Focus uses the visible `:focus-visible` ring. Do not remove outlines.
-- Ink on the page and on glass, page-colored type on the dark glass primary, and page-colored glyphs on deep wells are the contrast pairs. Do not put ink-soft text on a vivid blob or a deep hue. Do not fade text with opacity to mean "disabled". Disabled buttons use the `line` token.
+- Ink on the page and on glass, page-colored type on the near-black primary, and page-colored glyphs on deep wells are the contrast pairs. Do not put text on a corner glow. Do not fade text with opacity to mean "disabled". Disabled buttons use the `line` token.
 
 ## Commands
 
