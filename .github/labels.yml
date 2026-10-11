@@ -1,0 +1,23 @@
+- name: feature
+  color: "1D76DB"
+  description: A user-facing capability
+
+- name: infra
+  color: "5319E7"
+  description: Tooling, hosting, CI, and dependencies
+
+- name: quality
+  color: "FBCA04"
+  description: Tests, lint, and cleanup
+
+- name: docs
+  color: "0075CA"
+  description: Documentation and store copy
+
+- name: design
+  color: "D93F0B"
+  description: Visual design, motion, and interface copy
+
+- name: dependencies
+  color: "0366D6"
+  description: Dependency updates from Dependabot

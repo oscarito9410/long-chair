@@ -1,0 +1,53 @@
+{
+  "name": "@long-chair/mobile",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Long Chair for iPhone. Android follows. The Qloo key stays on the server.",
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "doctor": "expo-doctor",
+    "export:ios": "expo export --platform ios --output-dir dist"
+  },
+  "dependencies": {
+    "@expo-google-fonts/caveat": "0.4.2",
+    "@expo-google-fonts/nunito": "0.4.2",
+    "@expo/metro-runtime": "57.0.16",
+    "@long-chair/core": "0.1.0",
+    "expo": "57.0.27",
+    "expo-blur": "57.0.3",
+    "expo-constants": "57.0.21",
+    "expo-font": "57.0.4",
+    "expo-glass-effect": "57.0.4",
+    "expo-haptics": "57.0.3",
+    "expo-linking": "57.0.12",
+    "expo-router": "57.0.25",
+    "expo-splash-screen": "57.0.9",
+    "expo-status-bar": "57.0.1",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-native": "0.86.3",
+    "react-native-gesture-handler": "2.32.0",
+    "react-native-reanimated": "4.5.1",
+    "react-native-safe-area-context": "5.7.0",
+    "react-native-screens": "4.26.2",
+    "react-native-svg": "15.15.4",
+    "react-native-web": "0.21.4",
+    "react-native-worklets": "0.10.1"
+  },
+  "expo": {
+    "install": {
+      "exclude": [
+        "react",
+        "react-dom",
+        "@types/react"
+      ]
+    }
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "expo-doctor": "1.20.4"
+  }
+}

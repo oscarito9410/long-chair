@@ -1,0 +1,24 @@
+name: Design feedback
+description: Visual design, motion, or copy
+title: "[Design] "
+labels:
+  - design
+body:
+  - type: textarea
+    id: screen
+    attributes:
+      label: Screen
+      description: Which screen, and phone or desktop.
+    validations:
+      required: true
+  - type: textarea
+    id: note
+    attributes:
+      label: What to change
+    validations:
+      required: true
+  - type: textarea
+    id: shots
+    attributes:
+      label: Screenshots
+      description: Paste images or paths. Covers stay free of text. Glass stays on the cream page.

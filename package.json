@@ -2,44 +2,36 @@
   "name": "long-chair",
   "private": true,
   "version": "0.1.0",
-  "description": "Responsive web app and session API for Long Chair, a companion for long infusion and dialysis hours.",
+  "description": "Long Chair workspace: web demo, native app, and the shared session kit.",
   "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "preview": "vite preview",
-    "typecheck": "tsc -b --pretty false",
+    "dev": "npm run dev -w @long-chair/web",
+    "dev:mobile": "npm run start -w @long-chair/mobile -- --web --port 4181",
+    "build": "npm run build -w @long-chair/web",
+    "preview": "npm run preview -w @long-chair/web",
+    "typecheck": "npm run typecheck --workspaces --if-present",
     "lint": "eslint .",
-    "test": "vitest run",
+    "test": "npm run test --workspaces --if-present",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "lint:slop": "python3 .cursor/skills/no-slop-design/scripts/slop_lint.py src",
-    "lint:slopmd": "node tools/slopmd/bin/slopmd.js src && node tools/slopmd/bin/slopmd.js services/api"
-  },
-  "dependencies": {
-    "@fontsource/caveat": "^5.2.7",
-    "@fontsource/nunito": "^5.2.7",
-    "lucide-react": "^1.55.0",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "lint:slop": "python3 .cursor/skills/no-slop-design/scripts/slop_lint.py apps/web/src apps/mobile",
+    "lint:slopmd": "node tools/slopmd/bin/slopmd.js apps && node tools/slopmd/bin/slopmd.js packages && node tools/slopmd/bin/slopmd.js services/api",
+    "export:ios": "npm run export:ios -w @long-chair/mobile",
+    "doctor": "npm run doctor -w @long-chair/mobile"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
-    "@tailwindcss/vite": "^4.1.16",
-    "@types/node": "^24.13.3",
-    "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.7",
-    "@vitejs/plugin-react": "^6.1.1",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react-hooks": "^7.0.1",
     "globals": "^16.4.0",
     "prettier": "^3.6.2",
-    "tailwindcss": "^4.1.16",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.46.1",
-    "vite": "^8.3.0",
-    "vite-plugin-pwa": "2.0.0",
     "vitest": "5.0.3"
   }
 }

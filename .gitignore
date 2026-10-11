@@ -10,6 +10,9 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+.expo
+apps/mobile/ios
+apps/mobile/android
 *.local
 *.tsbuildinfo
 

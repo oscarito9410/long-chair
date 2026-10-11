@@ -1,6 +1,6 @@
 # ADR 0007: Responsive web app as the client
 
-- Status: accepted
+- Status: accepted for the judge demo; the Expo prohibition is superseded by [ADR 0008](0008-expo-client.md)
 - Date: 2026-10-11
 - Supersedes: [ADR 0006](0006-flutter-client.md)
 

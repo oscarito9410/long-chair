@@ -1,0 +1,30 @@
+name: Bug report
+description: Something in Long Chair is broken
+title: "[Bug] "
+labels:
+  - quality
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what you saw.
+    validations:
+      required: true
+  - type: textarea
+    id: where
+    attributes:
+      label: Where
+      description: Web demo, iOS app, or the API. Include the screen and a build or commit if you have one.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true

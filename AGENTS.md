@@ -1,14 +1,18 @@
 # Agent guide
 
-Long Chair is a responsive web app for the Qloo Agentic Hackathon, plus a FastAPI session service. Read this before editing. The product story and the run steps live in `README.md`.
+Long Chair is a responsive web demo for the Qloo Agentic Hackathon, an Expo app for iPhone, and a FastAPI session service. Read this before editing. The product story and the run steps live in `README.md`.
 
 ## What this repo is
 
-The deliverable is the Vite + React + TypeScript app in `src/`. It is mobile-first and widens for a tablet and a desktop. Screens still render the in-memory sample shelf. They do not call the API yet.
+The judge deliverable is the Vite + React + TypeScript app in `apps/web`. It is mobile-first and widens for a tablet and a desktop. Those screens still render the in-memory sample shelf. They do not call the API yet.
+
+The iPhone app is `apps/mobile` (Expo SDK 57, expo-router). Android uses the same project later. Shared kit logic lives in `packages/core` and is imported by both apps. Do not copy it into a screen. [ADR 0008](docs/adr/0008-expo-client.md) is the native decision. [ADR 0007](docs/adr/0007-responsive-web-client.md) still governs the judge demo. [ADR 0006](docs/adr/0006-flutter-client.md) is superseded.
 
 The session API lives in `services/api`. It is hexagonal: domain, application, ports, adapters, and the HTTP layer. `BuildSessionKit` resolves tastes, asks for insights with exclusion tags, checks once, packs the chair, and returns explanations plus a companion plan. `FakeQlooAdapter` is the default. `HttpQlooAdapter` and `RecordingQlooAdapter` stay behind `QlooPort`.
 
-A native Swift app is a post-hackathon idea. Flutter and React Native are not the client plan. [ADR 0007](docs/adr/0007-responsive-web-client.md) is the living client decision. [ADR 0006](docs/adr/0006-flutter-client.md) is superseded. Do not scaffold `apps/client`.
+The mobile app talks to that API only through `KitService` when `EXPO_PUBLIC_API_URL` is set. The Qloo key never goes in the app. The review build leaves the variable unset and packs fixtures on the device. Store categories are Entertainment and Lifestyle. Copy must not claim treatment or a health outcome. "Not medical advice" stays on onboarding and in Settings. A test in `apps/mobile/src/medical-claims.test.ts` fails if the banned phrases appear.
+
+`check-dep` returned caution for `expo@57.0.27` and `react-native-reanimated@4.5.1` because other versions have advisories. These pins do not. They are the Expo SDK 57 set.
 
 Read `docs/architecture/ARCHITECTURE.md`, `docs/architecture/qloo-port.md`, `docs/adr/`, and `docs/plan/ROADMAP.md` before changing the pipeline or the hosting plan.
 
@@ -31,9 +35,18 @@ These apply to code this team writes. The design-system rules further down still
 
 Do not invent live API responses. Do not commit API keys, `.env` files, `.qloo-cache/`, or real Qloo payloads. Hackathon rules forbid Qloo data in the public repo. Fictional fixtures that match the documented JSON shape are allowed. A recording of a real response is not a fixture.
 
-Map Qloo search hits and insight rows onto the types in `src/data/types.ts` inside the adapter. Keep the screens on those types.
+Map Qloo search hits and insight rows onto the types in `packages/core/src/data/types.ts` inside the adapter. Keep the screens on those types.
 
 ## Layout
+
+```
+apps/web/         Judge demo. Presentational UI under src/.
+apps/mobile/      Expo app. app/ routes, src/ glass, art, and session state.
+packages/core/    Kit model, packer, copy, fixtures, KitService. No React.
+services/api/     FastAPI.
+```
+
+Web UI, under `apps/web/src/`:
 
 ```
 src/components/   Presentational UI. One component per file.
@@ -42,10 +55,9 @@ src/components/   Presentational UI. One component per file.
   glass/          GlassSurface and the action button and link.
   kit/            Timeline, pause, places, topics, agent steps.
   ui/             Dial, option rows, icon, wells, chips, empty state.
-src/content/      How a kind, a taste, or a theme maps to a character.
-src/data/         Sample records, guides, and the draft / catalog types.
+src/content/      How a kind, a taste, or a theme maps to a character. Sample records are in packages/core.
 src/hooks/        React hooks only.
-src/lib/          Pure functions: packing, formatting, matching.
+src/lib/          Web-only helpers. Packing and formatting live in packages/core.
 src/routing/      Hash parsing and path builders.
 src/screens/      Route-level composition. One screen per file.
 src/state/        The in-memory session draft.
@@ -53,9 +65,9 @@ src/tokens/       Hue names and motion numbers used by TypeScript.
 src/index.css     Paint tokens and the utilities that consume them.
 ```
 
-Put a new screen in `src/screens/` and register it in `src/screens/ScreenOutlet.tsx` and `src/routing/parse-route.ts`. Put a new sample record in `src/data/`. Put a reusable control in `src/components/`, not inside a screen.
+Put a new web screen in `apps/web/src/screens/` and register it in `ScreenOutlet.tsx` and `parse-route.ts`. Put a new sample record in `packages/core`. Put a reusable control in `apps/web/src/components/`, not inside a screen.
 
-Paths such as `#/kit` live only in `src/routing/paths.ts`.
+Paths such as `#/kit` live only in `apps/web/src/routing/paths.ts`. Mobile routes live in `apps/mobile/app/`.
 
 ## TypeScript and naming
 
@@ -194,7 +206,7 @@ Keep the field quiet. This screen sits beside a person for hours. Do not add tra
 ## Components and data
 
 - Screens compose. They do not fetch, and they do not own palette values.
-- Sample data stays in `src/data/` behind the interfaces in `types.ts`. Components receive plain props or call a pure helper in `src/lib/`.
+- Sample data stays in `packages/core` behind the interfaces in `types.ts`. Components receive plain props or call a pure helper from that package.
 - `packSession` is the duration fitter. Change packing rules there, not inside `KitScreen`. It reads tastes, themes, and minutes. It does not read `companionId`.
 - Reuse `QuestionFrame`, `Character`, `CoverArt`, `Dial`, `Stamp`, `GlassSurface`, `GlassButton`, `GlassLink`, `OptionRow`, `IconWell`, `HeroNumber`, and `BecauseChip` instead of copying markup. A screen has a headline and at most one short subline. Kit cards show the cover, title, type, time range, and one "Because you love" chip. Item detail is a bottom sheet over the dimmed kit and adds one check: "No illness, hospital, or cancer themes." Compare is a title and one line on each panel, and the plain-model panel lists the themes it would bring with the same chips as the kit header. The fictional-sample tag is welcome only.
 - Session state is the draft in `SessionContext` (tastes, themes, minutes, companion). The packed kit is derived with `usePackedSession`. Do not store a second copy of the kit.
@@ -222,11 +234,24 @@ npm run typecheck
 npm test
 npm run build
 npm run dev
+npm run dev:mobile
+npm run export:ios
+npm run doctor
 npm run lint:slop
 npm run lint:slopmd
 ```
 
-`npm run dev` serves http://127.0.0.1:4179.
+`npm run dev` serves the web demo at http://127.0.0.1:4179. `npm run dev:mobile` serves the Expo app for web on port 4181.
+
+Signed iOS builds run on a Mac:
+
+```bash
+npx eas-cli login
+npx eas-cli build --platform ios --profile preview
+npx eas-cli submit --platform ios --profile production
+```
+
+Leave `EXPO_PUBLIC_API_URL` unset for TestFlight and App Review. Profiles live in `apps/mobile/eas.json`. iOS build numbers auto-increment. See `docs/app-store.md`.
 
 `lint:slop` and `lint:slopmd` are informational. CI runs them and does not fail the build on their findings yet.
 

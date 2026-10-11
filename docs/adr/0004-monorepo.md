@@ -1,7 +1,9 @@
 # ADR 0004: One repo, API beside the web app
 
-- Status: accepted
+- Status: superseded in part by [ADR 0008](0008-expo-client.md)
 - Date: 2026-10-11
+
+The directory layout below was the decision on this date. [ADR 0008](0008-expo-client.md) moves the web app to `apps/web` and adds `apps/mobile` and `packages/core`.
 
 ## Context
 

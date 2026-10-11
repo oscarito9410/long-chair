@@ -2,7 +2,9 @@
 
 30 October 2026, 21:45 America/Mexico_City is the submission deadline. The client is the responsive web app in [ADR 0007](../adr/0007-responsive-web-client.md). [ADR 0006](../adr/0006-flutter-client.md) and [ADR 0005](../adr/0005-client-strategy.md) are withdrawn. The API is FastAPI behind `QlooPort`. The web app calls that API and never calls Qloo. The fake adapter carries the demo until the key-arrival checklist runs.
 
-The session-kit slice is in `services/api` and is tested against `FakeQlooAdapter`. The Vite screens still use the in-memory sample shelf. Wiring those screens to `/v1` is the next product change. A native Swift app is post-hackathon only. TestFlight and an APK are not deliverables.
+The session-kit slice is in `services/api` and is tested against `FakeQlooAdapter`. The Vite screens still use the in-memory sample shelf. Wiring those screens to `/v1` is the next product change for the judge demo.
+
+The iPhone app in [ADR 0008](../adr/0008-expo-client.md) is a separate track: TestFlight, then App Store review once a live catalog is wired. The judge URL stays the web app. The store categories are Entertainment and Lifestyle. The phone does not hold the Qloo key.
 
 ## What has to stay true
 
@@ -52,7 +54,7 @@ Run this the day the key arrives. It does not replace the fake adapter until the
 
 Drop, in this order: pointer-following dots, the Caveat welcome stickers, a shader glass experiment. Keep the twelve screens, the fake API, and a judge URL.
 
-Do not start a second UI toolkit to recover a slip. Flutter, React Native, Kotlin Multiplatform, and a SwiftUI client are out until after the hackathon.
+Do not start a third UI toolkit to recover a slip. The web demo and the Expo app are the two clients. Flutter and a SwiftUI rewrite stay out.
 
 ## Devpost checklist
 
@@ -67,8 +69,8 @@ Do not start a second UI toolkit to recover a slip. Flutter, React Native, Kotli
 ## Explicitly later
 
 - Accounts, a database of people, and saved medical context.
-- App Store and Play Store listings. TestFlight and a sideload APK.
-- A Swift client, after the hackathon.
+- Play Store, after the iPhone app is in review.
+- A Swift client, after the hackathon. The Expo app is the native track now.
 - A shader liquid-glass package.
 - A model that chooses or rejects titles on its own.
 - Publishing Qloo fixtures so the tests look like production.

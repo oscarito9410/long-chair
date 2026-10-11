@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security
+    url: https://github.com/oscarito9410
+    about: Report a vulnerability to the maintainer in private. Do not open a public issue for a key or a credential. See SECURITY.md.

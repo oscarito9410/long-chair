@@ -3,6 +3,7 @@ node_modules
 tmp
 uploads
 package-lock.json
+CODE_OF_CONDUCT.md
 .cursor
 .specify
 tools/slopmd

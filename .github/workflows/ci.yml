@@ -1,5 +1,5 @@
 # Actions run only on GitHub. A local clone does not execute this file.
-# Slop scans stay non-blocking until the inherited src tree is cleaned on purpose.
+# Slop scans stay non-blocking until the inherited tree is cleaned on purpose.
 
 name: CI
 
@@ -30,6 +30,7 @@ jobs:
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
       frontend: ${{ steps.filter.outputs.frontend }}
+      mobile: ${{ steps.filter.outputs.mobile }}
       slop: ${{ steps.filter.outputs.slop }}
     steps:
       - name: Checkout
@@ -47,6 +48,7 @@ jobs:
           mark_all() {
             echo "backend=true" >> "$GITHUB_OUTPUT"
             echo "frontend=true" >> "$GITHUB_OUTPUT"
+            echo "mobile=true" >> "$GITHUB_OUTPUT"
             echo "slop=true" >> "$GITHUB_OUTPUT"
           }
           if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
@@ -68,6 +70,7 @@ jobs:
           fi
           backend=false
           frontend=false
+          mobile=false
           slop=false
           while IFS= read -r path; do
             [ -z "$path" ] && continue
@@ -78,18 +81,24 @@ jobs:
                 ;;
             esac
             case "$path" in
-              src/*|public/*|index.html|package.json|package-lock.json|tsconfig*.json|eslint.config.js|prettier.config.js|.prettierignore|vite.config.ts|.github/workflows/*)
+              apps/web/*|packages/*|package.json|package-lock.json|eslint.config.js|prettier.config.js|.prettierignore|.github/workflows/*)
                 frontend=true
                 ;;
             esac
             case "$path" in
-              src/*|services/api/*|tools/slopmd/*|.cursor/skills/no-slop-design/*|.github/workflows/*)
+              apps/mobile/*|packages/*|package.json|package-lock.json|eslint.config.js|.github/workflows/*)
+                mobile=true
+                ;;
+            esac
+            case "$path" in
+              apps/*|packages/*|services/api/*|tools/slopmd/*|.cursor/skills/no-slop-design/*|.github/workflows/*)
                 slop=true
                 ;;
             esac
           done <<< "$files"
           echo "backend=$backend" >> "$GITHUB_OUTPUT"
           echo "frontend=$frontend" >> "$GITHUB_OUTPUT"
+          echo "mobile=$mobile" >> "$GITHUB_OUTPUT"
           echo "slop=$slop" >> "$GITHUB_OUTPUT"
 
   backend:
@@ -175,10 +184,39 @@ jobs:
           node-version: "22"
       - name: SlopMD lab scan
         run: |
-          node tools/slopmd/bin/slopmd.js src
+          node tools/slopmd/bin/slopmd.js apps
+          node tools/slopmd/bin/slopmd.js packages
           node tools/slopmd/bin/slopmd.js services/api
       - name: no-slop-design slop_lint
-        run: python3 .cursor/skills/no-slop-design/scripts/slop_lint.py src
+        run: python3 .cursor/skills/no-slop-design/scripts/slop_lint.py apps/web/src apps/mobile
+
+  mobile:
+    name: Mobile
+    needs: changes
+    if: needs.changes.outputs.mobile == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Typecheck
+        run: npm run typecheck -w @long-chair/mobile
+      - name: ESLint
+        run: npx eslint apps/mobile --max-warnings 0
+      - name: Vitest
+        run: npm test -w @long-chair/mobile
+      - name: expo-doctor
+        run: npm run doctor -w @long-chair/mobile
 
   qloo-live:
     name: Live Qloo contract
@@ -222,7 +260,7 @@ jobs:
 
   ci:
     name: CI result
-    needs: [changes, backend, frontend, slop]
+    needs: [changes, backend, frontend, mobile, slop]
     if: always() && (github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -234,12 +272,13 @@ jobs:
           CHANGES: ${{ needs.changes.result }}
           BACKEND: ${{ needs.backend.result }}
           FRONTEND: ${{ needs.frontend.result }}
+          MOBILE: ${{ needs.mobile.result }}
           SLOP: ${{ needs.slop.result }}
         run: |
           set -euo pipefail
-          echo "changes=$CHANGES backend=$BACKEND frontend=$FRONTEND slop=$SLOP"
+          echo "changes=$CHANGES backend=$BACKEND frontend=$FRONTEND mobile=$MOBILE slop=$SLOP"
           fail=0
-          for result in "$CHANGES" "$BACKEND" "$FRONTEND"; do
+          for result in "$CHANGES" "$BACKEND" "$FRONTEND" "$MOBILE"; do
             if [ "$result" = "failure" ] || [ "$result" = "cancelled" ]; then
               fail=1
             fi

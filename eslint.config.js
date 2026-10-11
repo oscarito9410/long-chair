@@ -6,7 +6,16 @@ import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   {
-    ignores: ["dist/**", "node_modules/**", "tmp/**", "uploads/**"],
+    ignores: [
+      "dist/**",
+      "node_modules/**",
+      "tmp/**",
+      "uploads/**",
+      "**/.expo/**",
+      "**/vitest.config.ts",
+      "apps/mobile/ios/**",
+      "apps/mobile/android/**",
+    ],
   },
   {
     files: ["**/*.{ts,tsx}"],
@@ -32,7 +41,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ["vite.config.ts"],
+    files: ["**/vite.config.ts", "**/vitest.config.ts"],
     languageOptions: {
       globals: globals.node,
     },
