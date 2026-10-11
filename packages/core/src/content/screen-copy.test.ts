@@ -4,6 +4,7 @@ import {
   buildingReadyLabel,
   buildingSkipLabel,
   itemThemeCheck,
+  loveLede,
   themesLede,
   themesNote,
 } from "./screen-copy.ts";
@@ -12,6 +13,7 @@ describe("screen copy", () => {
   it("uses the shorter themes line", () => {
     expect(themesLede).toBe("We left out three. Change any.");
     expect(themesNote).toBe("Only if it helps. You can change this anytime.");
+    expect(loveLede).toBe("Search or tap a few. Pick at least three.");
   });
 
   it("states the themes a piece does not carry", () => {

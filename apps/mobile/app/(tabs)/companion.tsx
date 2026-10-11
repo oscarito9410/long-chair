@@ -1,4 +1,4 @@
-import { companionTopics, guideById, guideHeader, nearbyPlaces } from "@long-chair/core";
+import { guideById, guideHeader, nearbyPlaces, topicsForSeeds } from "@long-chair/core";
 import type { CompanionTopic, NearbyPlace } from "@long-chair/core";
 import { memo } from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -31,7 +31,7 @@ export default function CompanionScreen() {
   const { draft } = useSession();
   const { plan } = usePlan(draft);
   const guide = guideById(draft.companionId);
-  const topics = companionTopics.filter((topic) => draft.seedIds.includes(topic.seedId));
+  const topics = topicsForSeeds(draft.seedIds);
   const places = plan?.places ?? nearbyPlaces;
 
   return (

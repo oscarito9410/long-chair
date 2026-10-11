@@ -127,6 +127,22 @@ class SessionKitOut(BaseModel):
     source: str
 
 
+class TasteHitOut(BaseModel):
+    """One taste the love step can pick. `kind` is our shelf type, not a catalog urn."""
+
+    id: str
+    name: str
+    kind: str
+    detail: str
+
+
+class TasteSearchOut(BaseModel):
+    """Search results. `source` stays fake until a live catalog key is connected."""
+
+    results: list[TasteHitOut]
+    source: str
+
+
 class SessionCreatedOut(BaseModel):
     """The id of a stored draft. It is not an account."""
 

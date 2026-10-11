@@ -1,6 +1,7 @@
 """Session kit routes. Packing stays in the use case."""
 
 import logging
+import unicodedata
 from uuid import uuid4
 
 from fastapi import FastAPI, Request
@@ -16,15 +17,18 @@ from app.api.schemas import (
     HealthOut,
     SessionCreatedOut,
     SessionKitOut,
+    TasteHitOut,
+    TasteSearchOut,
 )
 from app.application.build_session_kit import BuildSessionKit
 from app.domain.demo_profile import DEMO_DRAFT, TASTES, THEMES, demo_locality, demo_weekday
 from app.domain.draft import resolve_tastes, resolve_themes, validate_draft
 from app.domain.entities import SessionDraft
 from app.domain.errors import DraftError
-from app.domain.kinds import WEEKDAYS, Weekday
+from app.domain.kinds import CONTENT_KINDS, WEEKDAYS, Weekday
 from app.domain.limits import LOCALITY_MAX_CHARS
 from app.ports.errors import CacheMiss, QlooTransportError, QlooValidationError
+from app.ports.models import TasteHit
 from app.ports.qloo import QlooPort
 
 logger = logging.getLogger(__name__)
@@ -33,6 +37,16 @@ CREATED = 201
 UNPROCESSABLE = 422
 NOT_FOUND = 404
 UNAVAILABLE = 503
+TASTE_QUERY_MIN = 2
+TASTE_RESULT_LIMIT = 8
+TASTE_KINDS = {"artist", "show", "film", "book", "podcast", "game", "tag"}
+TASTE_KIND_BY_CONTENT = {
+    "movie": "film",
+    "tv_show": "show",
+    "podcast": "podcast",
+    "book": "book",
+    "artist": "artist",
+}
 
 
 class SessionNotFoundError(Exception):
@@ -88,6 +102,10 @@ def register_routes(app: FastAPI, qloo: QlooPort) -> None:
         logger.info("plan source=%s slots=%s", app.state.qloo_mode, len(kit.packed.slots))
         return present_kit(kit, app.state.qloo_mode)
 
+    @app.get("/v1/tastes/search", response_model=TasteSearchOut)
+    async def search_tastes(q: str = "") -> TasteSearchOut:
+        return await collect_taste_hits(qloo, q, str(app.state.qloo_mode))
+
 
 def _draft(body: CreateSessionIn) -> SessionDraft:
     draft = body.draft
@@ -104,6 +122,47 @@ def _locality(value: str | None) -> str:
     if len(text) > LOCALITY_MAX_CHARS:
         raise DraftError("invalid_locality", "Locality must be a neighborhood name.")
     return text
+
+
+def _folded_query(value: str) -> str:
+    decomposed = unicodedata.normalize("NFD", value)
+    plain = "".join(ch for ch in decomposed if unicodedata.category(ch) != "Mn")
+    return plain.casefold().strip()
+
+
+def _taste_kind(hit: TasteHit) -> str:
+    custom = hit.taste_kind.strip()
+    if custom in TASTE_KINDS:
+        return custom
+    return TASTE_KIND_BY_CONTENT[hit.kind]
+
+
+def _taste_row(hit: TasteHit) -> TasteHitOut:
+    return TasteHitOut(
+        id=hit.slug or hit.qloo_entity_id,
+        name=hit.name,
+        kind=_taste_kind(hit),
+        detail=hit.detail,
+    )
+
+
+async def collect_taste_hits(qloo: QlooPort, query: str, source: str) -> TasteSearchOut:
+    """Search every content kind through the catalog port. Short text is an empty list."""
+
+    if len(_folded_query(query)) < TASTE_QUERY_MIN:
+        return TasteSearchOut(results=[], source=source)
+    results: list[TasteHitOut] = []
+    seen: set[str] = set()
+    for kind in CONTENT_KINDS:
+        for hit in await qloo.search(query, kind):
+            row = _taste_row(hit)
+            if row.id in seen:
+                continue
+            seen.add(row.id)
+            results.append(row)
+            if len(results) >= TASTE_RESULT_LIMIT:
+                return TasteSearchOut(results=results, source=source)
+    return TasteSearchOut(results=results, source=source)
 
 
 def _weekday(value: str | None) -> Weekday | None:

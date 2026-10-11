@@ -1,4 +1,5 @@
 import { clearedThemes } from "./avoid-themes.ts";
+import { tasteShelf } from "./catalog-tastes.ts";
 import type { CatalogItem } from "./types.ts";
 
 const avoided = clearedThemes();
@@ -177,6 +178,7 @@ export const catalog: readonly CatalogItem[] = [
     synopsis:
       "Four songs and an encore that is almost spoken. The audience is quiet in the way of people who want to stay.",
   },
+  ...tasteShelf,
 ];
 
 export function itemById(id: string): CatalogItem | undefined {

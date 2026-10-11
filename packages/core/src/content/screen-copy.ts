@@ -1,3 +1,5 @@
+export const loveLede = "Search or tap a few. Pick at least three.";
+
 export const sampleShelfNote = "Fictional sample \u00b7 nothing is sent";
 
 export const notMedicalAdvice = "Not medical advice";

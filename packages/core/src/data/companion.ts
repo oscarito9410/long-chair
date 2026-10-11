@@ -1,3 +1,4 @@
+import { tasteById } from "./taste-catalog.ts";
 import type { CompanionTopic, NearbyPlace } from "./types.ts";
 
 export const companionSetting = {
@@ -51,6 +52,26 @@ export const companionTopics: readonly CompanionTopic[] = [
       "Sunday Engines loves short lines and open windows. What is the smallest train either of you has ridden?",
   },
 ];
+
+export function topicsForSeeds(seedIds: readonly string[]): CompanionTopic[] {
+  const known = companionTopics.filter((topic) => seedIds.includes(topic.seedId));
+  const covered = new Set(known.map((topic) => topic.seedId));
+  const added: CompanionTopic[] = [];
+  for (const id of seedIds) {
+    if (covered.has(id) || added.length >= 4) {
+      continue;
+    }
+    const taste = tasteById(id);
+    const name = taste?.name ?? id;
+    added.push({
+      id: `taste-${id}`,
+      seedId: id,
+      title: name,
+      prompt: `You picked ${name}. What would you want beside it for a long afternoon?`,
+    });
+  }
+  return [...known, ...added];
+}
 
 export const nearbyPlaces: readonly NearbyPlace[] = [
   {

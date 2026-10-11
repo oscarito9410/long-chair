@@ -1,5 +1,6 @@
-import { notMedicalAdvice, sampleShelfNote, stickerTilt } from "@long-chair/core";
+import { notMedicalAdvice, sampleShelfNote, stickerTilt, welcomeNotesAt } from "@long-chair/core";
 import { router } from "expo-router";
+import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Animated, { Keyframe } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -10,6 +11,7 @@ import { ScreenScaffold } from "../src/components/chrome/ScreenScaffold";
 import { getStarted, seeSample, welcomeLede, welcomeTitle } from "../src/copy/phrases";
 import { useReducedMotion } from "../src/motion/use-reduced-motion";
 import { openSettings } from "../src/navigation/present-sheet";
+import { useSession } from "../src/state/session";
 import {
   FONT_BODY,
   FONT_SECONDARY,
@@ -28,16 +30,34 @@ const heroIn = new Keyframe({
   100: { opacity: 1, transform: [{ translateY: 0 }] },
 }).duration(HERO_MS);
 
-const notes = [
-  { text: "jazz on Sundays", hue: "honey" as const, tilt: stickerTilt.jazz },
-  { text: "cozy mysteries", hue: "apricot" as const, tilt: stickerTilt.mystery },
-  { text: "slow bread", hue: "seaglass" as const, tilt: stickerTilt.bread },
-  { text: "window light", hue: "wisteria" as const, tilt: stickerTilt.light },
-];
+const NOTE_HUES = ["honey", "apricot", "seaglass", "wisteria"] as const;
+const NOTE_TILTS = [stickerTilt.jazz, stickerTilt.mystery, stickerTilt.bread, stickerTilt.light] as const;
+const WELCOME_NOTE_MS = 3200;
+
+function useWelcomeNotes(): readonly string[] {
+  const reduced = useReducedMotion();
+  const [step, setStep] = useState(0);
+
+  useEffect(() => {
+    if (reduced) {
+      return;
+    }
+    const id = setInterval(() => {
+      setStep((current) => current + 1);
+    }, WELCOME_NOTE_MS);
+    return () => {
+      clearInterval(id);
+    };
+  }, [reduced]);
+
+  return welcomeNotesAt(reduced ? 0 : step);
+}
 
 export default function WelcomeScreen() {
   const insets = useSafeAreaInsets();
   const reduced = useReducedMotion();
+  const notes = useWelcomeNotes();
+  const { beginOnboarding, reset } = useSession();
   return (
     <View style={styles.screen}>
       <ScreenScaffold
@@ -48,17 +68,23 @@ export default function WelcomeScreen() {
         primary={getStarted}
         primaryHaptic="firm"
         onPrimary={() => {
-          router.push("/love");
+          beginOnboarding();
+          setTimeout(() => {
+            router.push("/love");
+          }, 0);
         }}
         linkLabel={seeSample}
         linkIcon="stack"
         onLink={() => {
-          router.push("/(tabs)/kit");
+          reset();
+          setTimeout(() => {
+            router.push("/(tabs)/kit");
+          }, 0);
         }}
       >
         <Text style={styles.sample}>{sampleShelfNote}</Text>
         <Animated.View entering={reduced ? undefined : heroIn}>
-          <WelcomeStage />
+          <WelcomeStage notes={notes} />
         </Animated.View>
       </ScreenScaffold>
       <View style={[styles.gear, { top: insets.top + SPACE_8 }]}>
@@ -72,13 +98,13 @@ export default function WelcomeScreen() {
   );
 }
 
-function WelcomeStage() {
-  const [jazz, mystery, bread, light] = notes;
+function WelcomeStage({ notes }: { notes: readonly string[] }) {
+  const [first, second, third, fourth] = notes;
   return (
     <View style={styles.stage}>
       <View style={styles.row}>
-        {jazz ? <HandNote text={jazz.text} hue={jazz.hue} tilt={jazz.tilt} /> : null}
-        {mystery ? <HandNote text={mystery.text} hue={mystery.hue} tilt={mystery.tilt} /> : null}
+        <Sticky text={first} index={0} />
+        <Sticky text={second} index={1} />
       </View>
       <View style={styles.copy}>
         <Text accessibilityRole="header" style={styles.title}>
@@ -88,11 +114,20 @@ function WelcomeStage() {
       </View>
       <DoodleArrow />
       <View style={styles.row}>
-        {bread ? <HandNote text={bread.text} hue={bread.hue} tilt={bread.tilt} /> : null}
-        {light ? <HandNote text={light.text} hue={light.hue} tilt={light.tilt} /> : null}
+        <Sticky text={third} index={2} />
+        <Sticky text={fourth} index={3} />
       </View>
     </View>
   );
+}
+
+function Sticky({ text, index }: { text: string | undefined; index: number }) {
+  const hue = NOTE_HUES[index] ?? "honey";
+  const tilt = NOTE_TILTS[index] ?? 0;
+  if (!text) {
+    return null;
+  }
+  return <HandNote text={text} hue={hue} tilt={tilt} />;
 }
 
 const styles = StyleSheet.create({

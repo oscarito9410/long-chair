@@ -1,5 +1,6 @@
 import { avoidThemes } from "../data/avoid-themes.ts";
 import { plainModelExample } from "../data/comparison.ts";
+import { tasteById } from "../data/taste-catalog.ts";
 import { tasteSeeds } from "../data/taste-seeds.ts";
 import type { CatalogItem, SessionDraft } from "../data/types.ts";
 
@@ -9,9 +10,9 @@ export function matchingSeedNames(item: CatalogItem, draft: SessionDraft): strin
     if (!draft.seedIds.includes(id)) {
       continue;
     }
-    const seed = tasteSeeds.find((entry) => entry.id === id);
-    if (seed) {
-      names.push(seed.name);
+    const taste = tasteById(id) ?? tasteSeeds.find((entry) => entry.id === id);
+    if (taste) {
+      names.push(taste.name);
     }
   }
   return names;

@@ -4,7 +4,7 @@ import { TopicCard } from "../components/kit/TopicCard.tsx";
 import { GlassSurface } from "../components/glass/GlassSurface.tsx";
 import { SectionHeading } from "../components/ui/SectionHeading.tsx";
 import { tasteCharacter } from "../content/presentation.ts";
-import { companionTopics, nearbyPlaces } from "@long-chair/core";
+import { nearbyPlaces, topicsForSeeds } from "@long-chair/core";
 import { guideById } from "@long-chair/core";
 import { guideHeader } from "@long-chair/core";
 import { useSession } from "../state/SessionContext.tsx";
@@ -12,7 +12,7 @@ import { useSession } from "../state/SessionContext.tsx";
 export function CompanionScreen() {
   const { draft } = useSession();
   const guide = guideById(draft.companionId);
-  const topics = companionTopics.filter((topic) => draft.seedIds.includes(topic.seedId));
+  const topics = topicsForSeeds(draft.seedIds);
 
   return (
     <div className="flex flex-col gap-8" data-screen="companion">

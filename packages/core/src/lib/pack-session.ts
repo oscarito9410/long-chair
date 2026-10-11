@@ -64,15 +64,28 @@ function shapeFor(minutes: number): readonly SlotRequest[] {
   return match ? match.slots : [];
 }
 
+function allowsThemes(item: CatalogItem, avoided: ReadonlySet<string>): boolean {
+  for (const id of avoided) {
+    if (!item.avoidedThemeIds.includes(id)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 function pickForSlot(
   slot: SlotRequest,
   remaining: number,
   used: ReadonlySet<string>,
   selected: ReadonlySet<string>,
+  avoided: ReadonlySet<string>,
 ): CatalogItem | undefined {
   const cap = Math.min(slot.maxMinutes, remaining);
   const candidates = catalog.filter((item) => {
     if (item.kind !== slot.kind || used.has(item.id) || item.minutes > cap) {
+      return false;
+    }
+    if (!allowsThemes(item, avoided)) {
       return false;
     }
     return tasteScore(item, selected) > 0;
@@ -83,12 +96,13 @@ function pickForSlot(
 
 export function packSession(draft: SessionDraft): PackedSession {
   const selected = new Set(draft.seedIds);
+  const avoided = new Set(draft.avoidIds);
   const used = new Set<string>();
   const chosen: CatalogItem[] = [];
   let remaining = draft.durationMinutes;
 
   for (const slot of shapeFor(draft.durationMinutes)) {
-    const item = pickForSlot(slot, remaining, used, selected);
+    const item = pickForSlot(slot, remaining, used, selected, avoided);
     if (!item) {
       continue;
     }
@@ -98,7 +112,9 @@ export function packSession(draft: SessionDraft): PackedSession {
   }
 
   const extras = catalog
-    .filter((item) => !used.has(item.id) && tasteScore(item, selected) > 0)
+    .filter(
+      (item) => !used.has(item.id) && allowsThemes(item, avoided) && tasteScore(item, selected) > 0,
+    )
     .sort((a, b) => tasteScore(b, selected) - tasteScore(a, selected) || b.minutes - a.minutes);
 
   let extraCount = 0;

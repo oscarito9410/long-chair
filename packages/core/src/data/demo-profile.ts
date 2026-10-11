@@ -16,3 +16,6 @@ export const demoDraft: SessionDraft = {
   durationMinutes: TYPICAL_CHAIR_MINUTES,
   companionId: "pebble",
 };
+
+/** Onboarding starts with an empty shelf so the love step has to ask. */
+export const openingDraft: SessionDraft = { ...demoDraft, seedIds: [] };

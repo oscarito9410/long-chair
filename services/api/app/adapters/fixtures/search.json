@@ -85,6 +85,30 @@
             }
           ]
         }
+      },
+      {
+        "name": "Soccer",
+        "entity_id": "00000000-0000-4000-8000-0000000000a1",
+        "type": "urn:entity",
+        "subtype": "urn:entity:book",
+        "x-long-chair-slug": "soccer",
+        "properties": {
+          "description": "The sport, from five-a-side to a final",
+          "x-long-chair-taste-kind": "tag",
+          "x-long-chair-aliases": ["futbol", "fútbol", "football"]
+        }
+      },
+      {
+        "name": "Anime",
+        "entity_id": "00000000-0000-4000-8000-0000000000a2",
+        "type": "urn:entity",
+        "subtype": "urn:entity:tv_show",
+        "x-long-chair-slug": "anime",
+        "properties": {
+          "description": "Series and films from Japan",
+          "x-long-chair-taste-kind": "tag",
+          "x-long-chair-aliases": ["anime", "animé"]
+        }
       }
     ]
   }

@@ -1,18 +1,39 @@
-import { notMedicalAdvice } from "@long-chair/core";
-import { GlassLink } from "../components/glass/GlassLink.tsx";
+import { useEffect, useState } from "react";
+import { notMedicalAdvice, welcomeNotesAt } from "@long-chair/core";
+import { controlClass } from "../components/glass/glass-styles.ts";
 import { Icon } from "../components/ui/Icon.tsx";
 import { SampleNote } from "../components/ui/SampleNote.tsx";
+import { useReducedMotion } from "../hooks/use-reduced-motion.ts";
 import type { Hue } from "../tokens/tokens.ts";
 import { paths } from "../routing/paths.ts";
+import { useSession } from "../state/SessionContext.tsx";
 
-const notes: readonly { text: string; className: string; tint: Hue }[] = [
-  { text: "jazz on Sundays", className: "note-a", tint: "honey" },
-  { text: "cozy mysteries", className: "note-b", tint: "apricot" },
-  { text: "slow bread", className: "note-c", tint: "seaglass" },
-  { text: "window light", className: "note-d", tint: "wisteria" },
-];
+const NOTE_CLASS = ["note-a", "note-b", "note-c", "note-d"] as const;
+const NOTE_HUE: readonly Hue[] = ["honey", "apricot", "seaglass", "wisteria"];
+const WELCOME_NOTE_MS = 3200;
+
+function useWelcomeNotes(): readonly string[] {
+  const reduced = useReducedMotion();
+  const [step, setStep] = useState(0);
+
+  useEffect(() => {
+    if (reduced) {
+      return;
+    }
+    const id = window.setInterval(() => {
+      setStep((current) => current + 1);
+    }, WELCOME_NOTE_MS);
+    return () => {
+      window.clearInterval(id);
+    };
+  }, [reduced]);
+
+  return welcomeNotesAt(reduced ? 0 : step);
+}
 
 export function WelcomeScreen() {
+  const notes = useWelcomeNotes();
+  const { beginOnboarding, reset } = useSession();
   return (
     <div className="question welcome-screen" data-screen="welcome">
       <a className="welcome-gear glass-surface glass-thin glass-disc" href={paths.settings} aria-label="Settings">
@@ -20,13 +41,13 @@ export function WelcomeScreen() {
       </a>
       <SampleNote />
       <div className="welcome-stage">
-        {notes.map((note) => (
+        {notes.map((text, index) => (
           <p
-            key={note.text}
-            className={`sticker sticker-${note.tint} hand ${note.className}`}
+            key={NOTE_CLASS[index] ?? text}
+            className={`sticker sticker-${NOTE_HUE[index] ?? "honey"} hand ${NOTE_CLASS[index] ?? "note-a"}`}
             aria-hidden="true"
           >
-            {note.text}
+            {text}
           </p>
         ))}
         <div className="welcome-copy">
@@ -54,10 +75,22 @@ export function WelcomeScreen() {
         </svg>
       </div>
       <div className="welcome-dock">
-        <GlassLink href={paths.love} className="w-full">
+        <a
+          href={paths.love}
+          className={controlClass("solid", "w-full")}
+          onClick={() => {
+            beginOnboarding();
+          }}
+        >
           Get started
-        </GlassLink>
-        <a className="text-link" href={paths.kit}>
+        </a>
+        <a
+          className="text-link"
+          href={paths.kit}
+          onClick={() => {
+            reset();
+          }}
+        >
           <Icon name="stack" />
           See a sample kit
         </a>

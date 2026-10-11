@@ -10,7 +10,7 @@ export const settingsLabel = "Settings";
 
 export const loveTitle = "What do you love?";
 
-export const loveLede = "Tap what belongs in the room.";
+export { loveLede } from "@long-chair/core";
 
 export const continueLabel = "Continue";
 

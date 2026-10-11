@@ -68,6 +68,9 @@ def map_search(document: InsightsDocument, kind: ContentKind) -> tuple[TasteHit,
                 kind=kind,
                 detail=_detail(entity),
                 qloo_entity_id=entity.entity_id,
+                slug=entity.slug or "",
+                taste_kind=entity.properties.taste_kind.strip(),
+                aliases=tuple(alias for alias in entity.properties.aliases if alias.strip()),
             )
         )
     return tuple(hits)

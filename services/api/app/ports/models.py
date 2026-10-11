@@ -13,6 +13,9 @@ class TasteHit:
     kind: ContentKind
     detail: str
     qloo_entity_id: str
+    slug: str = ""
+    taste_kind: str = ""
+    aliases: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)

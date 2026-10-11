@@ -35,6 +35,19 @@ async def test_fake_search_finds_the_fictional_film() -> None:
 
 
 @pytest.mark.asyncio
+async def test_fake_search_folds_spanish_aliases() -> None:
+    port = FakeQlooAdapter()
+    soccer = await port.search("futbol", "book")
+    assert [hit.slug for hit in soccer] == ["soccer"]
+    assert soccer[0].taste_kind == "tag"
+    accented = await port.search("fútbol", "book")
+    assert [hit.slug for hit in accented] == ["soccer"]
+    anime = await port.search("anime", "tv_show")
+    assert [hit.slug for hit in anime] == ["anime"]
+    assert anime[0].taste_kind == "tag"
+
+
+@pytest.mark.asyncio
 async def test_fake_insights_drop_an_excluded_tag_and_entity() -> None:
     port = FakeQlooAdapter()
     kept = await port.insights("movie", (INTEREST,), (ILLNESS,))

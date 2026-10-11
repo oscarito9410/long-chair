@@ -66,6 +66,8 @@ class EntityProperties(BaseModel):
     walk_minutes: int | None = Field(default=None, alias="x-long-chair-walk-minutes")
     open_until: str | None = Field(default=None, alias="x-long-chair-open-until")
     price_label: str | None = Field(default=None, alias="x-long-chair-price-label")
+    aliases: list[str] = Field(default_factory=list, alias="x-long-chair-aliases")
+    taste_kind: str = Field(default="", alias="x-long-chair-taste-kind")
 
 
 class EntityRecord(BaseModel):

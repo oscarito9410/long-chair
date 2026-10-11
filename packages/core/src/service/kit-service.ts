@@ -1,5 +1,5 @@
 import { itemById } from "../data/catalog.ts";
-import { companionTopics, nearbyPlaces } from "../data/companion.ts";
+import { nearbyPlaces, topicsForSeeds } from "../data/companion.ts";
 import type {
   CatalogItem,
   CompanionTopic,
@@ -37,7 +37,7 @@ export function createFixtureKitService(): KitService {
       return Promise.resolve({
         packed,
         items,
-        topics: companionTopics.filter((topic) => draft.seedIds.includes(topic.seedId)),
+        topics: topicsForSeeds(draft.seedIds),
         places: nearbyPlaces,
         source: "fixture",
       });

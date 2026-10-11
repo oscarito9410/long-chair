@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import { demoDraft, toggleId } from "@long-chair/core";
+import { demoDraft, openingDraft, toggleId, toggleTaste } from "@long-chair/core";
 import type { SessionDraft } from "@long-chair/core";
 
 type SessionContextValue = {
@@ -9,19 +9,20 @@ type SessionContextValue = {
   toggleAvoid: (id: string) => void;
   setDuration: (minutes: number) => void;
   setCompanion: (id: string) => void;
+  beginOnboarding: () => void;
   reset: () => void;
 };
 
 const SessionContext = createContext<SessionContextValue | null>(null);
 
 export function SessionProvider({ children }: { children: ReactNode }) {
-  const [draft, setDraft] = useState<SessionDraft>(demoDraft);
+  const [draft, setDraft] = useState<SessionDraft>(openingDraft);
 
   const value = useMemo<SessionContextValue>(
     () => ({
       draft,
       toggleSeed: (id) => {
-        setDraft((current) => ({ ...current, seedIds: toggleId(current.seedIds, id) }));
+        setDraft((current) => ({ ...current, seedIds: toggleTaste(current.seedIds, id) }));
       },
       toggleAvoid: (id) => {
         setDraft((current) => ({ ...current, avoidIds: toggleId(current.avoidIds, id) }));
@@ -31,6 +32,9 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       },
       setCompanion: (id) => {
         setDraft((current) => ({ ...current, companionId: id }));
+      },
+      beginOnboarding: () => {
+        setDraft((current) => ({ ...current, seedIds: [] }));
       },
       reset: () => {
         setDraft(demoDraft);

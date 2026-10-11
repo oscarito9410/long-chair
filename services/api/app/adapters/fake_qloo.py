@@ -1,5 +1,6 @@
 """Deterministic catalog. Same request, same fictional document. No network."""
 
+import unicodedata
 from collections.abc import Sequence
 from pathlib import Path
 
@@ -32,8 +33,8 @@ class FakeQlooAdapter:
 
         validate_search(query, kind)
         document = self._read("search.json")
-        needle = query.strip().casefold()
-        hits = [hit for hit in map_search(document, kind) if hit.name.casefold() == needle]
+        needle = _folded(query)
+        hits = [hit for hit in map_search(document, kind) if _matches(hit, needle)]
         return tuple(hits)
 
     async def exclusion_tags(self, themes: Sequence[AvoidTheme]) -> Sequence[TagHit]:
@@ -83,3 +84,13 @@ class FakeQlooAdapter:
     def _read(self, name: str) -> InsightsDocument:
         path = self._fixture_dir / name
         return InsightsDocument.model_validate_json(path.read_text(encoding="utf-8"))
+
+
+def _folded(value: str) -> str:
+    decomposed = unicodedata.normalize("NFD", value)
+    plain = "".join(ch for ch in decomposed if unicodedata.category(ch) != "Mn")
+    return plain.casefold().strip()
+
+
+def _matches(hit: TasteHit, needle: str) -> bool:
+    return any(needle in _folded(field) for field in (hit.name, *hit.aliases) if field)
