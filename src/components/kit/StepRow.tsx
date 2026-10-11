@@ -1,4 +1,5 @@
 import { cn } from "../../lib/cn.ts";
+import type { IconName } from "../ui/icon-names.ts";
 import { glassClass } from "../glass/glass-styles.ts";
 import { Icon } from "../ui/Icon.tsx";
 import { IconWell } from "../ui/IconWell.tsx";
@@ -12,14 +13,12 @@ const stateHue = {
 } as const;
 
 export function StepRow({
-  index,
   title,
-  detail,
+  icon,
   state,
 }: {
-  index: number;
   title: string;
-  detail: string;
+  icon: IconName;
   state: StepState;
 }) {
   return (
@@ -30,22 +29,18 @@ export function StepRow({
           shape: "row",
           tint: state === "active" ? "honey" : undefined,
         }),
-        "option-row cursor-default",
+        "option-row step-row cursor-default",
         state === "done" && "is-selected",
       )}
       aria-current={state === "active" ? "step" : undefined}
     >
       <IconWell hue={stateHue[state]}>
-        {state === "done" ? (
-          <Icon name="check" />
-        ) : (
-          <span className="text-lg font-extrabold">{index + 1}</span>
-        )}
+        <Icon name={state === "done" ? "check" : icon} />
       </IconWell>
-      <div className="min-w-0">
-        <p className="text-lg font-bold">{title}</p>
-        <p className="text-lg text-ink-soft">{detail}</p>
-      </div>
+      <p className="min-w-0 text-lg font-bold">
+        {state === "done" ? <span className="visually-hidden">Done. </span> : null}
+        {title}
+      </p>
     </li>
   );
 }

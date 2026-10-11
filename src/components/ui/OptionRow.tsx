@@ -36,7 +36,7 @@ export function OptionRow({
           <span className="block text-lg font-bold">{title}</span>
         </span>
         <span className="mt-1 block text-base text-ink-soft">{detail}</span>
-        {checked ? <span className="mt-1 block text-lg font-bold">{selectedLabel}</span> : null}
+        {checked ? <span className="visually-hidden">{selectedLabel}</span> : null}
       </span>
       <Character variant={character} />
     </button>

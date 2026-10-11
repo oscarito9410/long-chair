@@ -78,5 +78,4 @@ export type NearbyPlace = {
 export type AgentStep = {
   id: string;
   title: string;
-  detail: string;
 };

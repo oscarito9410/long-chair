@@ -12,7 +12,7 @@ export function ThemesScreen() {
     <QuestionFrame
       screen="themes"
       title="What should stay out of the room?"
-      lede="These stay out of the kit. You can turn one back on if you want it in the room."
+      lede="These stay out of the kit."
       primary="Continue"
       primaryHref={paths.company}
       secondary="Skip for now"
@@ -31,7 +31,6 @@ export function ThemesScreen() {
           character={themeCharacter(theme.id)}
         />
       ))}
-      <p className="text-center text-lg">Names and medical details never leave this page.</p>
     </QuestionFrame>
   );
 }

@@ -78,7 +78,7 @@ Spacing is the scale 4, 8, 16, 24, 32, 64. In Tailwind that is `1`, `2`, `4`, `6
 
 Body copy is `text-lg` (18px) or larger. Secondary copy is `text-base` (16px) or larger. Do not use `text-sm` or `text-xs`. The tab label may be `text-base` under `sm` so the word "Companion" fits a phone, and `text-lg` from `sm` up. Card titles may stay at `text-2xl`. Secondary ink (`text-ink-soft`) has to clear 4.5:1 on the cream page and on every glass fill. Glows stay in the corners, off the text column. Measure before darkening `--lc-ink-soft`.
 
-Radii: `rounded-card` for rows and covers, `rounded-panel` for the detail sheet, `rounded-tag` for chips and stickers, `rounded-full` only for real actions (the near-black primary pill, the quiet text link still uses the pill hit area), the tab bar, and icon wells. Do not put a pill, a shadow, or a fill behind a label that is not an action. The sample line is flat text. The column is `--lc-content` (800px), applied by the `.page` class. Question screens narrow further to `--lc-question` (440px).
+Radii: `rounded-card` for rows and covers, `rounded-panel` for the detail sheet, `rounded-tag` for chips and stickers, `rounded-full` only for real actions (the near-black primary pill, the quiet text link still uses the pill hit area), the tab bar, and icon wells. Do not put a pill, a shadow, or a fill behind a label that is not an action. The fictional-sample tag appears once, on welcome. The column is `--lc-content` (800px), applied by the `.page` class. Question screens narrow further to `--lc-question` (440px).
 
 Nunito is the UI font. Caveat (the `.hand` class) is only the decorative welcome stickers, which are `aria-hidden`. Privacy notes, footnotes, instructions, and every other line use Nunito. Do not set `.hand` on a sentence a person needs to read to use the app.
 
@@ -100,7 +100,7 @@ Guides live in `src/data/guides.ts` (Pebble, Lumen, Nook, Brim). The draft store
 
 ### Option rows
 
-`OptionRow` is the taste and theme control, drawn as regular glass. A selected row shows a check, a 2px ink border, and a status word ("In the room" or "Left out"). An unselected row keeps the quiet line border. Both are toggle buttons with `aria-pressed`. Do not rely on color alone. The character sits on the right.
+`OptionRow` is the taste and theme control, drawn as thin glass. A selected row shows a check and a 2px ink border. The status word ("In the room" or "Left out") is visually hidden, and the button keeps `aria-pressed`. An unselected row keeps the quiet line border. Do not rely on color alone. The character sits on the right. The visible copy is the title and one short descriptor.
 
 ### Dial
 
@@ -171,7 +171,7 @@ Keep the field quiet. This screen sits beside a person for hours. Do not add tra
 - Screens compose. They do not fetch, and they do not own palette values.
 - Sample data stays in `src/data/` behind the interfaces in `types.ts`. Components receive plain props or call a pure helper in `src/lib/`.
 - `packSession` is the duration fitter. Change packing rules there, not inside `KitScreen`. It reads tastes, themes, and minutes. It does not read `companionId`.
-- Reuse `QuestionFrame`, `Character`, `CoverArt`, `Dial`, `Stamp`, `GlassSurface`, `GlassButton`, `GlassLink`, `OptionRow`, `IconWell`, `HeroNumber`, `BecauseList`, `ThemeCheck`, and `AvoidedRow` instead of copying markup. Kit cards use `ThemeCheck` (a line, plus chips only when a theme was not cleared). Item detail and Compare keep the full `AvoidedRow`.
+- Reuse `QuestionFrame`, `Character`, `CoverArt`, `Dial`, `Stamp`, `GlassSurface`, `GlassButton`, `GlassLink`, `OptionRow`, `IconWell`, `HeroNumber`, and `BecauseChip` instead of copying markup. A screen has a headline and at most one short subline. Kit cards show the cover, title, type, time range, and one "Because you love" chip. Item detail adds a one-line check. Compare is a title and one line on each panel. The fictional-sample tag is welcome only.
 - Session state is the draft in `SessionContext` (tastes, themes, minutes, companion). The packed kit is derived with `usePackedSession`. Do not store a second copy of the kit.
 - Do not thread the draft through props from `App`. Call `useSession` in the screen that needs it.
 

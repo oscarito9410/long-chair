@@ -11,7 +11,7 @@ export function ChairScreen() {
     <QuestionFrame
       screen="chair"
       title="How long is your chair?"
-      lede="Drag the dial. The kit will be cut to fit."
+      lede="Drag the dial."
       primary="Continue"
       primaryHref={paths.themes}
       secondary="You can change this anytime"

@@ -25,13 +25,10 @@ export function WelcomeScreen() {
           </p>
         ))}
         <div className="welcome-copy">
-          <p className="text-lg font-bold">Long Chair</p>
           <h1 className="text-4xl font-extrabold leading-tight">
             What you love, minus what hurts.
           </h1>
-          <p className="text-lg leading-relaxed">
-            A session kit cut to the length of the chair, with the themes you want left out.
-          </p>
+          <p className="text-lg leading-relaxed">A kit cut to the length of your chair.</p>
         </div>
         <svg viewBox="0 0 72 88" className="welcome-arrow" aria-hidden="true">
           <path
@@ -58,10 +55,7 @@ export function WelcomeScreen() {
         <GlassLink href={paths.kit} tone="quiet" className="w-full">
           See a sample kit
         </GlassLink>
-        <p className="text-center text-lg leading-relaxed">
-          Long Chair is for comfort and company. It is not medical advice, and it does not ask for a
-          name or a diagnosis.
-        </p>
+        <p className="text-center text-base">Not medical advice</p>
       </div>
     </div>
   );

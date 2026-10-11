@@ -16,11 +16,8 @@ export function ReadyScreen() {
     <QuestionFrame
       screen="ready"
       title="Your kit is ready"
-      lede="A collectible for this chair. Nothing was sent anywhere."
       primary="Open my kit"
       primaryHref={paths.kit}
-      secondary="Plan again"
-      secondaryHref={paths.love}
     >
       <Stamp
         seed={item?.id ?? "quiet-chair"}

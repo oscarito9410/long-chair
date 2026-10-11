@@ -17,8 +17,8 @@ export function PauseCard({ minutes }: { minutes: number }) {
         <Icon name="pause" />
       </IconWell>
       <div>
-        <p className="text-2xl font-extrabold">{formatHoursMinutes(minutes)} open</p>
-        <p className="text-lg">Unscheduled on purpose. A pause is part of the chair.</p>
+        <p className="text-2xl font-extrabold">Pause</p>
+        <p className="text-lg">{formatHoursMinutes(minutes)} open</p>
       </div>
     </article>
   );

@@ -248,6 +248,23 @@ button:disabled {
   box-shadow: none;
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.sample-tag {
+  margin: 0;
+  text-align: center;
+}
+
 .clip-input {
   position: absolute;
   width: 1px;
@@ -568,6 +585,10 @@ button:disabled {
   border-color: var(--lc-ink);
 }
 
+.step-row {
+  justify-content: flex-start;
+}
+
 .icon-hit {
   display: inline-flex;
   min-width: var(--lc-target);
@@ -866,14 +887,20 @@ button:disabled {
   text-decoration: none;
 }
 
+.kit-clip {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: var(--lc-radius-card);
+}
+
 .kit-bleed {
   position: absolute;
   z-index: 0;
-  inset: -10%;
+  inset: 0;
   overflow: hidden;
-  border-radius: var(--lc-radius-card);
+  border-radius: inherit;
   filter: blur(14px) saturate(1.25);
-  transform: scale(1.08);
 }
 
 .kit-face {

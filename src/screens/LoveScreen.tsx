@@ -13,7 +13,7 @@ export function LoveScreen() {
     <QuestionFrame
       screen="love"
       title="What do you love?"
-      lede="Tap anything that belongs in the room. The shelf is fictional, so you can change it freely."
+      lede="Tap what belongs in the room."
       primary="Continue"
       primaryHref={paths.chair}
       primaryDisabled={!canContinue}
@@ -33,11 +33,9 @@ export function LoveScreen() {
           character={tasteCharacter(seed.id)}
         />
       ))}
-      {canContinue ? null : (
-        <p className="text-lg" role="status">
-          Choose one title before you continue.
-        </p>
-      )}
+      <p className="visually-hidden" role="status">
+        {canContinue ? "A title is in the room." : "Choose one title before you continue."}
+      </p>
     </QuestionFrame>
   );
 }

@@ -2,15 +2,7 @@ import type { CharacterVariant } from "../../data/character-kinds.ts";
 import { Character } from "../art/Character.tsx";
 import { glassClass } from "../glass/glass-styles.ts";
 
-export function TopicCard({
-  title,
-  prompt,
-  character,
-}: {
-  title: string;
-  prompt: string;
-  character: CharacterVariant;
-}) {
+export function TopicCard({ prompt, character }: { prompt: string; character: CharacterVariant }) {
   return (
     <article
       className={glassClass({
@@ -19,10 +11,7 @@ export function TopicCard({
         className: "option-row cursor-default",
       })}
     >
-      <div className="min-w-0">
-        <h3 className="text-2xl font-bold">{title}</h3>
-        <p className="mt-2 text-lg leading-relaxed">{prompt}</p>
-      </div>
+      <h3 className="min-w-0 text-2xl font-bold">{prompt}</h3>
       <Character variant={character} />
     </article>
   );

@@ -25,7 +25,6 @@ export function CompanyScreen() {
     <QuestionFrame
       screen="company"
       title="Who keeps you company?"
-      lede="Pick a guide for the person sitting with you. They only change the tone, not the kit."
       primary="They'll sit with me"
       onPrimary={() => {
         setCompanion(guide.id);

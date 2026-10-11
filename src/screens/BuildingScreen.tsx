@@ -3,6 +3,7 @@ import { Character } from "../components/art/Character.tsx";
 import { ScreenIntro } from "../components/chrome/ScreenIntro.tsx";
 import { GlassLink } from "../components/glass/GlassLink.tsx";
 import { StepRow, type StepState } from "../components/kit/StepRow.tsx";
+import type { IconName } from "../components/ui/icon-names.ts";
 import { guideById } from "../data/guides.ts";
 import { buildAgentSteps } from "../lib/build-agent-steps.ts";
 import { formatHoursMinutes } from "../lib/format-duration.ts";
@@ -10,6 +11,14 @@ import { paths } from "../routing/paths.ts";
 import { useSession } from "../state/SessionContext.tsx";
 import { useReducedMotion } from "../hooks/use-reduced-motion.ts";
 import { motion } from "../tokens/tokens.ts";
+
+const stepIcons: Record<string, IconName> = {
+  resolve: "note",
+  match: "stack",
+  exclude: "aside",
+  pack: "clock",
+  check: "check",
+};
 
 function stepState(index: number, shown: number, total: number): StepState {
   if (index < shown) {
@@ -61,7 +70,6 @@ export function BuildingScreen() {
         hero={formatHoursMinutes(draft.durationMinutes)}
         caption="the chair we are filling"
         title="Building your kit"
-        lede="A preview of the agent. These steps are illustrated with the sample shelf. No live catalog is called."
       />
       <p className="sr-only" aria-live="polite">
         {liveText}
@@ -73,9 +81,8 @@ export function BuildingScreen() {
         {steps.map((step, index) => (
           <StepRow
             key={step.id}
-            index={index}
             title={step.title}
-            detail={step.detail}
+            icon={stepIcons[step.id] ?? "check"}
             state={stepState(index, shown, steps.length)}
           />
         ))}

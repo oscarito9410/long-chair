@@ -36,10 +36,7 @@ export function PlaceCard({ place }: { place: NearbyPlace }) {
         })}
       >
         <h3 className="text-2xl font-bold">{place.name}</h3>
-        <p className="text-lg leading-relaxed">{place.offer}</p>
-        <p className="text-lg font-bold">
-          {place.walkMinutes} min walk · open until {place.openUntil} · {place.priceLabel}
-        </p>
+        <p className="text-lg font-bold">{place.walkMinutes} min walk · Open now</p>
       </div>
     </article>
   );

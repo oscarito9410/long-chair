@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { GlassButton } from "../glass/GlassButton.tsx";
 import { GlassLink } from "../glass/GlassLink.tsx";
-import { SampleNote } from "../ui/SampleNote.tsx";
 
 export function QuestionFrame({
   screen,
@@ -17,21 +16,20 @@ export function QuestionFrame({
 }: {
   screen: string;
   title: string;
-  lede: string;
+  lede?: string;
   children: ReactNode;
   primary: string;
   primaryHref?: string;
   primaryDisabled?: boolean;
   onPrimary?: () => void;
-  secondary: string;
-  secondaryHref: string;
+  secondary?: string;
+  secondaryHref?: string;
 }) {
   return (
     <div className="question" data-screen={screen}>
       <header className="flex flex-col items-center gap-4 text-center">
-        <SampleNote />
         <h1 className="text-4xl font-extrabold leading-tight">{title}</h1>
-        <p className="text-lg leading-relaxed">{lede}</p>
+        {lede ? <p className="text-lg leading-relaxed">{lede}</p> : null}
       </header>
       <div className="question-body">{children}</div>
       <div className="flex flex-col items-center gap-2">
@@ -49,9 +47,11 @@ export function QuestionFrame({
             {primary}
           </GlassButton>
         )}
-        <GlassLink href={secondaryHref} tone="quiet" className="w-full">
-          {secondary}
-        </GlassLink>
+        {secondary && secondaryHref ? (
+          <GlassLink href={secondaryHref} tone="quiet" className="w-full">
+            {secondary}
+          </GlassLink>
+        ) : null}
       </div>
     </div>
   );

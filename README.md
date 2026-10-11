@@ -15,7 +15,7 @@ This repository is a **static design prototype** for the [Qloo Agentic Hackathon
 - A clickable, mobile-first web UI that still widens for a tablet.
 - A full pass through the product: welcome, one question at a time, an illustrated agent sequence, a stamp when the kit is ready, a session kit, a piece detail, a companion plan, and a plain-model contrast.
 - Driven by a typed sample shelf. Changing the session length or the tastes changes which pieces are packed into the kit.
-- Honest about being a sample. A flat line inside each hero says the data is fictional and nothing is sent.
+- Honest about being a sample. Welcome carries one tag: the shelf is fictional and nothing is sent. It is not medical advice.
 
 **This prototype is not:**
 
@@ -31,19 +31,19 @@ Refreshing the page restores the sample profile. Choices live in memory for the 
 
 Open the app and move through the story, or jump with the hash:
 
-| Screen      | Hash                  | What you do                                                                                            |
-| ----------- | --------------------- | ------------------------------------------------------------------------------------------------------ |
-| Welcome     | `#/welcome`           | The promise, paper notes of tastes, then get started or open the sample kit.                           |
-| Tastes      | `#/love`              | One question: what belongs in the room. `#/onboarding` lands here too.                                 |
-| Length      | `#/chair`             | A dial from 1 to 4 hours.                                                                              |
-| Themes      | `#/themes`            | What should stay out of the room.                                                                      |
-| Company     | `#/company`           | Pick a guide. The choice changes the tone, not the kit.                                                |
-| Building    | `#/building`          | Watch the five agent steps check off.                                                                  |
-| Ready       | `#/ready`             | A postage-style card for this chair, then open the kit.                                                |
-| Session kit | `#/kit`               | A timeline whose durations add up to the chair. Each card says why it is here and that it was checked. |
-| Piece       | `#/item/north-window` | Cover, why that piece was kept, and the second check against the themes.                               |
-| Companion   | `#/companion`         | The guide, conversation starters from the same tastes, and fictional places shown as open nearby.      |
-| Contrast    | `#/compare`           | An unfiltered suggestion beside the piece Long Chair kept, with the excluded themes visible.           |
+| Screen      | Hash                  | What you do                                                                                    |
+| ----------- | --------------------- | ---------------------------------------------------------------------------------------------- |
+| Welcome     | `#/welcome`           | The promise, paper notes of tastes, then get started or open the sample kit.                   |
+| Tastes      | `#/love`              | One question: what belongs in the room. `#/onboarding` lands here too.                         |
+| Length      | `#/chair`             | A dial from 1 to 4 hours.                                                                      |
+| Themes      | `#/themes`            | What should stay out of the room.                                                              |
+| Company     | `#/company`           | Pick a guide. The choice changes the tone, not the kit.                                        |
+| Building    | `#/building`          | Watch the five agent steps check off.                                                          |
+| Ready       | `#/ready`             | A postage-style card for this chair, then open the kit.                                        |
+| Session kit | `#/kit`               | A timeline whose durations add up to the chair. Each card is a cover, a title, and one reason. |
+| Piece       | `#/item/north-window` | Cover, creator, why it was kept, and a one-line theme check.                                   |
+| Companion   | `#/companion`         | The guide, short prompts from the same tastes, and places shown as open nearby.                |
+| Contrast    | `#/compare`           | An unfiltered title beside the piece Long Chair kept, each with one line.                      |
 
 After the kit exists, a floating glass tab bar switches among Kit, Companion, and Compare. The sample chair is 4 hours with Pebble as the guide. Most of the shelf is selected, Sunday Engines is not, and grief and the death of a parent are not held back, so both row states are visible. **See a sample kit** on the welcome screen opens that timeline immediately.
 

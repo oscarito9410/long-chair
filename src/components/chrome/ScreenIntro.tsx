@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { HeroNumber } from "../ui/HeroNumber.tsx";
-import { SampleNote } from "../ui/SampleNote.tsx";
 
 type ScreenIntroProps = {
   title: string;
@@ -13,7 +12,6 @@ type ScreenIntroProps = {
 export function ScreenIntro({ title, hero, caption, lede, children }: ScreenIntroProps) {
   return (
     <header className="flex flex-col gap-6">
-      <SampleNote />
       {hero !== undefined && caption !== undefined && hero.length > 0 ? (
         <HeroNumber value={hero} caption={caption} />
       ) : null}
