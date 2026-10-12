@@ -3,6 +3,7 @@ import { router } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { CharacterMark } from "../art/CharacterMark";
 import { backToWelcome, recoveryBody, recoveryTitle, tryAgainLabel } from "../../copy/phrases";
 import {
   FONT_BODY,
@@ -14,6 +15,8 @@ import {
   SPACE_24,
   TARGET,
 } from "../../theme/palette";
+
+const RECOVERY_MARK = 96;
 
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
   return (
@@ -35,6 +38,15 @@ export function RecoveryScreen({ detail, onRetry }: { detail?: string; onRetry: 
         { paddingTop: insets.top + SPACE_24, paddingBottom: insets.bottom + SPACE_24 },
       ]}
     >
+      <View style={styles.mark}>
+        <CharacterMark
+          variant={{ shape: "pebble", hue: "seaglass" }}
+          expression="determined"
+          size={RECOVERY_MARK}
+          animate
+          settle
+        />
+      </View>
       <Text accessibilityRole="header" style={styles.title}>
         {recoveryTitle}
       </Text>
@@ -74,6 +86,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: SPACE_16,
   },
+  mark: { alignItems: "center" },
   title: {
     fontFamily: "Nunito_800ExtraBold",
     fontSize: FONT_TITLE,

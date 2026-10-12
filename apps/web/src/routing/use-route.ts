@@ -14,5 +14,5 @@ export function useRoute(): Route {
     };
   }, []);
 
-  return useMemo(() => parseRoute(hash), [hash]);
+  return useMemo(() => parseRoute(hash, import.meta.env.DEV), [hash]);
 }

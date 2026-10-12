@@ -27,6 +27,8 @@ export function documentTitle(route: Route): string {
       return "Settings";
     case "marks":
       return "Shapes";
+    case "expressions":
+      return "Expressions";
     case "item": {
       const item = itemById(route.itemId);
       return item ? item.title : "Piece";

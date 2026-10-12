@@ -11,6 +11,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { bootSkia } from "../src/components/background/skia-boot";
 import { QuietBoundary } from "../src/components/background/QuietBoundary";
+import { StaticStudio } from "../src/components/background/StaticStudio";
 import { StudioBackground } from "../src/components/background/StudioBackground";
 import { SessionProvider } from "../src/state/session";
 import { palette } from "../src/theme/palette";
@@ -29,7 +30,7 @@ export default function RootLayout() {
     Nunito_800ExtraBold,
     Caveat_600SemiBold,
   });
-  const [skiaReady, setSkiaReady] = useState(false);
+  const [skiaReady, setSkiaReady] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (ready) {
@@ -38,9 +39,9 @@ export default function RootLayout() {
   }, [ready]);
   useEffect(() => {
     let live = true;
-    void bootSkia().finally(() => {
+    void bootSkia().then((ok) => {
       if (live) {
-        setSkiaReady(true);
+        setSkiaReady(ok);
       }
     });
     return () => {
@@ -48,7 +49,7 @@ export default function RootLayout() {
     };
   }, []);
 
-  if (!ready || !skiaReady) {
+  if (!ready || skiaReady === null) {
     return null;
   }
 
@@ -58,9 +59,13 @@ export default function RootLayout() {
         <SafeAreaProvider>
           <SessionProvider>
             <View style={styles.root}>
-              <QuietBoundary>
-                <StudioBackground />
-              </QuietBoundary>
+              {skiaReady ? (
+                <QuietBoundary>
+                  <StudioBackground />
+                </QuietBoundary>
+              ) : (
+                <StaticStudio />
+              )}
               <StatusBar style="dark" />
               <AppStack />
             </View>
@@ -81,6 +86,7 @@ function AppStack() {
       }}
     >
       <Stack.Screen name="index" />
+      <Stack.Screen name="expressions" options={{ headerShown: false }} />
       <Stack.Screen name="(onboarding)" options={{ animation: "fade" }} />
       <Stack.Screen name="(tabs)" />
       <Stack.Screen

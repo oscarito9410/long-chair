@@ -17,7 +17,7 @@ export function CompanionScreen() {
   return (
     <div className="flex flex-col gap-8" data-screen="companion">
       <header className="flex items-center gap-4">
-        <Character variant={guide.variant} size="md" animate />
+        <Character variant={guide.variant} size="md" expression="support" animate settle />
         <GlassSurface variant="chip" thickness="regular" className="min-w-0 px-4 py-2">
           <h1 className="text-2xl font-extrabold leading-tight">
             {guideHeader(guide.personality, guide.quote)}

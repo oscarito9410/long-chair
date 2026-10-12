@@ -760,28 +760,41 @@ button:disabled {
   height: min(var(--lc-character-lg), 62vw);
 }
 
-.character-live {
-  transform-origin: 50% 58%;
+.character-pose {
+  transform-box: fill-box;
+  transform-origin: 60px 78px;
+  transform: translateY(var(--pose-lift, 0px)) rotate(var(--pose-tilt, 0deg))
+    scale(var(--pose-sx, 1), var(--pose-sy, 1));
+}
+
+.character-intro .character-pose {
+  animation: character-arrive 2s cubic-bezier(0.22, 0.8, 0.24, 1) both;
+}
+
+.character-tickle .character-pose {
+  animation: character-giggle 0.28s ease-in-out infinite;
+}
+
+.character-idle {
+  transform-box: fill-box;
+  transform-origin: 60px 78px;
   animation: character-bob 3.2s ease-in-out infinite;
 }
 
-.character-settle {
-  transform-origin: 50% 58%;
-  animation:
-    character-pop 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both,
-    character-bob 3.2s ease-in-out 0.55s infinite;
+.character-thinking .character-idle {
+  animation: character-nod 2.6s ease-in-out infinite;
 }
 
 .character-eyes {
   transform-box: fill-box;
-  transform-origin: center;
+  transform-origin: 50px 58px;
   animation: character-blink 4.8s ease-in-out infinite;
 }
 
-.character-glance {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: character-glance 0.45s ease forwards;
+html.is-hidden .character-pose,
+html.is-hidden .character-idle,
+html.is-hidden .character-eyes {
+  animation-play-state: paused;
 }
 
 .mark-sheet {
@@ -790,6 +803,14 @@ button:disabled {
   gap: var(--lc-space-16);
   justify-items: center;
   padding-bottom: var(--lc-space-32);
+}
+
+.expression-sheet {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--lc-space-8);
+  justify-items: center;
+  padding-bottom: var(--lc-space-16);
 }
 
 @keyframes character-bob {
@@ -802,15 +823,33 @@ button:disabled {
   }
 }
 
-@keyframes character-pop {
+@keyframes character-arrive {
   0% {
-    transform: scale(1.08, 0.84);
-  }
-  60% {
-    transform: scale(0.98, 1.06);
+    transform: translateY(10px) rotate(0deg) scale(0.94, 1.06);
   }
   100% {
-    transform: scale(1, 1);
+    transform: translateY(var(--pose-lift, 0px)) rotate(var(--pose-tilt, 0deg))
+      scale(var(--pose-sx, 1), var(--pose-sy, 1));
+  }
+}
+
+@keyframes character-giggle {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-6deg) scale(1.08, 0.88);
+  }
+  50% {
+    transform: translateY(-4px) rotate(6deg) scale(0.92, 1.08);
+  }
+}
+
+@keyframes character-nod {
+  0%,
+  100% {
+    transform: rotate(-3deg) translateY(0);
+  }
+  50% {
+    transform: rotate(4deg) translateY(-2px);
   }
 }
 
@@ -825,12 +864,11 @@ button:disabled {
   }
 }
 
-@keyframes character-glance {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(5px);
+@media (prefers-reduced-motion: reduce) {
+  .character-pose,
+  .character-idle,
+  .character-eyes {
+    animation: none !important;
   }
 }
 

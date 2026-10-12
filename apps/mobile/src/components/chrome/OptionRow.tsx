@@ -41,7 +41,13 @@ export function OptionRow({
     >
       <WashCard style={styles.card} tint={hueFill[character.hue]} selected={selected}>
         <View style={styles.row}>
-          <CharacterMark variant={character} size={AVATAR} animate={selected} settle={selected} />
+          <CharacterMark
+            variant={character}
+            size={AVATAR}
+            expression={selected ? "attention" : undefined}
+            animate={selected}
+            settle={selected}
+          />
           <View style={styles.copy}>
             <Text style={styles.title}>{title}</Text>
             <Text style={styles.detail}>{detail}</Text>

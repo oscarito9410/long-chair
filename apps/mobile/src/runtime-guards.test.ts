@@ -35,6 +35,27 @@ describe("recovery boundary", () => {
     const recovery = source("src/components/chrome/RecoveryScreen.tsx");
     expect(recovery).toContain("tryAgainLabel");
     expect(recovery).toContain('router.replace("/")');
+    expect(recovery).toContain('expression="determined"');
+  });
+});
+
+describe("expression gallery", () => {
+  it("leaves the route only in dev builds", () => {
+    const route = source("app/expressions.tsx");
+    expect(route).toContain("if (!__DEV__)");
+    expect(route).toContain("<Redirect");
+  });
+});
+
+describe("skia web boot", () => {
+  it("loads canvaskit.wasm from the public folder and never rejects", () => {
+    const boot = source("src/components/background/skia-boot.web.ts");
+    const wasm = readFileSync(join(appRoot, "public/canvaskit.wasm"));
+    expect(boot).toContain("locateFile");
+    expect(boot).toContain("catch");
+    expect(boot).toContain("unhandledrejection");
+    expect(wasm.subarray(0, 4).toString("hex")).toBe("0061736d");
+    expect(source("app/_layout.tsx")).toContain("<StaticStudio />");
   });
 });
 

@@ -33,6 +33,31 @@ export {
 } from "./data/character-art.ts";
 export type { CharacterTone, EyeMark } from "./data/character-art.ts";
 export {
+  blushFill,
+  characterMoments,
+  expressionFace,
+  expressionForMoment,
+  expressionForMood,
+  expressionIntroduces,
+  expressionPose,
+  expressions,
+  faceArcPath,
+  idleTickle,
+  isTickling,
+  noteTickleTap,
+  POSE_INTRO_MS,
+  TICKLE_GIGGLE_MS,
+  TICKLE_TAP_COUNT,
+  TICKLE_WINDOW_MS,
+} from "./data/character-expression.ts";
+export type {
+  CharacterMoment,
+  Expression,
+  ExpressionPose,
+  FacePiece,
+  TickleClock,
+} from "./data/character-expression.ts";
+export {
   companionSetting,
   companionTopics,
   nearbyPlaces,

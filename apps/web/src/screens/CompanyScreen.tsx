@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Character } from "../components/art/Character.tsx";
+import { useTickle } from "../hooks/use-tickle.ts";
 import { QuestionFrame } from "../components/chrome/QuestionFrame.tsx";
 import { glassClass } from "../components/glass/glass-styles.ts";
 import { Icon } from "../components/ui/Icon.tsx";
@@ -12,6 +13,8 @@ import { useSession } from "../state/SessionContext.tsx";
 export function CompanyScreen() {
   const { draft, setCompanion } = useSession();
   const [companionId, setCompanionId] = useState(draft.companionId);
+  const [picked, setPicked] = useState(false);
+  const { tickling, tap, force } = useTickle();
   const guide = guideById(companionId);
 
   return (
@@ -27,6 +30,9 @@ export function CompanyScreen() {
       secondaryHref={paths.building}
       progress={{ ...onboardingProgress.company, total: ONBOARDING_DOT_COUNT }}
     >
+      <button type="button" className="visually-hidden" onClick={force}>
+        Tickle
+      </button>
       <div className="guide-grid">
         {guides.map((choice) => {
           const selected = choice.id === guide.id;
@@ -41,11 +47,20 @@ export function CompanyScreen() {
               )}
               aria-pressed={selected}
               onClick={() => {
+                setPicked(true);
                 setCompanionId(choice.id);
+                tap();
               }}
             >
               <span className="guide-mark">{selected ? <Icon name="check" /> : null}</span>
-              <Character variant={choice.variant} size="md" animate settle={selected} />
+              <Character
+                variant={choice.variant}
+                size="md"
+                animate
+                settle={selected}
+                expression={selected ? (picked ? "celebration" : "attention") : undefined}
+                tickled={tickling && selected}
+              />
               <span className="text-lg font-bold">{choice.name}</span>
             </button>
           );

@@ -4,6 +4,7 @@ import { ChairScreen } from "./ChairScreen.tsx";
 import { CompanionScreen } from "./CompanionScreen.tsx";
 import { CompanyScreen } from "./CompanyScreen.tsx";
 import { CompareScreen } from "./CompareScreen.tsx";
+import { DevExpressions } from "./DevExpressions.tsx";
 import { ItemDetailScreen } from "./ItemDetailScreen.tsx";
 import { KitScreen } from "./KitScreen.tsx";
 import { LoveScreen } from "./LoveScreen.tsx";
@@ -49,6 +50,8 @@ export function ScreenOutlet({ route }: { route: Route }) {
       return <SettingsScreen />;
     case "marks":
       return <MarksScreen />;
+    case "expressions":
+      return <DevExpressions />;
     case "unknown":
       return <UnknownScreen />;
   }
