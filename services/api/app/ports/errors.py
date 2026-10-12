@@ -29,3 +29,10 @@ class CacheMiss(PortError):
 
     def __init__(self, message: str) -> None:
         super().__init__("cache_miss", message)
+
+
+class EnrichmentTransportError(PortError):
+    """Secondary catalog transport/protocol failure, without private response details."""
+
+    def __init__(self) -> None:
+        super().__init__("enrichment_unavailable", "The enrichment source did not answer.")

@@ -1,5 +1,7 @@
 """HTTP bodies for the session kit. Camel case on the wire."""
 
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -136,6 +138,26 @@ class SessionKitOut(BaseModel):
     topics: list[TopicOut]
     places: list[PlaceOut]
     source: str
+
+
+class ToolTraceOut(BaseModel):
+    """Redacted tool execution. Times are milliseconds and counts are nonnegative."""
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    step: int = Field(ge=1)
+    tool: str
+    args_summary: str = Field(alias="argsSummary")
+    result_count: int = Field(alias="resultCount", ge=0)
+    latency_ms: float = Field(alias="latencyMs", ge=0)
+    status: Literal["ok", "error", "timeout"]
+
+
+class AgentKitOut(SessionKitOut):
+    """The agent endpoint retains all deterministic kit fields, including catalog source."""
+
+    trace: list[ToolTraceOut]
+    termination: Literal["completed", "step_limit", "time_limit", "provider_error", "no_key"]
 
 
 class TasteHitOut(BaseModel):

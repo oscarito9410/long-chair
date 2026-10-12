@@ -6,8 +6,11 @@ from pathlib import Path
 from app.adapters.enrichment import FakeEnrichment, HttpEnrichment
 from app.adapters.fake_qloo import FakeQlooAdapter
 from app.adapters.file_cache import FileCache
+from app.adapters.openai_llm import OPENAI_BASE_URL, OpenAiLlm
 from app.adapters.recording import RecordingQlooAdapter
+from app.application.agent.models import AgentLimits
 from app.ports.enrichment import EnrichmentPort
+from app.ports.llm import LlmPort
 from app.ports.qloo import QlooPort
 
 MODES = frozenset({"fake", "live", "replay"})
@@ -48,3 +51,30 @@ def build_qloo(mode: str) -> QlooPort:
     if mode == "live":
         return RecordingQlooAdapter(mode="live", cache=cache, api_key=key)
     return RecordingQlooAdapter(mode="replay", cache=cache, api_key=key or "replay")
+
+
+def build_llm() -> LlmPort | None:
+    """Missing credentials keep the deterministic builder; a key requires explicit model."""
+
+    key = os.environ.get("LLM_API_KEY", "").strip() or os.environ.get("OPENAI_API_KEY", "").strip()
+    if not key:
+        return None
+    return OpenAiLlm(
+        key,
+        os.environ.get("LLM_MODEL", ""),
+        base_url=os.environ.get("LLM_BASE_URL", OPENAI_BASE_URL),
+    )
+
+
+def build_agent_limits() -> AgentLimits:
+    """Budget settings are server-owned; invalid configuration fails before serving."""
+
+    defaults = AgentLimits()
+    return AgentLimits(
+        max_steps=int(os.environ.get("AGENT_MAX_STEPS", defaults.max_steps)),
+        max_turns=int(os.environ.get("AGENT_MAX_STEPS", defaults.max_turns)),
+        timeout_seconds=float(os.environ.get("AGENT_TIMEOUT_SECONDS", defaults.timeout_seconds)),
+        finalize_seconds=float(
+            os.environ.get("AGENT_FINALIZE_TIMEOUT_SECONDS", defaults.finalize_seconds)
+        ),
+    )
