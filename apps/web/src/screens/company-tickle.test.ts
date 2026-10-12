@@ -1,3 +1,4 @@
+/// <reference types="node" />
 /** @vitest-environment jsdom */
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
@@ -56,7 +57,7 @@ describe("Company tickle control", () => {
     expect(document.activeElement).toBe(button);
     expect(button.tabIndex).toBe(0);
     expect(button.classList.contains("visually-hidden")).toBe(false);
-    expect(getComputedStyle(button).clip).not.toContain("rect(");
+    expect(getComputedStyle(button).getPropertyValue("clip")).not.toContain("rect(");
     expect(getComputedStyle(button).width).not.toBe("1px");
     expect(getComputedStyle(button).height).not.toBe("1px");
     expect(button.classList.contains("min-h-[var(--lc-target)]")).toBe(true);
