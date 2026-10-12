@@ -36,13 +36,19 @@ export {
   TASTE_MIN,
   TASTE_SEARCH_DEBOUNCE_MS,
   canContinueTastes,
+  commitTypedTaste,
+  emptyPickCount,
   foldTasteText,
   quickStartTastes,
   searchTasteCatalog,
   tasteById,
   tasteCatalog,
+  tasteContinueLabel,
+  tasteDisplayName,
+  tasteIdForTyped,
   tasteKindIcons,
   tasteKinds,
+  tasteNeedMore,
   tastePickLabel,
   tasteSearchPlaceholder,
   toggleTaste,
@@ -50,14 +56,18 @@ export {
   welcomeTasteExamples,
 } from "./data/taste-catalog.ts";
 export type { TasteEntity, TasteIcon, TasteKind } from "./data/taste-catalog.ts";
+export { groupForTaste, groupMoreCount, groupTastes, previewGroupTastes, tasteGroups } from "./data/taste-groups.ts";
+export type { TasteGroup, TasteGroupIcon } from "./data/taste-groups.ts";
 export { kindLabels, placeLabels } from "./content/kind-labels.ts";
 export { ONBOARDING_DOT_COUNT, onboardingStepIndex } from "./content/onboarding-steps.ts";
 export {
   buildingReadyLabel,
   buildingSkipLabel,
   itemThemeCheck,
+  loveFooterMeta,
   loveLede,
   notMedicalAdvice,
+  sampleKitInstead,
   sampleShelfNote,
   themesLede,
   themesNote,

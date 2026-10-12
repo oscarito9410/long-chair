@@ -10,6 +10,7 @@ type SessionContextValue = {
   setDuration: (minutes: number) => void;
   setCompanion: (id: string) => void;
   beginOnboarding: () => void;
+  setSeeds: (ids: readonly string[]) => void;
   reset: () => void;
 };
 
@@ -35,6 +36,9 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       },
       beginOnboarding: () => {
         setDraft((current) => ({ ...current, seedIds: [] }));
+      },
+      setSeeds: (ids) => {
+        setDraft((current) => ({ ...current, seedIds: [...ids] }));
       },
       reset: () => {
         setDraft(demoDraft);

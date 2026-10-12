@@ -95,6 +95,14 @@ function OnboardingFrame() {
     setDirection(meta.step >= seen ? 1 : -1);
   }
 
+  if (meta.path === "/love") {
+    return (
+      <View style={[styles.screen, { paddingTop: insets.top }]}>
+        <Slot />
+      </View>
+    );
+  }
+
   const lede = "lede" in meta ? meta.lede : undefined;
   const note = "note" in meta ? meta.note : undefined;
   const mark = "mark" in meta ? meta.mark : undefined;

@@ -21,6 +21,16 @@ type AppShellProps = {
   showDots: boolean;
 };
 
+function pagePad(showTabs: boolean, name: Route["name"]): string {
+  if (showTabs) {
+    return "page-pad-tabs";
+  }
+  if (name === "love") {
+    return "page-pad-love";
+  }
+  return "page-pad";
+}
+
 export function AppShell({ children, route, showTabs, showDots }: AppShellProps) {
   const [windowEl, setWindowEl] = useState<HTMLDivElement | null>(null);
 
@@ -35,7 +45,7 @@ export function AppShell({ children, route, showTabs, showDots }: AppShellProps)
           {showDots ? <DotField mode="ambient" /> : null}
         </div>
         <div className="app-window" id="app-window" ref={setWindowEl}>
-          <div className={cn("layer-content page", showTabs ? "page-pad-tabs" : "page-pad")}>
+          <div className={cn("layer-content page", pagePad(showTabs, route.name))}>
             {showTabs ? (
               <a className="tab-gear glass-surface glass-thin glass-disc" href={paths.settings} aria-label="Settings">
                 <Icon name="gear" />

@@ -1,4 +1,8 @@
-export const loveLede = "Search or tap a few. Pick at least three.";
+export const loveLede = "Pick three or more, or search for anything.";
+
+export const loveFooterMeta = "Fictional sample \u00b7 Not medical advice";
+
+export const sampleKitInstead = "Use a sample kit instead";
 
 export const sampleShelfNote = "Fictional sample \u00b7 nothing is sent";
 

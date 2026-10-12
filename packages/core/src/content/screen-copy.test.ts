@@ -13,7 +13,7 @@ describe("screen copy", () => {
   it("uses the shorter themes line", () => {
     expect(themesLede).toBe("We left out three. Change any.");
     expect(themesNote).toBe("Only if it helps. You can change this anytime.");
-    expect(loveLede).toBe("Search or tap a few. Pick at least three.");
+    expect(loveLede).toBe("Pick three or more, or search for anything.");
   });
 
   it("states the themes a piece does not carry", () => {

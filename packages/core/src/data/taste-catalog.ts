@@ -204,6 +204,71 @@ export function canContinueTastes(count: number): boolean {
   return count >= TASTE_MIN && count <= TASTE_MAX;
 }
 
+export function tasteContinueLabel(count: number): string {
+  const remaining = TASTE_MIN - count;
+  if (remaining > 0) {
+    return `Pick ${remaining} more`;
+  }
+  return `Continue with ${count}`;
+}
+
+export function tasteNeedMore(count: number): string {
+  const remaining = Math.max(TASTE_MIN - count, 0);
+  if (remaining === 0) {
+    return tasteContinueLabel(count);
+  }
+  const noun = remaining === 1 ? "taste" : "tastes";
+  return `Pick ${remaining} more ${noun} to continue.`;
+}
+
+export function emptyPickCount(count: number): number {
+  return Math.max(0, TASTE_MIN - count);
+}
+
+const CUSTOM_MARK = "custom:";
+
+export function tasteDisplayName(id: string): string {
+  const known = tasteById(id);
+  if (known) {
+    return known.name;
+  }
+  if (id.startsWith(CUSTOM_MARK)) {
+    const raw = id.slice(CUSTOM_MARK.length);
+    try {
+      const name = decodeURIComponent(raw).trim();
+      if (name.length > 0) {
+        return name;
+      }
+    } catch {
+      return raw;
+    }
+  }
+  return id;
+}
+
+export function tasteIdForTyped(text: string): string | undefined {
+  const trimmed = text.trim();
+  if (foldTasteText(trimmed).length < 2) {
+    return undefined;
+  }
+  const needle = foldTasteText(trimmed);
+  const exact = tasteCatalog.find((taste) =>
+    [taste.name, ...taste.aliases].some((field) => foldTasteText(field) === needle),
+  );
+  if (exact) {
+    return exact.id;
+  }
+  return `${CUSTOM_MARK}${encodeURIComponent(trimmed)}`;
+}
+
+export function commitTypedTaste(ids: readonly string[], text: string): readonly string[] {
+  const id = tasteIdForTyped(text);
+  if (!id || ids.includes(id)) {
+    return ids;
+  }
+  return toggleTaste(ids, id);
+}
+
 export const welcomeTasteExamples = [
   "anime nights",
   "leg day",

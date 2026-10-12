@@ -1,4 +1,4 @@
-import { tasteById } from "./taste-catalog.ts";
+import { tasteDisplayName } from "./taste-catalog.ts";
 import type { CompanionTopic, NearbyPlace } from "./types.ts";
 
 export const companionSetting = {
@@ -61,8 +61,7 @@ export function topicsForSeeds(seedIds: readonly string[]): CompanionTopic[] {
     if (covered.has(id) || added.length >= 4) {
       continue;
     }
-    const taste = tasteById(id);
-    const name = taste?.name ?? id;
+    const name = tasteDisplayName(id);
     added.push({
       id: `taste-${id}`,
       seedId: id,

@@ -7,6 +7,8 @@ import {
   Clock,
   Coffee,
   Columns2,
+  CookingPot,
+  Volleyball,
   Croissant,
   Headphones,
   Layers,
@@ -44,6 +46,8 @@ const glyphs: Record<IconName, LucideIcon> = {
   pause: Pause,
   x: X,
   gear: Settings,
+  ball: Volleyball,
+  pan: CookingPot,
 };
 
 const strokeWidth = {

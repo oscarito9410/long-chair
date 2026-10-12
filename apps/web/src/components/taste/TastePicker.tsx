@@ -1,32 +1,141 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
+  commitTypedTaste,
   createFixtureTasteSearch,
+  emptyPickCount,
   foldTasteText,
-  quickStartTastes,
-  sampleShelfNote,
-  TASTE_MAX,
-  tasteById,
-  tastePickLabel,
+  groupForTaste,
+  groupMoreCount,
+  previewGroupTastes,
+  tasteDisplayName,
+  tasteGroups,
   tasteSearchPlaceholder,
+  TASTE_MAX,
+  toggleTaste,
 } from "@long-chair/core";
-import type { Hue, TasteEntity } from "@long-chair/core";
+import type { Hue, TasteEntity, TasteGroup } from "@long-chair/core";
 import { Icon } from "../ui/Icon.tsx";
+import type { IconName } from "../ui/icon-names.ts";
 import { cn } from "../../lib/cn.ts";
 import { useTasteQuery } from "./use-taste-query.ts";
 
-const CHIP_HUES = ["honey", "apricot", "seaglass", "wisteria"] as const;
+type Apply = (ids: readonly string[]) => void;
 
-type Toggle = (id: string) => void;
-
-function hueAt(index: number): Hue {
-  return CHIP_HUES[index % CHIP_HUES.length] ?? "honey";
+function chipIcon(taste: TasteEntity): IconName {
+  return groupForTaste(taste.id)?.icon ?? taste.icon;
 }
 
-function tasteName(id: string): string {
-  return tasteById(id)?.name ?? id;
+function TasteChip({
+  label,
+  icon,
+  hue,
+  selected,
+  disabled,
+  onPress,
+}: {
+  label: string;
+  icon: IconName | null;
+  hue: Hue;
+  selected: boolean;
+  disabled: boolean;
+  onPress: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      className={cn("taste-chip", `taste-${hue}`, selected && "is-selected")}
+      aria-selected={selected}
+      disabled={disabled}
+      onClick={onPress}
+    >
+      {selected ? <Icon name="check" /> : icon ? <Icon name={icon} /> : null}
+      {label}
+    </button>
+  );
 }
 
-function TasteResults({
+function PickNotes({ ids, onRemove }: { ids: readonly string[]; onRemove: (id: string) => void }) {
+  const blanks = emptyPickCount(ids.length);
+  return (
+    <ul className="taste-picks" aria-label="Your picks">
+      {ids.map((id) => {
+        const name = tasteDisplayName(id);
+        return (
+          <li key={id} className="taste-note">
+            <span>{name}</span>
+            <button
+              type="button"
+              className="taste-remove"
+              aria-label={`Remove ${name}`}
+              onClick={() => {
+                onRemove(id);
+              }}
+            >
+              <Icon name="x" />
+            </button>
+          </li>
+        );
+      })}
+      {Array.from({ length: blanks }, (_, index) => (
+        <li key={`slot-${index}`} className="taste-slot" aria-hidden="true" />
+      ))}
+    </ul>
+  );
+}
+
+function GroupBlock({
+  group,
+  expanded,
+  selectedIds,
+  full,
+  onToggle,
+  onExpand,
+}: {
+  group: TasteGroup;
+  expanded: boolean;
+  selectedIds: readonly string[];
+  full: boolean;
+  onToggle: (id: string) => void;
+  onExpand: () => void;
+}) {
+  const tastes = previewGroupTastes(group, expanded);
+  const more = expanded ? 0 : groupMoreCount(group);
+  return (
+    <section className="taste-group">
+      <p className={cn("taste-group-note", `taste-${group.hue}`)}>{group.label}</p>
+      <div className="taste-wrap">
+        {tastes.map((taste) => {
+          const selected = selectedIds.includes(taste.id);
+          return (
+            <TasteChip
+              key={taste.id}
+              label={taste.name}
+              icon={group.icon}
+              hue={group.hue}
+              selected={selected}
+              disabled={!selected && full}
+              onPress={() => {
+                onToggle(taste.id);
+              }}
+            />
+          );
+        })}
+        {more > 0 ? (
+          <TasteChip
+            label={`+${more} more`}
+            icon={null}
+            hue={group.hue}
+            selected={false}
+            disabled={false}
+            onPress={onExpand}
+          />
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
+function Suggestions({
   results,
   selectedIds,
   full,
@@ -35,144 +144,137 @@ function TasteResults({
   results: readonly TasteEntity[];
   selectedIds: readonly string[];
   full: boolean;
-  onToggle: Toggle;
+  onToggle: (id: string) => void;
 }) {
   if (results.length === 0) {
-    return <p className="text-base">Nothing matches that yet.</p>;
+    return <p className="taste-empty">Nothing matches that yet.</p>;
   }
   return (
-    <ul className="taste-results">
+    <div className="taste-wrap">
       {results.map((taste) => {
         const selected = selectedIds.includes(taste.id);
+        const group = groupForTaste(taste.id);
+        const hue: Hue = group?.hue ?? "seaglass";
         return (
-          <li key={taste.id}>
-            <button
-              type="button"
-              className="taste-result"
-              aria-pressed={selected}
-              disabled={!selected && full}
-              onClick={() => {
-                onToggle(taste.id);
-              }}
-            >
-              <Icon name={taste.icon} />
-              <span className="min-w-0">
-                <span className="block text-lg font-bold">{taste.name}</span>
-                <span className="block text-base text-ink-soft">{taste.detail}</span>
-              </span>
-            </button>
-          </li>
-        );
-      })}
-    </ul>
-  );
-}
-
-function QuickStarts({
-  selectedIds,
-  full,
-  onToggle,
-}: {
-  selectedIds: readonly string[];
-  full: boolean;
-  onToggle: Toggle;
-}) {
-  return (
-    <div className="taste-wrap" role="group" aria-label="Quick starts">
-      {quickStartTastes.map((taste, index) => {
-        const selected = selectedIds.includes(taste.id);
-        return (
-          <button
+          <TasteChip
             key={taste.id}
-            type="button"
-            className={cn("taste-chip", `taste-${hueAt(index)}`, selected && "is-selected")}
-            aria-pressed={selected}
+            label={taste.name}
+            icon={chipIcon(taste)}
+            hue={hue}
+            selected={selected}
             disabled={!selected && full}
-            onClick={() => {
+            onPress={() => {
               onToggle(taste.id);
             }}
-          >
-            <Icon name={taste.icon} />
-            {taste.name}
-            {selected ? (
-              <span className="taste-check">
-                <Icon name="check" />
-              </span>
-            ) : null}
-          </button>
+          />
         );
       })}
     </div>
   );
 }
 
-function SelectedPills({ selectedIds, onToggle }: { selectedIds: readonly string[]; onToggle: Toggle }) {
-  if (selectedIds.length === 0) {
-    return null;
-  }
-  return (
-    <ul className="taste-wrap" aria-label="Selected tastes">
-      {selectedIds.map((id) => (
-        <li key={id}>
-          <button
-            type="button"
-            className="taste-pill"
-            aria-label={`Remove ${tasteName(id)}`}
-            onClick={() => {
-              onToggle(id);
-            }}
-          >
-            {tasteName(id)}
-            <Icon name="x" />
-          </button>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-export function TastePicker({
-  selectedIds,
-  onToggle,
+function SearchField({
+  query,
+  onQuery,
+  onSubmit,
 }: {
-  selectedIds: readonly string[];
-  onToggle: Toggle;
+  query: string;
+  onQuery: (value: string) => void;
+  onSubmit: () => void;
 }) {
-  const port = useMemo(() => createFixtureTasteSearch(), []);
-  const { query, setQuery, results, source, error } = useTasteQuery(port);
-  const full = selectedIds.length >= TASTE_MAX;
-  const searching = foldTasteText(query).length >= 2;
-
   return (
-    <div className="taste-picker">
-      {source === "live" ? null : <p className="sample-tag text-base font-bold">{sampleShelfNote}</p>}
-      <label className="taste-search">
+    <form
+      onSubmit={(event) => {
+        event.preventDefault();
+        onSubmit();
+      }}
+    >
+      <label>
         <span className="visually-hidden">Search tastes</span>
         <input
           className="taste-field"
           value={query}
           placeholder={tasteSearchPlaceholder}
           spellCheck={false}
-          enterKeyHint="search"
+          enterKeyHint="done"
           onChange={(event) => {
-            setQuery(event.target.value);
+            onQuery(event.target.value);
           }}
         />
       </label>
-      {error ? (
-        <p className="text-base" role="alert">
-          {error}
-        </p>
-      ) : null}
-      {searching && !error ? (
-        <TasteResults results={results} selectedIds={selectedIds} full={full} onToggle={onToggle} />
-      ) : null}
-      <p className="text-base font-bold">Or start here</p>
-      <QuickStarts selectedIds={selectedIds} full={full} onToggle={onToggle} />
-      <SelectedPills selectedIds={selectedIds} onToggle={onToggle} />
-      <p className="text-base font-bold" role="status">
-        {tastePickLabel(selectedIds.length)}
-      </p>
+    </form>
+  );
+}
+
+export function TastePicker({
+  selectedIds,
+  footerClearance,
+  onApply,
+}: {
+  selectedIds: readonly string[];
+  footerClearance: number;
+  onApply: Apply;
+}) {
+  const port = useMemo(() => createFixtureTasteSearch(), []);
+  const { query, setQuery, results, error } = useTasteQuery(port);
+  const [open, setOpen] = useState<readonly string[]>([]);
+  const full = selectedIds.length >= TASTE_MAX;
+  const searching = foldTasteText(query).length >= 2;
+
+  function apply(next: readonly string[]) {
+    onApply(next);
+  }
+
+  function submit() {
+    apply(commitTypedTaste(selectedIds, query));
+    setQuery("");
+  }
+
+  return (
+    <div className="taste-picker">
+      <SearchField query={query} onQuery={setQuery} onSubmit={submit} />
+      <PickNotes
+        ids={selectedIds}
+        onRemove={(id) => {
+          apply(toggleTaste(selectedIds, id));
+        }}
+      />
+      <div className="love-groups" style={{ paddingBottom: footerClearance }}>
+        {error ? (
+          <p className="taste-empty" role="alert">
+            {error}
+          </p>
+        ) : null}
+        {searching && !error ? (
+          <Suggestions
+            results={results}
+            selectedIds={selectedIds}
+            full={full}
+            onToggle={(id) => {
+              apply(toggleTaste(selectedIds, id));
+            }}
+          />
+        ) : null}
+        {searching ? null : (
+          <div>
+            {tasteGroups.map((group) => (
+              <GroupBlock
+                key={group.id}
+                group={group}
+                expanded={open.includes(group.id)}
+                selectedIds={selectedIds}
+                full={full}
+                onToggle={(id) => {
+                  apply(toggleTaste(selectedIds, id));
+                }}
+                onExpand={() => {
+                  setOpen((current) => (current.includes(group.id) ? current : [...current, group.id]));
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -10,10 +10,16 @@ import {
   tasteKinds,
   tastePickLabel,
   tasteSearchPlaceholder,
+  commitTypedTaste,
+  emptyPickCount,
+  tasteContinueLabel,
+  tasteDisplayName,
+  tasteNeedMore,
   toggleTaste,
   welcomeNotesAt,
   welcomeTasteExamples,
 } from "./taste-catalog.ts";
+import { groupMoreCount, groupTastes, tasteGroups } from "./taste-groups.ts";
 
 const DOMAIN_IDS = [
   "anime",
@@ -77,6 +83,46 @@ describe("taste catalog", () => {
     expect(toggleTaste(full, "i")).toEqual(full);
     expect(toggleTaste(["anime"], "fitness")).toEqual(["anime", "fitness"]);
     expect(quickStartTastes.map((taste) => taste.id)).toContain("bad-bunny");
+  });
+
+  it("names the continue button from how many are still needed", () => {
+    expect(tasteContinueLabel(0)).toBe("Pick 3 more");
+    expect(tasteContinueLabel(1)).toBe("Pick 2 more");
+    expect(tasteContinueLabel(2)).toBe("Pick 1 more");
+    expect(tasteContinueLabel(4)).toBe("Continue with 4");
+    expect(tasteNeedMore(2)).toBe("Pick 1 more taste to continue.");
+    expect(tasteNeedMore(0)).toBe("Pick 3 more tastes to continue.");
+    expect(emptyPickCount(1)).toBe(2);
+    expect(emptyPickCount(3)).toBe(0);
+  });
+
+  it("keeps a typed title and still recognizes Soccer", () => {
+    const custom = commitTypedTaste([], "Neighborhood choir");
+    expect(custom).toHaveLength(1);
+    expect(tasteDisplayName(custom[0] ?? "")).toBe("Neighborhood choir");
+    expect(commitTypedTaste([], "futbol")).toEqual(["soccer"]);
+    expect(commitTypedTaste(["soccer"], "fútbol")).toEqual(["soccer"]);
+  });
+
+  it("groups the quick starts and hides the rest of Watch", () => {
+    expect(tasteGroups.map((group) => group.label)).toEqual([
+      "Watch",
+      "Listen",
+      "Follow and play",
+      "Make and learn",
+    ]);
+    const watch = tasteGroups[0];
+    expect(watch).toBeDefined();
+    if (!watch) {
+      return;
+    }
+    expect(groupTastes(watch)).toHaveLength(8);
+    expect(groupMoreCount(watch)).toBe(2);
+    const listen = tasteGroups[1];
+    expect(listen ? groupMoreCount(listen) : -1).toBe(0);
+    for (const group of tasteGroups) {
+      expect(groupTastes(group)).toHaveLength(group.tasteIds.length);
+    }
   });
 
   it("rotates welcome notes across personas", () => {
