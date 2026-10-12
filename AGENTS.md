@@ -12,7 +12,7 @@ The session API lives in `services/api`. It is hexagonal: domain, application, p
 
 The mobile app talks to that API only through `KitService` when `EXPO_PUBLIC_API_URL` is set. The Qloo key never goes in the app. The review build leaves the variable unset and packs fixtures on the device. Store categories are Entertainment and Lifestyle. Copy must not claim treatment or a health outcome. "Not medical advice" stays on onboarding and in Settings. A test in `apps/mobile/src/medical-claims.test.ts` fails if the banned phrases appear.
 
-`check-dep` returned caution for `expo@57.0.27` and `react-native-reanimated@4.5.1` because other versions have advisories. These pins do not. They are the Expo SDK 57 set.
+`check-dep` returned caution for `expo@57.0.28` and `react-native-reanimated@4.5.1` because other versions have advisories. These pins do not. They are the Expo SDK 57 set.
 
 Read `docs/architecture/ARCHITECTURE.md`, `docs/architecture/qloo-port.md`, `docs/adr/`, and `docs/plan/ROADMAP.md` before changing the pipeline or the hosting plan.
 
