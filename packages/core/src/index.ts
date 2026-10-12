@@ -123,8 +123,14 @@ export {
   tmdbCredit,
   sampleKitInstead,
   sampleShelfNote,
+  allowedState,
+  keptOutState,
+  keptOutSummary,
+  somethingElseLabel,
+  themesContinue,
   themesLede,
   themesNote,
+  themeSwitchLabel,
   whyItPassed,
 } from "./content/screen-copy.ts";
 export { buildAgentSteps } from "./lib/build-agent-steps.ts";

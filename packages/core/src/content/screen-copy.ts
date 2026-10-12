@@ -8,7 +8,7 @@ export const sampleShelfNote = "Fictional sample \u00b7 nothing is sent";
 
 export const notMedicalAdvice = "Not medical advice";
 
-export const themesLede = "All five start on. Turn any off, or add your own.";
+export const themesLede = "We'll keep these out of your kit. Switch off any you're okay with.";
 
 export const addThemeLabel = "Add a theme";
 
@@ -27,7 +27,23 @@ export const justWatchCredit = "Watch provider data is credited to JustWatch.";
 
 export const sampleWatchNote = "Sample watch note. Not a live listing.";
 
-export const themesNote = "Only if it helps. You can change this anytime.";
+export const themesNote = "You can change this anytime.";
+
+export const themesContinue = "Keep these and continue";
+
+export const keptOutState = "Kept out";
+
+export const allowedState = "Allowed";
+
+export const somethingElseLabel = "+ Something else";
+
+export function keptOutSummary(kept: number, total: number): string {
+  return `${kept} of ${total} kept out`;
+}
+
+export function themeSwitchLabel(name: string, kept: boolean): string {
+  return `${name}, ${kept ? "kept out" : "allowed"}`;
+}
 
 export const itemThemeCheck = "No illness, hospital, or cancer themes.";
 
