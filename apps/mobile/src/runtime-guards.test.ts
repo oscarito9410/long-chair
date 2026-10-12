@@ -47,6 +47,8 @@ describe("avoid themes screen", () => {
     expect(screen).toContain("themeSwitchLabel");
     expect(screen).toContain("somethingElseLabel");
     expect(screen).toContain("keptOutSummary");
+    expect(screen).toContain("numberOfLines={2}");
+    expect(screen).toContain("hueFill");
     expect(screen).not.toContain("themeCharacter");
     expect(screen).not.toContain("CharacterMark");
   });

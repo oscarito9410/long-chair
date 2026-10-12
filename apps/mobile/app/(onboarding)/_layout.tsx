@@ -123,9 +123,7 @@ function OnboardingFrame() {
           {hideTitle ? null : meta.path === "/themes" ? (
             <View style={styles.themeHead}>
               <RoomGuardian />
-              <View style={styles.themeCopy}>
-                <StepTitle title={meta.title} lede={lede} mark={mark} />
-              </View>
+              <StepTitle title={meta.title} lede={lede} mark={mark} />
             </View>
           ) : (
             <StepTitle title={meta.title} lede={lede} note={note} mark={mark} />
@@ -232,8 +230,7 @@ const styles = StyleSheet.create({
   body: { flex: 1 },
   scroll: { paddingHorizontal: SPACE_24, gap: SPACE_16, paddingBottom: SPACE_24 },
   themeScroll: { gap: SPACE_8, paddingBottom: THEME_FADE },
-  themeHead: { flexDirection: "row", alignItems: "center", gap: SPACE_8 },
-  themeCopy: { flex: 1 },
+  themeHead: { alignItems: "flex-start", gap: SPACE_16 },
   progress: {
     flexDirection: "row",
     alignItems: "center",

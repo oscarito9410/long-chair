@@ -10,6 +10,7 @@ import {
   themesContinue,
   themesNote,
   themeSwitchLabel,
+  type Hue,
 } from "@long-chair/core";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
@@ -24,16 +25,23 @@ import {
   BLUR_REGULAR,
   FONT_BODY,
   FONT_SECONDARY,
+  hueFill,
   palette,
   RADIUS_CARD,
+  SPACE_4,
   SPACE_8,
   SPACE_16,
 } from "../../src/theme/palette";
 
-const ROW_HEIGHT = 76;
+const ROW_MIN = 88;
+const ADD_HEIGHT = 56;
 const ICON_WELL = 40;
 const DOOR_GLYPH = 18;
+const SWITCH_W = 51;
+const SWITCH_H = 31;
 const MIN_THEME = 2;
+const DETAIL_LINE = 22;
+const ROW_PAD = 12;
 
 const glyphs: Record<string, ThemeGlyphName> = {
   illness: "thermometer",
@@ -41,6 +49,14 @@ const glyphs: Record<string, ThemeGlyphName> = {
   cancer: "ribbon",
   "parent-death": "flower",
   grief: "wreath",
+};
+
+const hues: Record<string, Hue> = {
+  illness: "apricot",
+  hospitals: "seaglass",
+  cancer: "wisteria",
+  "parent-death": "honey",
+  grief: "wisteria",
 };
 
 export default function ThemesScreen() {
@@ -67,6 +83,7 @@ export default function ThemesScreen() {
           title={theme.label}
           detail={theme.detail}
           glyph={glyphs[theme.id] ?? "slip"}
+          hue={hues[theme.id] ?? "seaglass"}
           kept={draft.avoidIds.includes(theme.id)}
           onToggle={() => {
             toggleAvoid(theme.id);
@@ -79,6 +96,7 @@ export default function ThemesScreen() {
           title={theme.label}
           detail="Keyword only, lower confidence"
           glyph="slip"
+          hue="seaglass"
           kept
           onToggle={() => {
             removeTheme(theme.id);
@@ -146,60 +164,77 @@ function AvoidRow({
   title,
   detail,
   glyph,
+  hue,
   kept,
   onToggle,
 }: {
   title: string;
   detail: string;
   glyph: ThemeGlyphName;
+  hue: Hue;
   kept: boolean;
   onToggle: () => void;
 }) {
   return (
-    <GlassSurface
-      tint={kept ? palette.honey : palette.page}
-      selected={kept}
-      style={[styles.row, kept ? styles.rowOn : styles.rowOff]}
-    >
+    <View style={styles.card}>
+      <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+        <GlassSurface
+          tint={kept ? hueFill[hue] : palette.card}
+          selected={kept}
+          style={[StyleSheet.absoluteFill, kept ? styles.rowOn : styles.rowOff]}
+        />
+      </View>
       <View style={styles.inner}>
-        <View style={styles.well}>
-          <ThemeGlyph name={glyph} />
-        </View>
         <View style={styles.copy}>
-          <Text numberOfLines={1} style={styles.title}>
-            {title}
-          </Text>
-          <Text numberOfLines={1} style={styles.detail}>
+          <View style={styles.heading}>
+            <View style={styles.well}>
+              <ThemeGlyph name={glyph} />
+            </View>
+            <View style={styles.titles}>
+              <Text style={styles.title}>{title}</Text>
+              <View style={styles.status}>
+                {kept ? <ThemeGlyph name="door" size={DOOR_GLYPH} /> : null}
+                <Text style={styles.state}>{kept ? keptOutState : allowedState}</Text>
+              </View>
+            </View>
+          </View>
+          <Text numberOfLines={2} style={styles.detail}>
             {detail}
           </Text>
         </View>
-        {kept ? <ThemeGlyph name="door" size={DOOR_GLYPH} /> : <View style={styles.doorGap} />}
-        <Text style={styles.state}>{kept ? keptOutState : allowedState}</Text>
-        <Switch
-          accessibilityRole="switch"
-          accessibilityLabel={themeSwitchLabel(title, kept)}
-          value={kept}
-          onValueChange={onToggle}
-          trackColor={{ false: palette.line, true: palette.ink }}
-          thumbColor={palette.white}
-          ios_backgroundColor={palette.line}
-        />
+        <View style={styles.switchHold}>
+          <Switch
+            accessibilityRole="switch"
+            accessibilityLabel={themeSwitchLabel(title, kept)}
+            value={kept}
+            onValueChange={onToggle}
+            trackColor={{ false: palette.line, true: palette.ink }}
+            thumbColor={palette.white}
+            ios_backgroundColor={palette.line}
+            style={styles.switch}
+          />
+        </View>
       </View>
-    </GlassSurface>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  row: { height: ROW_HEIGHT, justifyContent: "center" },
+  card: { minHeight: ROW_MIN, borderRadius: RADIUS_CARD },
   rowOn: { borderWidth: 2, borderColor: palette.ink },
   rowOff: { borderWidth: 1, borderColor: palette.glassEdge },
   inner: {
-    height: ROW_HEIGHT,
+    minHeight: ROW_MIN,
     flexDirection: "row",
     alignItems: "center",
     gap: SPACE_8,
-    paddingHorizontal: SPACE_8,
+    paddingLeft: SPACE_16,
+    paddingRight: SPACE_16,
+    paddingVertical: ROW_PAD,
   },
+  copy: { flex: 1, gap: SPACE_4 },
+  heading: { flexDirection: "row", alignItems: "center", gap: SPACE_8 },
+  titles: { flex: 1, gap: 2 },
   well: {
     width: ICON_WELL,
     height: ICON_WELL,
@@ -208,30 +243,42 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: palette.card,
   },
-  copy: { flex: 1, gap: 2 },
   title: { fontFamily: "Nunito_800ExtraBold", fontSize: FONT_BODY, color: palette.ink },
-  detail: { fontFamily: "Nunito_600SemiBold", fontSize: FONT_SECONDARY, color: palette.inkSoft },
+  status: { flexDirection: "row", alignItems: "center", gap: SPACE_4 },
   state: { fontFamily: "Nunito_700Bold", fontSize: FONT_SECONDARY, color: palette.ink },
-  doorGap: { width: DOOR_GLYPH },
-  dashed: {
-    height: ROW_HEIGHT,
-    borderRadius: RADIUS_CARD,
-    borderWidth: 1.5,
-    borderStyle: "dashed",
-    borderColor: palette.ink,
-    overflow: "hidden",
+  detail: {
+    marginLeft: ICON_WELL + SPACE_8,
+    fontFamily: "Nunito_600SemiBold",
+    fontSize: FONT_SECONDARY,
+    lineHeight: DETAIL_LINE,
+    color: palette.inkSoft,
+  },
+  switchHold: {
+    width: SWITCH_W,
+    height: SWITCH_H,
+    flexShrink: 0,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: palette.card,
   },
-  dashedLabel: { fontFamily: "Nunito_800ExtraBold", fontSize: FONT_BODY, color: palette.ink },
-  field: {
-    height: ROW_HEIGHT,
+  switch: { width: SWITCH_W, height: SWITCH_H },
+  dashed: {
+    height: ADD_HEIGHT,
     borderRadius: RADIUS_CARD,
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderStyle: "dashed",
-    borderColor: palette.ink,
-    backgroundColor: palette.card,
+    borderColor: palette.line,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: palette.page,
+  },
+  dashedLabel: { fontFamily: "Nunito_700Bold", fontSize: FONT_BODY, color: palette.inkSoft },
+  field: {
+    height: ADD_HEIGHT,
+    borderRadius: RADIUS_CARD,
+    borderWidth: 1,
+    borderStyle: "dashed",
+    borderColor: palette.line,
+    backgroundColor: palette.page,
     paddingHorizontal: SPACE_16,
     fontFamily: "Nunito_700Bold",
     fontSize: FONT_BODY,

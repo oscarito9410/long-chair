@@ -2,10 +2,10 @@ import { StyleSheet, View } from "react-native";
 import Svg, { G, Rect } from "react-native-svg";
 
 import { CharacterMark } from "../art/CharacterMark";
-import { palette } from "../../theme/palette";
+import { palette, SPACE_8 } from "../../theme/palette";
 
-const MARK = 56;
-const DOOR = 28;
+const MARK = 72;
+const DOOR = 36;
 
 export function RoomGuardian() {
   return (
@@ -39,5 +39,5 @@ function ClosingDoor() {
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: "row", alignItems: "flex-end", width: 84 },
+  row: { flexDirection: "row", alignItems: "flex-end", gap: SPACE_8 },
 });
