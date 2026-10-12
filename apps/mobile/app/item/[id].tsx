@@ -13,7 +13,16 @@ import {
 } from "@long-chair/core";
 import type { CatalogItem, CustomTheme, SessionDraft, ThemeVerdict } from "@long-chair/core";
 import { useLocalSearchParams } from "expo-router";
-import { Linking, Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  Linking,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CoverArt } from "../../src/components/art/CoverArt";
@@ -29,15 +38,20 @@ import {
   FONT_BODY,
   FONT_SECONDARY,
   FONT_TITLE,
+  hueFill,
   palette,
+  RADIUS_CARD,
   RADIUS_PANEL,
+  RADIUS_PILL,
   SPACE_16,
   SPACE_24,
   SPACE_8,
   TARGET,
 } from "../../src/theme/palette";
 
-const POSTER = 180;
+const POSTER_W = 220;
+const POSTER_H = 280;
+const SHEET_LIMIT = 0.82;
 
 export default function ItemRoute() {
   const params = useLocalSearchParams<{ id?: string | string[] }>();
@@ -79,14 +93,15 @@ function evidenceCopy(item: CatalogItem, draft: SessionDraft): string[] {
 
 function ItemBody({ itemId }: { itemId: string }) {
   const insets = useSafeAreaInsets();
+  const { height } = useWindowDimensions();
   const { draft } = useSession();
   const item = itemById(itemId);
-  const because = item ? matchingSeedNames(item, draft)[0] : undefined;
-  const [open, setOpen] = useState(false);
+  const pad = { paddingBottom: insets.bottom + SPACE_24 };
+  const scrollLimit = Platform.OS === "ios" ? undefined : height * SHEET_LIMIT;
 
   if (!item) {
     return (
-      <View style={[styles.body, { paddingBottom: insets.bottom + SPACE_16 }]}>
+      <View style={[styles.body, pad]}>
         <Text accessibilityRole="header" style={styles.title}>
           {missingPiece}
         </Text>
@@ -101,83 +116,111 @@ function ItemBody({ itemId }: { itemId: string }) {
   }
 
   return (
-    <View style={[styles.body, { paddingBottom: insets.bottom + SPACE_16 }]}>
-      <PillButton
-        label={closeLabel}
-        quiet
-        tint={palette.apricot}
-        icon="x"
-        onPress={() => {
-          closeSheet();
-        }}
-      />
-      <CoverArt
-        seed={item.id}
-        hue={kindHue[item.kind]}
-        kind={item.kind}
-        width={POSTER}
-        height={POSTER}
-      />
-      <View style={styles.meta}>
-        <IconWell hue={kindHue[item.kind]} name={kindIcon[item.kind]} size={TARGET} />
-        <Text style={styles.kind}>{kindLabel[item.kind]}</Text>
+    <ScrollView
+      style={[styles.scroll, scrollLimit ? { maxHeight: scrollLimit } : null]}
+      contentContainerStyle={[styles.body, pad]}
+    >
+      <ItemSheet item={item} draft={draft} />
+    </ScrollView>
+  );
+}
+
+function ItemSheet({ item, draft }: { item: CatalogItem; draft: SessionDraft }) {
+  const because = matchingSeedNames(item, draft)[0];
+  const [open, setOpen] = useState(false);
+  const hue = hueFill[kindHue[item.kind]];
+  const links = item.links ?? [];
+  const primary = links[0];
+  const more = links.slice(1);
+
+  return (
+    <>
+      <View style={styles.hero}>
+        <CoverArt
+          seed={item.id}
+          hue={kindHue[item.kind]}
+          kind={item.kind}
+          width={POSTER_W}
+          height={POSTER_H}
+        />
       </View>
+      <TypeChip item={item} />
       <Text accessibilityRole="header" style={styles.title}>
         {item.title}
       </Text>
       <Text style={styles.copy}>{item.maker}</Text>
       <Text style={styles.copy}>{formatHoursMinutes(item.minutes)}</Text>
-      {item.durationNote ? <Text style={styles.copy}>{item.durationNote}</Text> : null}
+      {item.durationNote ? <Text style={styles.note}>{item.durationNote}</Text> : null}
       {because ? <Text style={styles.copy}>{`Because you love ${because}.`}</Text> : null}
-      {item.links?.map((link) => (
-        <Pressable
-          key={link.href}
-          accessibilityRole="button"
-          onPress={() => {
-            void Linking.openURL(link.href);
-          }}
-        >
-          <Text style={styles.copy}>{link.label}</Text>
-        </Pressable>
+      {primary ? <OpenLink label={primary.label} href={primary.href} tint={hue} /> : null}
+      {more.map((link) => (
+        <OpenLink key={link.href} label={link.label} href={link.href} tint={palette.card} />
       ))}
-      {item.watchProviders && item.watchProviders.length > 0 ? (
-        <View>
-          <Text style={styles.copy}>{sampleWatchNote}</Text>
-          {item.watchProviders.map((name) => (
-            <Text key={name} style={styles.copy}>
-              {name}
-            </Text>
-          ))}
-          <Text style={styles.copy}>{justWatchCredit}</Text>
-        </View>
-      ) : null}
-      <Pressable
-        accessibilityRole="button"
+      <WatchNote item={item} />
+      <PillButton
+        label={whyItPassed}
+        quiet
+        tint={palette.card}
         onPress={() => {
-          setOpen(true);
+          setOpen((current) => !current);
         }}
-      >
-        <Text style={styles.copy}>{whyItPassed}</Text>
-      </Pressable>
-      {open ? (
-        <View>
-          <Text style={styles.copy}>{evidenceSampleNote}</Text>
-          {evidenceCopy(item, draft).map((line) => (
-            <Text key={line} style={styles.copy}>
-              {line}
-            </Text>
-          ))}
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => {
-              setOpen(false);
-            }}
-          >
-            <Text style={styles.copy}>Close</Text>
-          </Pressable>
-        </View>
-      ) : null}
+      />
+      {open ? <EvidencePanel lines={evidenceCopy(item, draft)} /> : null}
+    </>
+  );
+}
+
+function TypeChip({ item }: { item: CatalogItem }) {
+  return (
+    <GlassSurface tint={hueFill[kindHue[item.kind]]} style={styles.chip}>
+      <View style={styles.chipRow}>
+        <IconWell hue={kindHue[item.kind]} name={kindIcon[item.kind]} size={TARGET} />
+        <Text style={styles.kind}>{kindLabel[item.kind]}</Text>
+      </View>
+    </GlassSurface>
+  );
+}
+
+function OpenLink({ label, href, tint }: { label: string; href: string; tint: string }) {
+  return (
+    <PillButton
+      label={label}
+      quiet
+      tint={tint}
+      onPress={() => {
+        void Linking.openURL(href);
+      }}
+    />
+  );
+}
+
+function WatchNote({ item }: { item: CatalogItem }) {
+  if (!item.watchProviders || item.watchProviders.length === 0) {
+    return null;
+  }
+  return (
+    <View style={styles.noteBlock}>
+      <Text style={styles.note}>{sampleWatchNote}</Text>
+      {item.watchProviders.map((name) => (
+        <Text key={name} style={styles.note}>
+          {name}
+        </Text>
+      ))}
+      <Text style={styles.note}>{justWatchCredit}</Text>
     </View>
+  );
+}
+
+function EvidencePanel({ lines }: { lines: readonly string[] }) {
+  return (
+    <GlassSurface tint={palette.card} style={styles.evidence}>
+      <Text style={styles.note}>{evidenceSampleNote}</Text>
+      {lines.map((line) => (
+        <Text key={line} style={styles.evidenceLine}>
+          {line}
+        </Text>
+      ))}
+    </GlassSurface>
   );
 }
 
@@ -188,6 +231,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: RADIUS_PANEL,
     borderTopRightRadius: RADIUS_PANEL,
     maxHeight: "88%",
+    backgroundColor: palette.page,
   },
   handle: {
     alignSelf: "center",
@@ -197,9 +241,52 @@ const styles = StyleSheet.create({
     backgroundColor: palette.line,
     marginTop: SPACE_8,
   },
-  body: { padding: SPACE_24, gap: SPACE_8 },
-  meta: { flexDirection: "row", alignItems: "center", gap: SPACE_8 },
-  kind: { fontFamily: "Nunito_700Bold", fontSize: FONT_SECONDARY, color: palette.inkSoft },
-  title: { fontFamily: "Nunito_800ExtraBold", fontSize: FONT_TITLE, color: palette.ink },
-  copy: { fontFamily: "Nunito_600SemiBold", fontSize: FONT_BODY, color: palette.ink },
+  scroll: { flex: 1, backgroundColor: palette.page },
+  body: {
+    flexGrow: 1,
+    backgroundColor: palette.page,
+    paddingHorizontal: SPACE_24,
+    paddingTop: SPACE_16,
+    gap: SPACE_16,
+  },
+  hero: {
+    alignSelf: "center",
+    borderRadius: RADIUS_CARD,
+    overflow: "hidden",
+  },
+  chip: { alignSelf: "center", borderRadius: RADIUS_PILL },
+  chipRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: SPACE_8,
+    paddingLeft: SPACE_8,
+    paddingRight: SPACE_16,
+    paddingVertical: SPACE_8,
+  },
+  kind: { fontFamily: "Nunito_700Bold", fontSize: FONT_SECONDARY, color: palette.ink },
+  title: {
+    fontFamily: "Nunito_800ExtraBold",
+    fontSize: FONT_TITLE,
+    color: palette.ink,
+    textAlign: "center",
+  },
+  copy: {
+    fontFamily: "Nunito_600SemiBold",
+    fontSize: FONT_BODY,
+    color: palette.ink,
+    textAlign: "center",
+  },
+  note: {
+    fontFamily: "Nunito_600SemiBold",
+    fontSize: FONT_SECONDARY,
+    color: palette.inkSoft,
+    textAlign: "center",
+  },
+  noteBlock: { gap: SPACE_8 },
+  evidence: { padding: SPACE_16, gap: SPACE_8 },
+  evidenceLine: {
+    fontFamily: "Nunito_600SemiBold",
+    fontSize: FONT_BODY,
+    color: palette.ink,
+  },
 });

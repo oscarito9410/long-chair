@@ -11,6 +11,7 @@ export type Route =
   | { name: "compare" }
   | { name: "settings" }
   | { name: "item"; itemId: string }
+  | { name: "marks" }
   | { name: "unknown" };
 
 const itemPrefix = "/item/";
@@ -42,6 +43,8 @@ export function parseRoute(hash: string): Route {
       return { name: "compare" };
     case "/settings":
       return { name: "settings" };
+    case "/marks":
+      return { name: "marks" };
     default:
       break;
   }

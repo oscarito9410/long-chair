@@ -1,6 +1,14 @@
 import type { Hue } from "./hues.ts";
 
-export const characterShapes = ["pebble", "bean", "drop", "bun", "arch", "sprout"] as const;
+export const characterShapes = [
+  "pebble",
+  "bean",
+  "drop",
+  "bun",
+  "arch",
+  "sprout",
+  "diamond",
+] as const;
 
 export type CharacterShape = (typeof characterShapes)[number];
 

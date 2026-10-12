@@ -23,7 +23,21 @@ export type {
   CharacterShape,
   CharacterVariant,
 } from "./data/character-kinds.ts";
-export { companionSetting, companionTopics, nearbyPlaces, topicsForSeeds } from "./data/companion.ts";
+export {
+  characterBody,
+  characterEyeY,
+  characterEyes,
+  characterTone,
+  eyeArcPath,
+  eyeHighlight,
+} from "./data/character-art.ts";
+export type { CharacterTone, EyeMark } from "./data/character-art.ts";
+export {
+  companionSetting,
+  companionTopics,
+  nearbyPlaces,
+  topicsForSeeds,
+} from "./data/companion.ts";
 export { FALLBACK_COMPARE_ID, plainModelExample } from "./data/comparison.ts";
 export { demoDraft, openingDraft } from "./data/demo-profile.ts";
 export { TYPICAL_CHAIR_MINUTES, durationChoices } from "./data/durations.ts";
@@ -58,7 +72,13 @@ export {
   welcomeTasteExamples,
 } from "./data/taste-catalog.ts";
 export type { TasteEntity, TasteIcon, TasteKind } from "./data/taste-catalog.ts";
-export { groupForTaste, groupMoreCount, groupTastes, previewGroupTastes, tasteGroups } from "./data/taste-groups.ts";
+export {
+  groupForTaste,
+  groupMoreCount,
+  groupTastes,
+  previewGroupTastes,
+  tasteGroups,
+} from "./data/taste-groups.ts";
 export type { TasteGroup, TasteGroupIcon } from "./data/taste-groups.ts";
 export { kindLabels, placeLabels } from "./content/kind-labels.ts";
 export { ONBOARDING_DOT_COUNT, onboardingStepIndex } from "./content/onboarding-steps.ts";
@@ -140,7 +160,12 @@ export type {
   ThemeVerifier,
   WarningSource,
 } from "./service/theme-verifier.ts";
-export { groupsForRegion, groupsFromSeeds, outsideSeedCount, regionSeedList } from "./data/region-seeds.ts";
+export {
+  groupsForRegion,
+  groupsFromSeeds,
+  outsideSeedCount,
+  regionSeedList,
+} from "./data/region-seeds.ts";
 export type { RegionSeed, TasteGroupId } from "./data/region-seeds.ts";
 export { isRegionCode, regionCodes, regionFromLocale, regionNames } from "./data/regions.ts";
 export type { RegionCode } from "./data/regions.ts";

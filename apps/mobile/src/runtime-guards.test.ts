@@ -69,7 +69,11 @@ describe("runtime guards", () => {
     expect(sheets).toContain("router.canDismiss()");
     expect(sheets).toContain("router.canGoBack()");
     expect(sheets).toContain('router.replace("/(tabs)/kit")');
-    expect(source("app/item/[id].tsx")).toContain("itemIdFromParams");
-    expect(source("app/item/[id].tsx")).not.toContain("router.back");
+    const item = source("app/item/[id].tsx");
+    expect(item).toContain("itemIdFromParams");
+    expect(item).not.toContain("router.back");
+    expect(item).not.toContain("label={closeLabel}");
+    expect(item).toContain("whyItPassed");
+    expect(item).toContain("ScrollView");
   });
 });

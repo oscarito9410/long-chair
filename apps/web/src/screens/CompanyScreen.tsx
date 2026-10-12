@@ -45,7 +45,7 @@ export function CompanyScreen() {
               }}
             >
               <span className="guide-mark">{selected ? <Icon name="check" /> : null}</span>
-              <Character variant={choice.variant} size="md" animate={selected} />
+              <Character variant={choice.variant} size="md" animate settle={selected} />
               <span className="text-lg font-bold">{choice.name}</span>
             </button>
           );

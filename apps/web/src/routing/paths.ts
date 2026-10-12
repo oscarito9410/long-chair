@@ -11,5 +11,6 @@ export const paths = {
   companion: "#/companion",
   compare: "#/compare",
   settings: "#/settings",
+  marks: "#/marks",
   item: (id: string) => `#/item/${encodeURIComponent(id)}`,
 } as const;

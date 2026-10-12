@@ -38,7 +38,7 @@ export function OptionRow({
         <span className="mt-1 block text-base text-ink-soft">{detail}</span>
         {checked ? <span className="visually-hidden">{selectedLabel}</span> : null}
       </span>
-      <Character variant={character} />
+      <Character variant={character} animate={checked} settle={checked} />
     </button>
   );
 }

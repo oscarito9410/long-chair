@@ -25,6 +25,8 @@ export function documentTitle(route: Route): string {
       return "Plain model contrast";
     case "settings":
       return "Settings";
+    case "marks":
+      return "Shapes";
     case "item": {
       const item = itemById(route.itemId);
       return item ? item.title : "Piece";

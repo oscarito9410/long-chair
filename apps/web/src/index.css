@@ -760,35 +760,77 @@ button:disabled {
   height: min(var(--lc-character-lg), 62vw);
 }
 
-.character-bob {
-  transform-origin: center;
-  animation: character-bob 3.4s ease-in-out infinite;
+.character-live {
+  transform-origin: 50% 58%;
+  animation: character-bob 3.2s ease-in-out infinite;
+}
+
+.character-settle {
+  transform-origin: 50% 58%;
+  animation:
+    character-pop 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both,
+    character-bob 3.2s ease-in-out 0.55s infinite;
 }
 
 .character-eyes {
   transform-box: fill-box;
   transform-origin: center;
-  animation: character-blink 4.6s ease-in-out infinite;
+  animation: character-blink 4.8s ease-in-out infinite;
+}
+
+.character-glance {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: character-glance 0.45s ease forwards;
+}
+
+.mark-sheet {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--lc-space-16);
+  justify-items: center;
+  padding-bottom: var(--lc-space-32);
 }
 
 @keyframes character-bob {
   0%,
   100% {
-    transform: translateY(0);
+    transform: translateY(0) scale(1.03, 0.97);
   }
   50% {
-    transform: translateY(calc(var(--lc-space-8) * -1));
+    transform: translateY(-3px) scale(0.97, 1.03);
+  }
+}
+
+@keyframes character-pop {
+  0% {
+    transform: scale(1.08, 0.84);
+  }
+  60% {
+    transform: scale(0.98, 1.06);
+  }
+  100% {
+    transform: scale(1, 1);
   }
 }
 
 @keyframes character-blink {
   0%,
-  88%,
+  86%,
   100% {
     transform: scaleY(1);
   }
-  94% {
+  92% {
     transform: scaleY(0.08);
+  }
+}
+
+@keyframes character-glance {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(5px);
   }
 }
 
@@ -1498,7 +1540,8 @@ button:disabled {
   display: flex;
   flex-direction: column;
   gap: var(--lc-space-8);
-  padding: var(--lc-space-8) var(--lc-space-24) max(var(--lc-space-16), env(safe-area-inset-bottom, 0px));
+  padding: var(--lc-space-8) var(--lc-space-24)
+    max(var(--lc-space-16), env(safe-area-inset-bottom, 0px));
   background: rgba(243, 238, 230, 0.55);
   backdrop-filter: blur(28px);
   -webkit-backdrop-filter: blur(28px);
