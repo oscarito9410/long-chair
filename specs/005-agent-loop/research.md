@@ -17,4 +17,4 @@
 
 - Decision: Bound tool count and turn count independently; use asyncio timeout for exploration and finalization/fallback. Keep trace entries for completed, failed, and interrupted calls. No credentials means no model construction.
 - Rationale: A slow model/tool must be interrupted, not checked only after it returns. Partial candidates may be packed if verified. Baseline measures are outcomes, not promises of improvement.
-- Alternatives: A model-only comparison is a separate scripted no-tool selection over the fictional shelf, scored before verification so its violations remain visible. It is never a production bypass. Live comparison remains explicitly opt-in.
+- Alternatives: A model-only comparison is a separate scripted no-tool selection over the fictional shelf, scored before verification so its violations remain visible. It is never a production bypass. Live comparison remains explicitly opt-in. In live mode, the model-only baseline selects without tools from deterministic verified catalog titles; only the fictional default exercises an avoided-title baseline.
