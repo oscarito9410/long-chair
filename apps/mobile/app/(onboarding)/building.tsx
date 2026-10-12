@@ -73,9 +73,12 @@ export default function BuildingScreen() {
       <SessionHeader minutes={draft.durationMinutes} />
       <View style={styles.center}>
         <CharacterMark
+          key={complete ? "ready" : "building"}
           variant={guideById(draft.companionId).variant}
           size={AVATAR}
-          animate={!complete}
+          expression={complete ? "celebration" : "thinking"}
+          animate
+          settle
         />
       </View>
       {steps.map((step, index) => (

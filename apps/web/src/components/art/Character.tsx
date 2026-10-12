@@ -1,14 +1,19 @@
 import {
+  blushFill,
   characterBody,
-  characterEyes,
   characterEyeY,
   characterTone,
-  eyeArcPath,
+  expressionFace,
+  expressionForMood,
+  expressionIntroduces,
+  expressionPose,
   eyeHighlight,
+  faceArcPath,
   type CharacterVariant,
-  type EyeMark,
+  type Expression,
+  type FacePiece,
 } from "@long-chair/core";
-import { useId } from "react";
+import { useId, type CSSProperties } from "react";
 import { cn } from "../../lib/cn.ts";
 import { palette } from "../../tokens/tokens.ts";
 
@@ -19,17 +24,28 @@ export function Character({
   size = "sm",
   animate = false,
   settle = false,
+  expression,
+  tickled = false,
 }: {
   variant: CharacterVariant;
   size?: CharacterSize;
   animate?: boolean;
   settle?: boolean;
+  expression?: Expression;
+  tickled?: boolean;
 }) {
   const eyeY = characterEyeY[variant.shape];
-  const mood = variant.mood ?? "smile";
+  const face = tickled ? "tickled" : (expression ?? expressionForMood(variant.mood ?? "smile"));
+  const pose = expressionPose[face];
   const tone = characterTone[variant.hue];
   const gradientId = `lc-mark-${useId().replace(/:/g, "")}`;
-  const live = animate || settle;
+  const intro = settle || (animate && expressionIntroduces(face));
+  const poseStyle = {
+    "--pose-tilt": `${pose.tilt}deg`,
+    "--pose-sx": String(pose.scaleX),
+    "--pose-sy": String(pose.scaleY),
+    "--pose-lift": `${pose.lift}px`,
+  } as CSSProperties;
 
   return (
     <svg
@@ -37,8 +53,12 @@ export function Character({
       className={cn(
         "character",
         `character-${size}`,
-        settle ? "character-settle" : animate && "character-live",
+        `character-${face}`,
+        intro && "character-intro",
+        tickled && "character-tickle",
       )}
+      style={poseStyle}
+      data-expression={face}
       aria-hidden="true"
       focusable="false"
     >
@@ -49,37 +69,55 @@ export function Character({
           <stop offset="1" stopColor={tone.shade} />
         </radialGradient>
       </defs>
-      <path d={characterBody[variant.shape]} fill={`url(#${gradientId})`} />
-      <g className={settle ? "character-glance" : undefined}>
-        <g className={live ? "character-eyes" : undefined}>
-          {characterEyes(mood, eyeY).map((mark) => (
-            <Eye key={`${mark.kind}-${mark.x}`} mark={mark} />
-          ))}
+      <g className="character-pose">
+        <g className={animate && !tickled ? "character-idle" : undefined}>
+          <path d={characterBody[variant.shape]} fill={`url(#${gradientId})`} />
+          <g className={animate && !tickled && blinks(face) ? "character-eyes" : undefined}>
+            {expressionFace(face, eyeY).map((piece, index) => (
+              <Face key={`${piece.role}-${index}`} piece={piece} />
+            ))}
+          </g>
         </g>
       </g>
     </svg>
   );
 }
 
-function Eye({ mark }: { mark: EyeMark }) {
-  if (mark.kind === "arc") {
-    return <path d={eyeArcPath(mark)} fill={palette.ink} />;
+function blinks(expression: Expression): boolean {
+  return expression !== "support" && expression !== "celebration" && expression !== "tickled";
+}
+
+function Face({ piece }: { piece: FacePiece }) {
+  const fill = piece.role === "blush" ? blushFill : palette.ink;
+  if (piece.kind === "arc") {
+    return <path d={faceArcPath(piece)} fill={fill} />;
   }
-  const showShine = mark.height >= eyeHighlight.minEye;
+  if (piece.kind === "oval") {
+    return (
+      <ellipse
+        cx={piece.x + piece.width / 2}
+        cy={piece.y + piece.height / 2}
+        rx={piece.width / 2}
+        ry={piece.height / 2}
+        fill={fill}
+      />
+    );
+  }
+  const shine = piece.role === "eye" && piece.height >= eyeHighlight.minEye;
   return (
     <g>
       <rect
-        x={mark.x}
-        y={mark.y}
-        width={mark.width}
-        height={mark.height}
-        rx={mark.width / 2}
-        fill={palette.ink}
+        x={piece.x}
+        y={piece.y}
+        width={piece.width}
+        height={piece.height}
+        rx={piece.width / 2}
+        fill={fill}
       />
-      {showShine ? (
+      {shine ? (
         <rect
-          x={mark.x + eyeHighlight.insetX}
-          y={mark.y + eyeHighlight.insetY}
+          x={piece.x + eyeHighlight.insetX}
+          y={piece.y + eyeHighlight.insetY}
           width={eyeHighlight.width}
           height={eyeHighlight.height}
           rx={eyeHighlight.radius}

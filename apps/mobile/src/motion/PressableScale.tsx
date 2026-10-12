@@ -1,6 +1,13 @@
 import type { ReactNode } from "react";
 import { Pressable } from "react-native";
-import type { AccessibilityRole, AccessibilityState, StyleProp, ViewStyle } from "react-native";
+import type {
+  AccessibilityActionEvent,
+  AccessibilityActionInfo,
+  AccessibilityRole,
+  AccessibilityState,
+  StyleProp,
+  ViewStyle,
+} from "react-native";
 import Animated, {
   type SharedValue,
   useAnimatedStyle,
@@ -24,6 +31,8 @@ export function PressableScale({
   accessibilityRole = "button",
   accessibilityLabel,
   accessibilityState,
+  accessibilityActions,
+  onAccessibilityAction,
 }: {
   children: ReactNode;
   onPress: () => void;
@@ -34,6 +43,8 @@ export function PressableScale({
   accessibilityRole?: AccessibilityRole;
   accessibilityLabel?: string;
   accessibilityState?: AccessibilityState;
+  accessibilityActions?: readonly AccessibilityActionInfo[];
+  onAccessibilityAction?: (event: AccessibilityActionEvent) => void;
 }) {
   const reduced = useReducedMotion();
   const scale = useSharedValue(1);
@@ -43,6 +54,8 @@ export function PressableScale({
       accessibilityRole={accessibilityRole}
       accessibilityLabel={accessibilityLabel}
       accessibilityState={{ ...accessibilityState, disabled }}
+      accessibilityActions={accessibilityActions}
+      onAccessibilityAction={onAccessibilityAction}
       disabled={disabled}
       onPressIn={() => {
         if (reduced || disabled) {

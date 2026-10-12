@@ -24,6 +24,16 @@ export function App() {
   const previous = useRef(route.name);
 
   useEffect(() => {
+    const sync = () => {
+      document.documentElement.classList.toggle("is-hidden", document.hidden);
+    };
+    document.addEventListener("visibilitychange", sync);
+    return () => {
+      document.removeEventListener("visibilitychange", sync);
+    };
+  }, []);
+
+  useEffect(() => {
     document.title = `${documentTitle(route)} · Long Chair`;
     const fromKit = staysOnKit(previous.current);
     previous.current = route.name;

@@ -129,7 +129,13 @@ describe("taste catalog", () => {
     expect(welcomeNotesAt(0)).toEqual(welcomeTasteExamples.slice(0, 4));
     expect(welcomeNotesAt(1)[0]).toBe("leg day");
     expect(welcomeTasteExamples).toEqual(
-      expect.arrayContaining(["anime nights", "true crime", "Bad Bunny", "Studio Ghibli", "F1 races"]),
+      expect.arrayContaining([
+        "anime nights",
+        "true crime",
+        "Bad Bunny",
+        "Studio Ghibli",
+        "F1 races",
+      ]),
     );
   });
 

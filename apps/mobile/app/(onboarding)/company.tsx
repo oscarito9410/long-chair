@@ -15,6 +15,7 @@ import { SpringCheck } from "../../src/motion/SpringCheck";
 import { useOnboardingChrome } from "../../src/motion/onboarding-chrome";
 import { PressableScale } from "../../src/motion/PressableScale";
 import { useReducedMotion } from "../../src/motion/use-reduced-motion";
+import { useTickle } from "../../src/motion/use-tickle";
 import { useSession } from "../../src/state/session";
 import {
   FONT_BODY,
@@ -39,6 +40,8 @@ export default function CompanyScreen() {
   const { width } = useWindowDimensions();
   const { draft, setCompanion } = useSession();
   const [companionId, setCompanionId] = useState(draft.companionId);
+  const [picked, setPicked] = useState(false);
+  const { tickling, tap, force } = useTickle();
   const guide = guideById(companionId);
   const tile = columnWidth(width, SPACE_24, SPACE_16);
 
@@ -68,7 +71,15 @@ export default function CompanyScreen() {
               accessibilityLabel={choice.name}
               accessibilityState={{ selected }}
               onPress={() => {
+                setPicked(true);
                 setCompanionId(choice.id);
+                tap();
+              }}
+              accessibilityActions={selected ? [{ name: "tickle", label: "Tickle" }] : undefined}
+              onAccessibilityAction={(event) => {
+                if (event.nativeEvent.actionName === "tickle") {
+                  force();
+                }
               }}
               style={{ width: tile }}
             >
@@ -83,6 +94,8 @@ export default function CompanyScreen() {
                   size={ART}
                   animate
                   settle={selected}
+                  expression={selected ? (picked ? "celebration" : "attention") : undefined}
+                  tickled={tickling && selected}
                 />
               </ChoiceTile>
             </PressableScale>

@@ -5,6 +5,7 @@ import { StyleSheet, Text, View } from "react-native";
 import Animated, { Keyframe } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { CharacterMark } from "../src/components/art/CharacterMark";
 import { GearButton } from "../src/components/chrome/GearButton";
 import { DoodleArrow, HandNote } from "../src/components/chrome/HandNote";
 import { ScreenScaffold } from "../src/components/chrome/ScreenScaffold";
@@ -24,6 +25,7 @@ import {
 import { screenTints } from "../src/theme/screen-tints";
 
 const HERO_MS = 900;
+const GREETING_MARK = 96;
 
 const heroIn = new Keyframe({
   0: { opacity: 0, transform: [{ translateY: 14 }] },
@@ -31,7 +33,12 @@ const heroIn = new Keyframe({
 }).duration(HERO_MS);
 
 const NOTE_HUES = ["honey", "apricot", "seaglass", "wisteria"] as const;
-const NOTE_TILTS = [stickerTilt.jazz, stickerTilt.mystery, stickerTilt.bread, stickerTilt.light] as const;
+const NOTE_TILTS = [
+  stickerTilt.jazz,
+  stickerTilt.mystery,
+  stickerTilt.bread,
+  stickerTilt.light,
+] as const;
 const WELCOME_NOTE_MS = 3200;
 
 function useWelcomeNotes(): readonly string[] {
@@ -107,6 +114,13 @@ function WelcomeStage({ notes }: { notes: readonly string[] }) {
         <Sticky text={second} index={1} />
       </View>
       <View style={styles.copy}>
+        <CharacterMark
+          variant={{ shape: "pebble", hue: "apricot" }}
+          expression="greeting"
+          size={GREETING_MARK}
+          animate
+          settle
+        />
         <Text accessibilityRole="header" style={styles.title}>
           {welcomeTitle}
         </Text>

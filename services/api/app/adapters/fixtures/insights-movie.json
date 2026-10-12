@@ -23,15 +23,11 @@
           "content_rating": "PG",
           "release_year": 2019,
           "release_date": "2019-06-01",
-          "production_companies": [
-            "Ellis Maren"
-          ],
+          "production_companies": ["Ellis Maren"],
           "short_descriptions": [
             {
               "value": "A slow repair, told through weather and glass.",
-              "languages": [
-                "en"
-              ]
+              "languages": ["en"]
             }
           ]
         },
@@ -76,15 +72,11 @@
           "duration": 90,
           "content_rating": "PG-13",
           "release_year": 2018,
-          "production_companies": [
-            "A fictional crew"
-          ],
+          "production_companies": ["A fictional crew"],
           "short_descriptions": [
             {
               "value": "A shift that should stay out of the room.",
-              "languages": [
-                "en"
-              ]
+              "languages": ["en"]
             }
           ]
         },

@@ -16,7 +16,15 @@ import { TastePicker } from "../../src/components/taste/TastePicker";
 import { showKit } from "../../src/navigation/present-sheet";
 import { useSession } from "../../src/state/session";
 import { useRegionGroups } from "../../src/state/use-region";
-import { FONT_BODY, palette, RADIUS_CARD, SPACE_8, SPACE_16, SPACE_24, TARGET } from "../../src/theme/palette";
+import {
+  FONT_BODY,
+  palette,
+  RADIUS_CARD,
+  SPACE_8,
+  SPACE_16,
+  SPACE_24,
+  TARGET,
+} from "../../src/theme/palette";
 
 const FOOTER_FALLBACK = 180;
 
@@ -76,7 +84,8 @@ export default function LoveScreen() {
 
   function apply(next: readonly string[]) {
     const same =
-      next.length === draft.seedIds.length && next.every((id, index) => id === draft.seedIds[index]);
+      next.length === draft.seedIds.length &&
+      next.every((id, index) => id === draft.seedIds[index]);
     if (same) {
       return;
     }

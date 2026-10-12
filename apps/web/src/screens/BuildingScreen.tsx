@@ -68,7 +68,14 @@ export function BuildingScreen() {
         {liveText}
       </p>
       <div className="flex justify-center">
-        <Character variant={guideById(draft.companionId).variant} size="md" animate />
+        <Character
+          key={complete ? "ready" : "building"}
+          variant={guideById(draft.companionId).variant}
+          size="md"
+          expression={complete ? "celebration" : "thinking"}
+          animate
+          settle
+        />
       </div>
       <ol className="m-0 flex list-none flex-col gap-4 p-0">
         {steps.map((step, index) => (

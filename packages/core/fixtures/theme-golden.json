@@ -123,9 +123,7 @@
       "title": "Sample illness eight",
       "synopsis": "Neighbors bring soup.",
       "qlooTags": [],
-      "tmdbKeywords": [
-        "illness"
-      ],
+      "tmdbKeywords": ["illness"],
       "contentWarnings": [],
       "expected": {
         "illness": "flagged",
@@ -222,9 +220,7 @@
       "synopsis": "A short walk home.",
       "qlooTags": [],
       "tmdbKeywords": [],
-      "contentWarnings": [
-        "hospital"
-      ],
+      "contentWarnings": ["hospital"],
       "expected": {
         "illness": "clear",
         "hospitals": "flagged",
@@ -420,9 +416,7 @@
       "title": "Sample parent six",
       "synopsis": "Un viaje largo.",
       "qlooTags": [],
-      "tmdbKeywords": [
-        "muerte del padre"
-      ],
+      "tmdbKeywords": ["muerte del padre"],
       "contentWarnings": [],
       "expected": {
         "illness": "clear",

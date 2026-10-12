@@ -1,5 +1,11 @@
 import type { FetchLike } from "./kit-service.ts";
-import type { CustomTheme, Evidence, ItemSignals, NamedTag, ThemeVerdict } from "../data/theme-signals.ts";
+import type {
+  CustomTheme,
+  Evidence,
+  ItemSignals,
+  NamedTag,
+  ThemeVerdict,
+} from "../data/theme-signals.ts";
 import { judgeSignals, sampleSignals } from "../data/theme-signals.ts";
 import type { CatalogItem } from "../data/types.ts";
 
@@ -74,7 +80,9 @@ export function tagsFromQlooBody(body: unknown): readonly NamedTag[] | null {
   return direct.length > 0 ? direct : [];
 }
 
-export function createFixtureTagSource(table: Readonly<Record<string, readonly NamedTag[] | null>>): TagSource {
+export function createFixtureTagSource(
+  table: Readonly<Record<string, readonly NamedTag[] | null>>,
+): TagSource {
   return {
     tagsFor(itemId) {
       const found = table[itemId];
@@ -122,7 +130,10 @@ export function createHttpQlooTagSource({ apiKey, fetchImpl = fetch }: KeyedFetc
   };
 }
 
-export function createHttpTmdbKeywordSource({ apiKey, fetchImpl = fetch }: KeyedFetch): KeywordSource {
+export function createHttpTmdbKeywordSource({
+  apiKey,
+  fetchImpl = fetch,
+}: KeyedFetch): KeywordSource {
   return {
     async keywordsFor(itemId) {
       if (!apiKey) {
@@ -201,7 +212,8 @@ export function cautionThemeIdsFor(
 ): readonly string[] {
   return explainItem(item, themeIds, custom)
     .filter(
-      (verdict) => custom.some((theme) => theme.id === verdict.themeId) && verdict.verdict === "unverified",
+      (verdict) =>
+        custom.some((theme) => theme.id === verdict.themeId) && verdict.verdict === "unverified",
     )
     .map((verdict) => verdict.themeId);
 }

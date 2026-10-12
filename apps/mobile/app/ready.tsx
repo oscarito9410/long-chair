@@ -1,8 +1,9 @@
-import { itemById, kitStampLine, stickerTilt } from "@long-chair/core";
+import { guideById, itemById, kitStampLine, stickerTilt } from "@long-chair/core";
 import { router } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 import Animated, { Keyframe } from "react-native-reanimated";
 
+import { CharacterMark } from "../src/components/art/CharacterMark";
 import { CoverArt } from "../src/components/art/CoverArt";
 import { GlassSurface } from "../src/components/glass/GlassSurface";
 import { SampleBanner } from "../src/components/chrome/SampleBanner";
@@ -24,6 +25,7 @@ import {
 import { screenTints } from "../src/theme/screen-tints";
 
 const fanLimit = 3;
+const READY_MARK = 96;
 const POP_MS = 700;
 
 const readyPop = new Keyframe({
@@ -55,6 +57,13 @@ export default function ReadyScreen() {
       {error ? <Text style={styles.note}>{error}</Text> : null}
       {packed ? (
         <Animated.View entering={reduced ? undefined : readyPop} style={styles.stage}>
+          <CharacterMark
+            variant={guideById(draft.companionId).variant}
+            expression="celebration"
+            size={READY_MARK}
+            animate
+            settle
+          />
           <View style={styles.fan}>
             {packed.slots.slice(0, fanLimit).map((slot, index) => (
               <FanCover key={slot.itemId} itemId={slot.itemId} index={index} />

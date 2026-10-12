@@ -1,3 +1,3 @@
-export async function bootSkia(): Promise<void> {
-  return Promise.resolve();
+export function bootSkia(): Promise<boolean> {
+  return Promise.resolve(true);
 }

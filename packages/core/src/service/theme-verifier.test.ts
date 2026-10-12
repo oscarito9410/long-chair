@@ -3,7 +3,17 @@ import { describe, expect, it } from "vitest";
 import { itemById } from "../data/catalog.ts";
 import { openingDraft } from "../data/demo-profile.ts";
 import { addCustomTheme, customThemeFromLabel } from "../data/theme-signals.ts";
-import { admissionFor, createHttpQlooTagSource, createHttpTmdbKeywordSource, createHttpWarningSource, createThemeVerifier, createFixtureKeywordSource, createFixtureTagSource, createFixtureWarningSource, explainItem } from "./theme-verifier.ts";
+import {
+  admissionFor,
+  createHttpQlooTagSource,
+  createHttpTmdbKeywordSource,
+  createHttpWarningSource,
+  createThemeVerifier,
+  createFixtureKeywordSource,
+  createFixtureTagSource,
+  createFixtureWarningSource,
+  explainItem,
+} from "./theme-verifier.ts";
 
 describe("ThemeVerifier", () => {
   it("clears a sample greenhouse film and flags the clinic episode for illness", () => {
@@ -18,7 +28,9 @@ describe("ThemeVerifier", () => {
     expect(filmVerdicts.every((verdict) => verdict.verdict === "clear")).toBe(true);
     const wardVerdicts = explainItem(ward, ["illness", "hospitals"]);
     expect(wardVerdicts.find((verdict) => verdict.themeId === "illness")?.verdict).toBe("flagged");
-    expect(wardVerdicts.find((verdict) => verdict.themeId === "hospitals")?.verdict).toBe("flagged");
+    expect(wardVerdicts.find((verdict) => verdict.themeId === "hospitals")?.verdict).toBe(
+      "flagged",
+    );
     expect(admissionFor(ward, ["illness"])).toBe("block");
     expect(admissionFor(film, openingDraft.avoidIds)).toBe("clear");
   });
@@ -30,8 +42,12 @@ describe("ThemeVerifier", () => {
       return Promise.resolve(new Response("{}", { status: 200 }));
     };
     expect(await createHttpQlooTagSource({ apiKey: undefined, fetchImpl }).tagsFor("x")).toBeNull();
-    expect(await createHttpTmdbKeywordSource({ apiKey: undefined, fetchImpl }).keywordsFor("x")).toBeNull();
-    expect(await createHttpWarningSource({ apiKey: undefined, fetchImpl }).warningsFor("x")).toBeNull();
+    expect(
+      await createHttpTmdbKeywordSource({ apiKey: undefined, fetchImpl }).keywordsFor("x"),
+    ).toBeNull();
+    expect(
+      await createHttpWarningSource({ apiKey: undefined, fetchImpl }).warningsFor("x"),
+    ).toBeNull();
     expect(calls).toEqual([]);
 
     const verifier = createThemeVerifier({
@@ -39,7 +55,9 @@ describe("ThemeVerifier", () => {
       keywords: createFixtureKeywordSource({ "sample-1": [] }),
       warnings: createFixtureWarningSource({ "sample-1": [] }),
     });
-    const verdicts = await verifier.verify("sample-1", "A garden and a long afternoon.", ["illness"]);
+    const verdicts = await verifier.verify("sample-1", "A garden and a long afternoon.", [
+      "illness",
+    ]);
     expect(verdicts[0]?.verdict).toBe("unverified");
     expect(verdicts[0]?.verdict).not.toBe("clear");
   });
@@ -56,7 +74,9 @@ describe("ThemeVerifier", () => {
     if (!film) {
       return;
     }
-    expect(admissionFor({ ...film, synopsis: "Train whistles at dusk." }, [], themes)).toBe("block");
+    expect(admissionFor({ ...film, synopsis: "Train whistles at dusk." }, [], themes)).toBe(
+      "block",
+    );
     expect(admissionFor(film, [], themes)).toBe("caution");
     const miss = explainItem(film, [], themes)[0];
     expect(miss?.verdict).toBe("unverified");
@@ -92,7 +112,9 @@ describe("ThemeVerifier", () => {
           { status: 200 },
         ),
       );
-    const tags = await createHttpQlooTagSource({ apiKey: "example-key", fetchImpl }).tagsFor("ward-clock");
+    const tags = await createHttpQlooTagSource({ apiKey: "example-key", fetchImpl }).tagsFor(
+      "ward-clock",
+    );
     expect(tags?.map((tag) => tag.name)).toEqual(["Illness"]);
   });
 
@@ -101,9 +123,12 @@ describe("ThemeVerifier", () => {
       apiKey: "example-key",
       fetchImpl: () =>
         Promise.resolve(
-          new Response(JSON.stringify({ tags: [{ id: "urn:tag:sample:illness", name: "illness" }] }), {
-            status: 200,
-          }),
+          new Response(
+            JSON.stringify({ tags: [{ id: "urn:tag:sample:illness", name: "illness" }] }),
+            {
+              status: 200,
+            },
+          ),
         ),
     });
     const tags = await source.tagsFor("ward-episode");

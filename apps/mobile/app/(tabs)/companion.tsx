@@ -38,7 +38,7 @@ export default function CompanionScreen() {
     <TabPage>
       <SampleBanner live={plan?.source === "live"} />
       <View style={styles.header}>
-        <CharacterMark variant={guide.variant} size={AVATAR} animate />
+        <CharacterMark variant={guide.variant} size={AVATAR} expression="support" animate settle />
         <GlassSurface style={styles.bubble} tint={hueFill[guide.variant.hue]}>
           <Text accessibilityRole="header" style={styles.headerText}>
             {guideHeader(guide.personality, guide.quote)}

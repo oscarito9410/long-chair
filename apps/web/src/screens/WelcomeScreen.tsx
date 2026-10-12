@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { notMedicalAdvice, welcomeNotesAt } from "@long-chair/core";
+import { Character } from "../components/art/Character.tsx";
 import { controlClass } from "../components/glass/glass-styles.ts";
 import { Icon } from "../components/ui/Icon.tsx";
 import { SampleNote } from "../components/ui/SampleNote.tsx";
@@ -36,7 +37,11 @@ export function WelcomeScreen() {
   const { beginOnboarding, reset } = useSession();
   return (
     <div className="question welcome-screen" data-screen="welcome">
-      <a className="welcome-gear glass-surface glass-thin glass-disc" href={paths.settings} aria-label="Settings">
+      <a
+        className="welcome-gear glass-surface glass-thin glass-disc"
+        href={paths.settings}
+        aria-label="Settings"
+      >
         <Icon name="gear" />
       </a>
       <SampleNote />
@@ -51,6 +56,13 @@ export function WelcomeScreen() {
           </p>
         ))}
         <div className="welcome-copy">
+          <Character
+            variant={{ shape: "pebble", hue: "apricot" }}
+            expression="greeting"
+            size="md"
+            animate
+            settle
+          />
           <h1 className="text-4xl font-extrabold leading-tight">
             What you love, minus what hurts.
           </h1>

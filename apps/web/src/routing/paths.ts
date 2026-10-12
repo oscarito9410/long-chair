@@ -12,5 +12,6 @@ export const paths = {
   compare: "#/compare",
   settings: "#/settings",
   marks: "#/marks",
+  expressions: "#/expressions",
   item: (id: string) => `#/item/${encodeURIComponent(id)}`,
 } as const;

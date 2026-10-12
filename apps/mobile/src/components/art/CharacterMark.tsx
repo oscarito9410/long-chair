@@ -1,23 +1,31 @@
 import {
+  blushFill,
   characterBody,
-  characterEyes,
   characterEyeY,
   characterTone,
-  eyeArcPath,
+  expressionFace,
+  expressionForMood,
+  expressionIntroduces,
+  expressionPose,
   eyeHighlight,
-  type CharacterMood,
+  faceArcPath,
+  POSE_INTRO_MS,
   type CharacterVariant,
-  type EyeMark,
+  type Expression,
+  type ExpressionPose,
+  type FacePiece,
 } from "@long-chair/core";
-import { useEffect, useId } from "react";
-import Svg, { Defs, G, Path, RadialGradient, Rect, Stop } from "react-native-svg";
+import { useEffect, useId, useState } from "react";
+import { AppState } from "react-native";
+import Svg, { Defs, Ellipse, G, Path, RadialGradient, Rect, Stop } from "react-native-svg";
 import Animated, {
+  cancelAnimation,
+  Easing,
   useAnimatedProps,
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
   withSequence,
-  withSpring,
   withTiming,
 } from "react-native-reanimated";
 
@@ -27,48 +35,51 @@ import { palette } from "../../theme/palette";
 const AnimatedG = Animated.createAnimatedComponent(G);
 
 const BOB_MS = 1400;
-const BOB = 3;
-const WIDE = 1.03;
-const NARROW = 0.97;
-const TALL = 1.03;
-const SHORT = 0.97;
-const SQUASH_X = 1.08;
-const SQUASH_Y = 0.84;
-const POP_MS = 90;
-const POP_DAMP = 8;
-const POP_STIFF = 180;
+const BOB_PX = 3;
+const NOD_PX = 2;
+const REST_LIFT = 8;
+const REST_SX = 0.94;
+const REST_SY = 1.06;
 const BLINK_GAP = 2600;
 const BLINK_SHUT = 70;
 const BLINK_OPEN = 90;
 const BLINK_CLOSED = 0.08;
-const GLANCE = 5;
-const GLANCE_MS = 320;
+const GIGGLE_MS = 140;
+const WOBBLE_DEG = 6;
 const FACE_X = 60;
+const ARRIVE = { duration: POSE_INTRO_MS, easing: Easing.bezier(0.22, 0.8, 0.24, 1) };
 
 export function CharacterMark({
   variant,
   size,
   animate = false,
   settle = false,
+  expression,
+  tickled = false,
 }: {
   variant: CharacterVariant;
   size: number;
   animate?: boolean;
   settle?: boolean;
+  expression?: Expression;
+  tickled?: boolean;
 }) {
   const reduced = useReducedMotion();
-  const moving = animate && !reduced;
-  const motion = useCharacterMotion(moving, settle && !reduced);
+  const foreground = useForeground();
+  const face = tickled ? "tickled" : (expression ?? expressionForMood(variant.mood ?? "smile"));
+  const pose = expressionPose[face];
   const eyeY = characterEyeY[variant.shape];
-  const mood = variant.mood ?? "smile";
   const tone = characterTone[variant.hue];
   const gradientId = `lc-mark-${useId().replace(/:/g, "")}`;
-  const eyeProps = useAnimatedProps(() => {
-    const shift = motion.glance.value;
-    const open = motion.blink.value;
-    return {
-      transform: `translate(${shift} 0) translate(${FACE_X} ${eyeY}) scale(1 ${open}) translate(${-FACE_X} ${-eyeY})`,
-    };
+  const live = foreground && !reduced;
+  const motion = usePoseMotion({
+    pose,
+    intro: live && !tickled && (settle || (animate && expressionIntroduces(face))),
+    idle: live && animate && !tickled,
+    thinking: face === "thinking",
+    wobble: live && tickled,
+    blink: live && animate && !tickled && eyesBlink(face),
+    eyeY,
   });
 
   return (
@@ -86,103 +97,188 @@ export function CharacterMark({
           </RadialGradient>
         </Defs>
         <Path d={characterBody[variant.shape]} fill={`url(#${gradientId})`} />
-        <AnimatedG animatedProps={eyeProps}>
-          <Eyes mood={mood} eyeY={eyeY} />
+        <AnimatedG animatedProps={motion.eyeProps}>
+          {expressionFace(face, eyeY).map((piece, index) => (
+            <Face key={`${piece.role}-${index}`} piece={piece} />
+          ))}
         </AnimatedG>
       </Svg>
     </Animated.View>
   );
 }
 
-function useCharacterMotion(moving: boolean, settle: boolean) {
+function eyesBlink(expression: Expression): boolean {
+  return expression !== "support" && expression !== "celebration" && expression !== "tickled";
+}
+
+function useForeground(): boolean {
+  const [foreground, setForeground] = useState(AppState.currentState === "active");
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (next) => {
+      setForeground(next === "active");
+    });
+    return () => {
+      sub.remove();
+    };
+  }, []);
+  return foreground;
+}
+
+function usePoseMotion({
+  pose,
+  intro,
+  idle,
+  thinking,
+  wobble,
+  blink,
+  eyeY,
+}: {
+  pose: ExpressionPose;
+  intro: boolean;
+  idle: boolean;
+  thinking: boolean;
+  wobble: boolean;
+  blink: boolean;
+  eyeY: number;
+}) {
+  const tilt = useSharedValue(pose.tilt);
+  const scaleX = useSharedValue(pose.scaleX);
+  const scaleY = useSharedValue(pose.scaleY);
+  const lift = useSharedValue(pose.lift);
   const bob = useSharedValue(0);
-  const widen = useSharedValue(1);
-  const squash = useSharedValue(1);
-  const blink = useSharedValue(1);
-  const glance = useSharedValue(0);
+  const nod = useSharedValue(0);
+  const sway = useSharedValue(0);
+  const lids = useSharedValue(1);
 
   useEffect(() => {
-    if (!moving) {
-      bob.value = 0;
-      widen.value = 1;
-      squash.value = 1;
-      blink.value = 1;
-      glance.value = 0;
-      return;
-    }
-    blink.value = withRepeat(
-      withSequence(
-        withTiming(1, { duration: BLINK_GAP }),
-        withTiming(BLINK_CLOSED, { duration: BLINK_SHUT }),
-        withTiming(1, { duration: BLINK_OPEN }),
-      ),
-      -1,
-      false,
-    );
-    glance.value = withTiming(settle ? GLANCE : 0, { duration: GLANCE_MS });
-    const idleBob = withRepeat(
-      withSequence(withTiming(-BOB, { duration: BOB_MS }), withTiming(0, { duration: BOB_MS })),
-      -1,
-      true,
-    );
-    const idleWiden = withRepeat(
-      withSequence(
-        withTiming(WIDE, { duration: BOB_MS }),
-        withTiming(NARROW, { duration: BOB_MS }),
-      ),
-      -1,
-      true,
-    );
-    const idleSquash = withRepeat(
-      withSequence(withTiming(SHORT, { duration: BOB_MS }), withTiming(TALL, { duration: BOB_MS })),
-      -1,
-      true,
-    );
-    if (settle) {
-      widen.value = withSequence(
-        withTiming(SQUASH_X, { duration: POP_MS }),
-        withSpring(1, { damping: POP_DAMP, stiffness: POP_STIFF }),
-        idleWiden,
+    const stop = () => {
+      cancelAnimation(tilt);
+      cancelAnimation(scaleX);
+      cancelAnimation(scaleY);
+      cancelAnimation(lift);
+      cancelAnimation(bob);
+      cancelAnimation(nod);
+      cancelAnimation(sway);
+      cancelAnimation(lids);
+    };
+    stop();
+    tilt.value = pose.tilt;
+    scaleX.value = pose.scaleX;
+    scaleY.value = pose.scaleY;
+    lift.value = pose.lift;
+    bob.value = 0;
+    nod.value = 0;
+    sway.value = 0;
+    lids.value = 1;
+    if (wobble) {
+      sway.value = withRepeat(
+        withSequence(
+          withTiming(-1, { duration: GIGGLE_MS }),
+          withTiming(1, { duration: GIGGLE_MS }),
+        ),
+        -1,
+        true,
       );
-      squash.value = withSequence(
-        withTiming(SQUASH_Y, { duration: POP_MS }),
-        withSpring(1, { damping: POP_DAMP, stiffness: POP_STIFF }),
-        idleSquash,
-      );
-      bob.value = withSequence(withTiming(0, { duration: POP_MS }), idleBob);
-      return;
+      return stop;
     }
-    widen.value = idleWiden;
-    squash.value = idleSquash;
-    bob.value = idleBob;
-  }, [blink, bob, glance, moving, settle, squash, widen]);
+    if (intro) {
+      tilt.value = 0;
+      lift.value = REST_LIFT;
+      scaleX.value = REST_SX;
+      scaleY.value = REST_SY;
+      tilt.value = withTiming(pose.tilt, ARRIVE);
+      lift.value = withTiming(pose.lift, ARRIVE);
+      scaleX.value = withTiming(pose.scaleX, ARRIVE);
+      scaleY.value = withTiming(pose.scaleY, ARRIVE);
+    }
+    if (idle) {
+      bob.value = withRepeat(
+        withSequence(
+          withTiming(thinking ? -NOD_PX : -BOB_PX, { duration: BOB_MS }),
+          withTiming(0, { duration: BOB_MS }),
+        ),
+        -1,
+        true,
+      );
+    }
+    if (idle && thinking) {
+      nod.value = withRepeat(
+        withSequence(withTiming(4, { duration: BOB_MS }), withTiming(-3, { duration: BOB_MS })),
+        -1,
+        true,
+      );
+    }
+    if (blink) {
+      lids.value = withRepeat(
+        withSequence(
+          withTiming(1, { duration: BLINK_GAP }),
+          withTiming(BLINK_CLOSED, { duration: BLINK_SHUT }),
+          withTiming(1, { duration: BLINK_OPEN }),
+        ),
+        -1,
+        false,
+      );
+    }
+    return stop;
+  }, [
+    blink,
+    bob,
+    idle,
+    intro,
+    lids,
+    lift,
+    nod,
+    pose.lift,
+    pose.scaleX,
+    pose.scaleY,
+    pose.tilt,
+    scaleX,
+    scaleY,
+    sway,
+    thinking,
+    tilt,
+    wobble,
+  ]);
 
   const style = useAnimatedStyle(() => ({
-    transform: [{ translateY: bob.value }, { scaleX: widen.value }, { scaleY: squash.value }],
+    transform: [
+      { translateY: lift.value + bob.value - sway.value * NOD_PX },
+      { rotate: `${tilt.value + nod.value + sway.value * WOBBLE_DEG}deg` },
+      { scaleX: scaleX.value * (1 + Math.abs(sway.value) * 0.04) },
+      { scaleY: scaleY.value * (1 - Math.abs(sway.value) * 0.06) },
+    ],
   }));
 
-  return { style, blink, glance };
+  const eyeProps = useAnimatedProps(() => ({
+    transform: `translate(${FACE_X} ${eyeY}) scale(1 ${lids.value}) translate(${-FACE_X} ${-eyeY})`,
+  }));
+
+  return { style, eyeProps };
 }
 
-function Eyes({ mood, eyeY }: { mood: CharacterMood; eyeY: number }) {
-  return (
-    <>
-      {characterEyes(mood, eyeY).map((mark) => (
-        <Eye key={`${mark.kind}-${mark.x}`} mark={mark} />
-      ))}
-    </>
-  );
-}
-
-function Eye({ mark }: { mark: EyeMark }) {
-  if (mark.kind === "arc") {
-    return <Path d={eyeArcPath(mark)} fill={palette.ink} />;
+function Face({ piece }: { piece: FacePiece }) {
+  const fill = piece.role === "blush" ? blushFill : palette.ink;
+  if (piece.kind === "arc") {
+    return <Path d={faceArcPath(piece)} fill={fill} />;
   }
-  const showShine = mark.height >= eyeHighlight.minEye;
+  if (piece.kind === "oval") {
+    return (
+      <G transform={`translate(${piece.x} ${piece.y})`}>
+        <Ellipse
+          cx={piece.width / 2}
+          cy={piece.height / 2}
+          rx={piece.width / 2}
+          ry={piece.height / 2}
+          fill={fill}
+        />
+      </G>
+    );
+  }
+  const shine = piece.role === "eye" && piece.height >= eyeHighlight.minEye;
   return (
-    <G transform={`translate(${mark.x} ${mark.y})`}>
-      <Rect width={mark.width} height={mark.height} rx={mark.width / 2} fill={palette.ink} />
-      {showShine ? (
+    <G transform={`translate(${piece.x} ${piece.y})`}>
+      <Rect width={piece.width} height={piece.height} rx={piece.width / 2} fill={fill} />
+      {shine ? (
         <G transform={`translate(${eyeHighlight.insetX} ${eyeHighlight.insetY})`}>
           <Rect
             width={eyeHighlight.width}

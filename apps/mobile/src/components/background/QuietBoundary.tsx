@@ -1,5 +1,7 @@
 import { Component, type ReactNode } from "react";
 
+import { StaticStudio } from "./StaticStudio";
+
 export class QuietBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false };
 
@@ -9,7 +11,7 @@ export class QuietBoundary extends Component<{ children: ReactNode }, { failed: 
 
   render() {
     if (this.state.failed) {
-      return null;
+      return <StaticStudio />;
     }
     return this.props.children;
   }

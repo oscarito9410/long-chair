@@ -17,12 +17,13 @@ describe("Character", () => {
     expect(html).toContain("radialGradient");
     expect(html).toContain("<rect");
     expect(html).toContain("#ffffff");
+    expect(html).toContain('data-expression="calm"');
     expect(html).not.toContain("stroke");
     expect(html).not.toContain("<ellipse");
     expect(html).not.toContain("M78 18");
   });
 
-  it("draws a diamond and a happy arc without a mouth", () => {
+  it("draws a greeting diamond with a small smile", () => {
     const html = renderToStaticMarkup(
       createElement(Character, {
         variant: { shape: "diamond", hue: "wisteria", mood: "grin", accessory: "star" },
@@ -31,7 +32,8 @@ describe("Character", () => {
 
     expect(html).toContain("M60 12");
     expect(html).toContain("Q");
-    expect(html.match(/<rect/g)).toBeNull();
+    expect(html).toContain('data-expression="greeting"');
+    expect(html).not.toContain("M78 18");
   });
 
   it("adds the settle motion classes only when asked", () => {
@@ -43,8 +45,10 @@ describe("Character", () => {
       }),
     );
 
-    expect(html).toContain("character-settle");
-    expect(html).toContain("character-glance");
+    expect(html).toContain("character-intro");
+    expect(html).toContain("character-pose");
+    expect(html).toContain("character-idle");
     expect(html).toContain("character-eyes");
+    expect(html).toContain('data-expression="thinking"');
   });
 });

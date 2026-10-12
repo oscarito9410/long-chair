@@ -13,7 +13,12 @@ export function EmptyState({ heading = "h2", title, href, action }: EmptyStatePr
   const TitleTag = heading;
   return (
     <div className="flex flex-col items-center gap-6 text-center">
-      <Character variant={{ shape: "pebble", hue: "seaglass" }} size="lg" animate />
+      <Character
+        variant={{ shape: "pebble", hue: "seaglass" }}
+        size="lg"
+        expression="sleepy"
+        animate
+      />
       <TitleTag
         className={cn(
           heading === "h1" ? "text-4xl font-extrabold leading-tight" : "text-2xl font-bold",

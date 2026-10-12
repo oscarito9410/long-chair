@@ -32,12 +32,19 @@ export function createStaticTasteSeedProvider(): TasteSeedProvider {
   };
 }
 
-export function rankSeeds(seeds: readonly RegionSeed[], hits: readonly PopularityHit[]): RegionSeed[] {
+export function rankSeeds(
+  seeds: readonly RegionSeed[],
+  hits: readonly PopularityHit[],
+): RegionSeed[] {
   const score = new Map(hits.map((hit) => [hit.tasteId, hit.score]));
-  return [...seeds].sort((left, right) => (score.get(right.tasteId) ?? 0) - (score.get(left.tasteId) ?? 0));
+  return [...seeds].sort(
+    (left, right) => (score.get(right.tasteId) ?? 0) - (score.get(left.tasteId) ?? 0),
+  );
 }
 
-export function createFakePopularitySeedProvider(hits: readonly PopularityHit[]): TasteSeedProvider {
+export function createFakePopularitySeedProvider(
+  hits: readonly PopularityHit[],
+): TasteSeedProvider {
   return {
     seedsFor(region) {
       return Promise.resolve(rankSeeds(regionSeedList(region), hits));

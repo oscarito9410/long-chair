@@ -12,11 +12,12 @@ export type Route =
   | { name: "settings" }
   | { name: "item"; itemId: string }
   | { name: "marks" }
+  | { name: "expressions" }
   | { name: "unknown" };
 
 const itemPrefix = "/item/";
 
-export function parseRoute(hash: string): Route {
+export function parseRoute(hash: string, dev = false): Route {
   const path = hash.replace(/^#/, "") || "/welcome";
   switch (path) {
     case "/welcome":
@@ -45,6 +46,8 @@ export function parseRoute(hash: string): Route {
       return { name: "settings" };
     case "/marks":
       return { name: "marks" };
+    case "/expressions":
+      return dev ? { name: "expressions" } : { name: "unknown" };
     default:
       break;
   }

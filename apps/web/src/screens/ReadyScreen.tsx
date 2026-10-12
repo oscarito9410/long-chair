@@ -1,16 +1,19 @@
+import { Character } from "../components/art/Character.tsx";
 import { Stamp } from "../components/art/Stamp.tsx";
 import { CoverArt } from "../components/art/CoverArt.tsx";
 import { QuestionFrame } from "../components/chrome/QuestionFrame.tsx";
 import { kindMeta } from "../content/presentation.ts";
-import { itemById } from "@long-chair/core";
+import { guideById, itemById } from "@long-chair/core";
 import type { PackedSession } from "@long-chair/core";
 import { usePackedSession } from "../hooks/use-packed-session.ts";
 import { kitStampLine } from "@long-chair/core";
 import { paths } from "../routing/paths.ts";
+import { useSession } from "../state/SessionContext.tsx";
 
 const fanLimit = 3;
 
 export function ReadyScreen() {
+  const { draft } = useSession();
   const packed = usePackedSession();
   const firstId = packed.slots[0]?.itemId;
   const item = firstId ? itemById(firstId) : undefined;
@@ -24,6 +27,15 @@ export function ReadyScreen() {
       primaryHref={paths.kit}
       dock
     >
+      <div className="flex justify-center">
+        <Character
+          variant={guideById(draft.companionId).variant}
+          expression="celebration"
+          size="md"
+          animate
+          settle
+        />
+      </div>
       <div className="stamp-stage">
         <StampFan packed={packed} />
         <Stamp
