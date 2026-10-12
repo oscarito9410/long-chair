@@ -1,12 +1,12 @@
 """Build a session kit: resolve, insights, one checker pass, pack, explain."""
 
-import asyncio
 from collections.abc import Sequence
 from dataclasses import replace
 
 from app.application.checker import rejects
 from app.application.enrich import EmptyEnrichment, apply_enrichment
 from app.application.plan_companion import plan_companion, scheduled_items
+from app.application.port_batches import collect_port_batch
 from app.domain.draft import resolve_tastes, resolve_themes, validate_draft
 from app.domain.entities import (
     AvoidTheme,
@@ -63,8 +63,8 @@ class BuildSessionKit:
         return SessionKit(packed, explained, plan_companion(explained), places)
 
     async def _resolve(self, tastes: Sequence[TasteSeed]) -> tuple[InterestLink, ...]:
-        hits = await asyncio.gather(
-            *(self._qloo.search(taste.name, taste.kind) for taste in tastes)
+        hits = await collect_port_batch(
+            self._qloo.search(taste.name, taste.kind) for taste in tastes
         )
         links: list[InterestLink] = []
         for taste, found in zip(tastes, hits, strict=True):
@@ -90,12 +90,10 @@ class BuildSessionKit:
         rejected_kinds = {item.kind for item in rejected}
         kept = tuple(item for item in first if item.kind not in rejected_kinds)
         banned = tuple(dict.fromkeys(item.qloo_entity_id for item in rejected))
-        batches = await asyncio.gather(
-            *(
-                self._qloo.insights(kind, links, exclude_tag_ids, banned)
-                for kind in CONTENT_KINDS
-                if kind in rejected_kinds
-            )
+        batches = await collect_port_batch(
+            self._qloo.insights(kind, links, exclude_tag_ids, banned)
+            for kind in CONTENT_KINDS
+            if kind in rejected_kinds
         )
         second = tuple(item for batch in batches for item in batch if not rejects(item, held))
         return kept + second
@@ -106,11 +104,9 @@ class BuildSessionKit:
         exclude_tag_ids: Sequence[str],
         exclude_entity_ids: Sequence[str],
     ) -> tuple[CatalogItem, ...]:
-        batches = await asyncio.gather(
-            *(
-                self._qloo.insights(kind, links, exclude_tag_ids, exclude_entity_ids)
-                for kind in CONTENT_KINDS
-            )
+        batches = await collect_port_batch(
+            self._qloo.insights(kind, links, exclude_tag_ids, exclude_entity_ids)
+            for kind in CONTENT_KINDS
         )
         items: list[CatalogItem] = []
         for batch in batches:
@@ -118,7 +114,7 @@ class BuildSessionKit:
         return tuple(items)
 
     async def _enrich(self, items: Sequence[CatalogItem]) -> tuple[CatalogItem, ...]:
-        extras = await asyncio.gather(*(self._enrichment.for_item(item) for item in items))
+        extras = await collect_port_batch(self._enrichment.for_item(item) for item in items)
         return tuple(
             apply_enrichment(item, extra) for item, extra in zip(items, extras, strict=True)
         )
@@ -127,7 +123,7 @@ class BuildSessionKit:
         llm = self._llm
         if llm is None:
             return tuple(items)
-        rewritten = await asyncio.gather(*(self._rewrite(item, llm) for item in items))
+        rewritten = await collect_port_batch(self._rewrite(item, llm) for item in items)
         return tuple(rewritten)
 
     async def _rewrite(self, item: CatalogItem, llm: LlmPort) -> CatalogItem:

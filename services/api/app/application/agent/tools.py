@@ -1,6 +1,5 @@
 """Six agent tools over ports and existing domain/application rules."""
 
-import asyncio
 from collections.abc import Sequence
 from dataclasses import dataclass
 
@@ -8,6 +7,7 @@ from app.application.agent.arguments import ToolArgumentError, ToolArguments
 from app.application.agent.models import AgentState
 from app.application.checker import rejects
 from app.application.enrich import apply_enrichment
+from app.application.port_batches import collect_port_batch
 from app.domain.entities import CatalogItem
 from app.domain.kinds import CONTENT_KINDS
 from app.domain.packer import pack_session
@@ -59,8 +59,8 @@ class AgentTools:
 
     async def _search(self, seed_ids: Sequence[str]) -> ToolResult:
         chosen = [taste for taste in self.state.tastes if taste.id in seed_ids]
-        batches = await asyncio.gather(
-            *(self._qloo.search(taste.name, taste.kind) for taste in chosen)
+        batches = await collect_port_batch(
+            self._qloo.search(taste.name, taste.kind) for taste in chosen
         )
         links: dict[str, InterestLink] = {}
         for taste, hits in zip(chosen, batches, strict=True):
@@ -77,17 +77,15 @@ class AgentTools:
             raise ToolArgumentError("search_required")
         tags = await self._qloo.exclusion_tags(self.state.held)
         excluded_tags = tuple(tag.qloo_tag_id for tag in tags)
-        batches = await asyncio.gather(
-            *(
-                self._qloo.insights(
-                    kind,
-                    tuple(self.state.links.values()),
-                    excluded_tags,
-                    tuple(sorted(self.state.rejected_entity_ids)),
-                )
-                for kind in CONTENT_KINDS
-                if kind in kinds
+        batches = await collect_port_batch(
+            self._qloo.insights(
+                kind,
+                tuple(self.state.links.values()),
+                excluded_tags,
+                tuple(sorted(self.state.rejected_entity_ids)),
             )
+            for kind in CONTENT_KINDS
+            if kind in kinds
         )
         found = tuple(item for batch in batches for item in batch)
         for item in found:
@@ -133,7 +131,7 @@ class AgentTools:
         items = tuple(
             item for item in self.verified_items() if item.id not in self.state.enriched_ids
         )
-        extras = await asyncio.gather(*(self._enrichment.for_item(item) for item in items))
+        extras = await collect_port_batch(self._enrichment.for_item(item) for item in items)
         for item, extra in zip(items, extras, strict=True):
             self.state.candidates[item.id] = apply_enrichment(item, extra)
             self.state.enriched_ids.add(item.id)
