@@ -26,7 +26,10 @@ export function regionFromLocale(locale: string | undefined): RegionCode {
   if (!locale) {
     return "GLOBAL";
   }
-  const parts = locale.replaceAll("_", "-").split("-").filter((part) => part.length > 0);
+  const parts = locale
+    .replaceAll("_", "-")
+    .split("-")
+    .filter((part) => part.length > 0);
   const country = parts.length > 1 ? parts[parts.length - 1]?.toUpperCase() : undefined;
   if (country && isRegionCode(country)) {
     return country;

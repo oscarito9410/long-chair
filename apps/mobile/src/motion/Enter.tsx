@@ -1,5 +1,10 @@
 import type { ReactNode } from "react";
-import Animated, { FadeOut, FadeOutDown, Keyframe, LinearTransition } from "react-native-reanimated";
+import Animated, {
+  FadeOut,
+  FadeOutDown,
+  Keyframe,
+  LinearTransition,
+} from "react-native-reanimated";
 
 import { useReducedMotion } from "./use-reduced-motion";
 

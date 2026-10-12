@@ -1,6 +1,13 @@
 import { createContext, useContext, useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import { addCustomTheme, customThemesOf, demoDraft, openingDraft, toggleId, toggleTaste } from "@long-chair/core";
+import {
+  addCustomTheme,
+  customThemesOf,
+  demoDraft,
+  openingDraft,
+  toggleId,
+  toggleTaste,
+} from "@long-chair/core";
 import type { SessionDraft } from "@long-chair/core";
 
 type SessionContextValue = {

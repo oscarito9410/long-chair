@@ -57,7 +57,10 @@ export function customThemeFromLabel(label: string): CustomTheme | undefined {
   return { id: `${CUSTOM_PREFIX}${encodeURIComponent(trimmed)}`, label: trimmed };
 }
 
-export function addCustomTheme(themes: readonly CustomTheme[], label: string): readonly CustomTheme[] {
+export function addCustomTheme(
+  themes: readonly CustomTheme[],
+  label: string,
+): readonly CustomTheme[] {
   const next = customThemeFromLabel(label);
   if (!next || themes.some((theme) => theme.id === next.id)) {
     return themes;
@@ -122,7 +125,11 @@ export function judgeRule(rule: ThemeRule, signals: ItemSignals): ThemeVerdict {
   }
   const synopsis = synopsisHit(rule, signals.synopsis);
   if (synopsis) {
-    evidence.push({ source: "keyword", detail: `Synopsis keyword "${synopsis}"`, confidence: "standard" });
+    evidence.push({
+      source: "keyword",
+      detail: `Synopsis keyword "${synopsis}"`,
+      confidence: "standard",
+    });
   }
   if (evidence.length > 0) {
     return { themeId: rule.id, verdict: "flagged", evidence };
@@ -146,7 +153,13 @@ export function judgeRule(rule: ThemeRule, signals: ItemSignals): ThemeVerdict {
   return {
     themeId: rule.id,
     verdict: "unverified",
-    evidence: [{ source: "qloo", detail: "A source did not answer, so this is not clear.", confidence: "standard" }],
+    evidence: [
+      {
+        source: "qloo",
+        detail: "A source did not answer, so this is not clear.",
+        confidence: "standard",
+      },
+    ],
   };
 }
 
@@ -155,7 +168,9 @@ export function judgeCustom(theme: CustomTheme, synopsis: string): ThemeVerdict 
     return {
       themeId: theme.id,
       verdict: "flagged",
-      evidence: [{ source: "keyword", detail: `Synopsis contains "${theme.label}"`, confidence: "low" }],
+      evidence: [
+        { source: "keyword", detail: `Synopsis contains "${theme.label}"`, confidence: "low" },
+      ],
     };
   }
   return {

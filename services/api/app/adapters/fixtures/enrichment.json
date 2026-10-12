@@ -31,9 +31,7 @@
     },
     "00000000-0000-4000-8000-000000000001": {
       "durationNote": "Runtime.",
-      "watchProviders": [
-        "Sample cinema"
-      ],
+      "watchProviders": ["Sample cinema"],
       "links": [
         {
           "label": "Open in Apple TV",
@@ -44,9 +42,7 @@
     "00000000-0000-4000-8000-000000000003": {
       "title": "Harbor Lights: The Blue Buoy",
       "durationNote": "Episode runtime.",
-      "watchProviders": [
-        "Sample cinema"
-      ],
+      "watchProviders": ["Sample cinema"],
       "links": [
         {
           "label": "Open in Apple TV",

@@ -29,7 +29,12 @@ describe("region seeds", () => {
       for (const seed of seeds) {
         expect(tasteById(seed.tasteId)?.id).toBe(seed.tasteId);
       }
-      expect(groupsForRegion(region).map((group) => group.id)).toEqual(["watch", "listen", "play", "make"]);
+      expect(groupsForRegion(region).map((group) => group.id)).toEqual([
+        "watch",
+        "listen",
+        "play",
+        "make",
+      ]);
     }
   });
 

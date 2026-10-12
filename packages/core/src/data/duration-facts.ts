@@ -11,10 +11,10 @@ function searchLink(label: string, base: string, title: string): ItemLink {
   return { label, href: `${base}${encodeURIComponent(title)}` };
 }
 
-export function durationFactFor(kind: ContentKind, title: string): Pick<
-  CatalogItem,
-  "durationSource" | "durationNote" | "links" | "watchProviders"
-> {
+export function durationFactFor(
+  kind: ContentKind,
+  title: string,
+): Pick<CatalogItem, "durationSource" | "durationNote" | "links" | "watchProviders"> {
   if (kind === "movie" || kind === "tv_show") {
     const note = kind === "movie" ? "Runtime. Sample shelf." : "Episode runtime. Sample shelf.";
     return {

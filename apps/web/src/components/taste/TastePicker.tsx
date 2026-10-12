@@ -277,7 +277,9 @@ export function TastePicker({
                   apply(toggleTaste(selectedIds, id));
                 }}
                 onExpand={() => {
-                  setOpen((current) => (current.includes(group.id) ? current : [...current, group.id]));
+                  setOpen((current) =>
+                    current.includes(group.id) ? current : [...current, group.id],
+                  );
                 }}
               />
             ))}

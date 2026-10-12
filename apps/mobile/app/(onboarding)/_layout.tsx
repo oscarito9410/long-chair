@@ -22,10 +22,7 @@ import {
   loveTitle,
 } from "../../src/copy/phrases";
 import { PressableScale } from "../../src/motion/PressableScale";
-import {
-  OnboardingChromeProvider,
-  useOnboardingStore,
-} from "../../src/motion/onboarding-chrome";
+import { OnboardingChromeProvider, useOnboardingStore } from "../../src/motion/onboarding-chrome";
 import { useReducedMotion } from "../../src/motion/use-reduced-motion";
 import {
   FONT_BODY,
@@ -117,9 +114,7 @@ function OnboardingFrame() {
         style={styles.body}
       >
         <ScrollView contentContainerStyle={styles.scroll}>
-          {hideTitle ? null : (
-            <StepTitle title={meta.title} lede={lede} note={note} mark={mark} />
-          )}
+          {hideTitle ? null : <StepTitle title={meta.title} lede={lede} note={note} mark={mark} />}
           <Slot />
         </ScrollView>
       </Animated.View>

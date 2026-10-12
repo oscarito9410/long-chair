@@ -47,7 +47,11 @@ export function AppShell({ children, route, showTabs, showDots }: AppShellProps)
         <div className="app-window" id="app-window" ref={setWindowEl}>
           <div className={cn("layer-content page", pagePad(showTabs, route.name))}>
             {showTabs ? (
-              <a className="tab-gear glass-surface glass-thin glass-disc" href={paths.settings} aria-label="Settings">
+              <a
+                className="tab-gear glass-surface glass-thin glass-disc"
+                href={paths.settings}
+                aria-label="Settings"
+              >
                 <Icon name="gear" />
               </a>
             ) : null}

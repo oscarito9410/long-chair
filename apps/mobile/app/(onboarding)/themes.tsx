@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import { addThemeLabel, addThemePlaceholder, avoidThemes, customThemesOf, notMedicalAdvice } from "@long-chair/core";
+import {
+  addThemeLabel,
+  addThemePlaceholder,
+  avoidThemes,
+  customThemesOf,
+  notMedicalAdvice,
+} from "@long-chair/core";
 import { router } from "expo-router";
 
 import { OptionRow } from "../../src/components/chrome/OptionRow";
@@ -9,7 +15,15 @@ import { Enter } from "../../src/motion/Enter";
 import { useOnboardingChrome } from "../../src/motion/onboarding-chrome";
 import { themeCharacter } from "../../src/presentation";
 import { useSession } from "../../src/state/session";
-import { FONT_BODY, FONT_SECONDARY, palette, RADIUS_PILL, SPACE_8, SPACE_16, TARGET } from "../../src/theme/palette";
+import {
+  FONT_BODY,
+  FONT_SECONDARY,
+  palette,
+  RADIUS_PILL,
+  SPACE_8,
+  SPACE_16,
+  TARGET,
+} from "../../src/theme/palette";
 
 export default function ThemesScreen() {
   const { draft, toggleAvoid, addTheme, removeTheme } = useSession();
@@ -100,5 +114,9 @@ const styles = StyleSheet.create({
   addText: { fontFamily: "Nunito_800ExtraBold", fontSize: FONT_BODY, color: palette.ink },
   custom: { minHeight: TARGET, justifyContent: "center", gap: SPACE_8 },
   customTitle: { fontFamily: "Nunito_800ExtraBold", fontSize: FONT_BODY, color: palette.ink },
-  customDetail: { fontFamily: "Nunito_600SemiBold", fontSize: FONT_SECONDARY, color: palette.inkSoft },
+  customDetail: {
+    fontFamily: "Nunito_600SemiBold",
+    fontSize: FONT_SECONDARY,
+    color: palette.inkSoft,
+  },
 });

@@ -184,7 +184,9 @@ function readOptionalList(record: Record<string, unknown>, key: string): string[
   if (!Array.isArray(value)) {
     return undefined;
   }
-  const list = value.filter((entry): entry is string => typeof entry === "string" && entry.length > 0);
+  const list = value.filter(
+    (entry): entry is string => typeof entry === "string" && entry.length > 0,
+  );
   return list.length > 0 ? list : undefined;
 }
 

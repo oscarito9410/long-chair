@@ -68,7 +68,12 @@ function LoveMark() {
   return (
     <span className="love-mark">
       love
-      <svg className="love-underline" viewBox="0 0 120 12" preserveAspectRatio="none" aria-hidden="true">
+      <svg
+        className="love-underline"
+        viewBox="0 0 120 12"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
         <path
           d="M2 8 C 18 3, 36 11, 58 6 C 78 2, 96 10, 118 5"
           fill="none"

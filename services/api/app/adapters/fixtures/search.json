@@ -15,9 +15,7 @@
         "short_descriptions": [
           {
             "value": "A slow road film about a repair",
-            "languages": [
-              "en"
-            ]
+            "languages": ["en"]
           }
         ]
       },
@@ -47,9 +45,7 @@
         "short_descriptions": [
           {
             "value": "A coastal mystery, told quietly",
-            "languages": [
-              "en"
-            ]
+            "languages": ["en"]
           }
         ]
       },
@@ -80,9 +76,7 @@
         "short_descriptions": [
           {
             "value": "One recipe, and no rush",
-            "languages": [
-              "en"
-            ]
+            "languages": ["en"]
           }
         ]
       },
@@ -112,9 +106,7 @@
         "short_descriptions": [
           {
             "value": "Warm vocal jazz in small rooms",
-            "languages": [
-              "en"
-            ]
+            "languages": ["en"]
           }
         ]
       },
@@ -145,9 +137,7 @@
         "short_descriptions": [
           {
             "value": "Essays on kitchens and weather",
-            "languages": [
-              "en"
-            ]
+            "languages": ["en"]
           }
         ]
       },
@@ -177,9 +167,7 @@
         "short_descriptions": [
           {
             "value": "A gentle film about small trains",
-            "languages": [
-              "en"
-            ]
+            "languages": ["en"]
           }
         ]
       },
@@ -207,17 +195,11 @@
       "properties": {
         "description": "The sport, from five-a-side to a final",
         "x-long-chair-taste-kind": "tag",
-        "x-long-chair-aliases": [
-          "futbol",
-          "f\u00fatbol",
-          "football"
-        ],
+        "x-long-chair-aliases": ["futbol", "f\u00fatbol", "football"],
         "short_descriptions": [
           {
             "value": "The sport, from five-a-side to a final",
-            "languages": [
-              "en"
-            ]
+            "languages": ["en"]
           }
         ]
       }
@@ -233,16 +215,11 @@
       "properties": {
         "description": "Series and films from Japan",
         "x-long-chair-taste-kind": "tag",
-        "x-long-chair-aliases": [
-          "anime",
-          "anim\u00e9"
-        ],
+        "x-long-chair-aliases": ["anime", "anim\u00e9"],
         "short_descriptions": [
           {
             "value": "Series and films from Japan",
-            "languages": [
-              "en"
-            ]
+            "languages": ["en"]
           }
         ]
       }

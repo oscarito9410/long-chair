@@ -263,11 +263,11 @@ Server-only fields, not sent to the browser as a dump of Qloo:
 
 `CatalogItem.minutes` mapping:
 
-| Kind                                   | Duration source                                                                                                                                                                               |
-| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `movie`, `tv_show`                     | `properties.duration` when the catalog sends it. Source `confirmed`. TV placement is still checked by the live scope script.                                                                 |
-| `podcast`, `artist`                    | No catalog duration. iTunes supplies an episode or album length, source `confirmed`, or the packer keeps an estimated fallback.                                                              |
-| `book`                                 | `page_count` times one minute per page. Source `estimated`.                                                                                                                                  |
+| Kind                | Duration source                                                                                                                 |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `movie`, `tv_show`  | `properties.duration` when the catalog sends it. Source `confirmed`. TV placement is still checked by the live scope script.    |
+| `podcast`, `artist` | No catalog duration. iTunes supplies an episode or album length, source `confirmed`, or the packer keeps an estimated fallback. |
+| `book`              | `page_count` times one minute per page. Source `estimated`.                                                                     |
 
 `CatalogItem.rank` is the position Qloo returned. A separate affinity field was not in the onboarding sample. Do not invent one. `popularity` is on the entity, beside `properties`, and is not the same thing as rank.
 

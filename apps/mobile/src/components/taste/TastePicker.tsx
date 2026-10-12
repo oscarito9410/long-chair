@@ -153,7 +153,12 @@ function GroupBlock({
   const tilt = reduced ? "0deg" : "-2deg";
   return (
     <View style={styles.group}>
-      <View style={[styles.groupNote, { backgroundColor: glassWash(tint, false), transform: [{ rotate: tilt }] }]}>
+      <View
+        style={[
+          styles.groupNote,
+          { backgroundColor: glassWash(tint, false), transform: [{ rotate: tilt }] },
+        ]}
+      >
         <Text style={styles.groupLabel}>{group.label}</Text>
       </View>
       <View style={styles.wrap}>
@@ -283,14 +288,23 @@ export function TastePicker({
         contentContainerStyle={[styles.pad, { paddingBottom: footerClearance }]}
         keyboardShouldPersistTaps="handled"
       >
-        <PressableScale onPress={onOpenRegion} haptic="tick" accessibilityLabel={`${regionMenuLabel}: ${regionName}`}>
+        <PressableScale
+          onPress={onOpenRegion}
+          haptic="tick"
+          accessibilityLabel={`${regionMenuLabel}: ${regionName}`}
+        >
           <View style={styles.regionChip}>
             <Text style={styles.chipLabel}>{`${regionMenuLabel}: ${regionName}`}</Text>
           </View>
         </PressableScale>
         {error ? <Text style={styles.body}>{error}</Text> : null}
         {searching && !error ? (
-          <Suggestions results={results} selectedIds={selectedIds} full={full} onToggle={(id) => apply(toggleTaste(selectedIds, id))} />
+          <Suggestions
+            results={results}
+            selectedIds={selectedIds}
+            full={full}
+            onToggle={(id) => apply(toggleTaste(selectedIds, id))}
+          />
         ) : null}
         {searching ? null : (
           <View>
@@ -305,7 +319,9 @@ export function TastePicker({
                   apply(toggleTaste(selectedIds, id));
                 }}
                 onExpand={() => {
-                  setOpen((current) => (current.includes(group.id) ? current : [...current, group.id]));
+                  setOpen((current) =>
+                    current.includes(group.id) ? current : [...current, group.id],
+                  );
                 }}
               />
             ))}
