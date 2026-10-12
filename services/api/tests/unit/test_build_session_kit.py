@@ -3,6 +3,7 @@
 from collections.abc import Sequence
 
 import pytest
+from app.adapters.enrichment import FakeEnrichment
 from app.adapters.fake_qloo import FakeQlooAdapter
 from app.application.build_session_kit import BuildSessionKit
 from app.application.checker import rejects
@@ -90,7 +91,7 @@ def _one_taste() -> SessionDraft:
 
 @pytest.mark.asyncio
 async def test_fake_demo_fills_the_chair() -> None:
-    kit = await BuildSessionKit(FakeQlooAdapter()).execute(
+    kit = await BuildSessionKit(FakeQlooAdapter(), enrichment=FakeEnrichment()).execute(
         DEMO_DRAFT,
         TASTES,
         THEMES,
@@ -108,7 +109,15 @@ async def test_fake_demo_fills_the_chair() -> None:
     assert kit.packed.open_minutes == 0
     assert kit.items[0].why == "Because you love The Paper Kite"
     assert kit.items[0].duration_source == "confirmed"
-    assert kit.items[1].duration_source == "assumed"
+    assert kit.items[1].duration_source == "confirmed"
+    by_id = {item.id: item for item in kit.items}
+    assert by_id["bread-tuesday"].duration_source == "confirmed"
+    assert by_id["bread-tuesday"].minutes == 36
+    assert by_id["market-morning"].duration_source == "estimated"
+    assert "page count" in by_id["market-morning"].duration_note.casefold()
+    assert by_id["cedar-hall"].links
+    assert kit.places[0].open_until == ""
+    assert kit.places[0].walk_minutes == 6
     assert len(kit.places) == 3
     assert len(kit.topics) == 5
 

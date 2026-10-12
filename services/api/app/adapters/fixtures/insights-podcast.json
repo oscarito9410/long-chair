@@ -1,33 +1,35 @@
 {
   "success": true,
+  "duration": 12,
   "results": {
     "entities": [
       {
-        "name": "Slow Kitchen Radio: Bread on a Tuesday",
+        "name": "Slow Kitchen Radio",
         "entity_id": "00000000-0000-4000-8000-000000000004",
         "type": "urn:entity",
         "subtype": "urn:entity:podcast",
-        "x-long-chair-slug": "bread-tuesday",
+        "popularity": 0.5,
+        "disambiguation": "Sample Radio",
+        "tags": [
+          {
+            "id": "urn:tag:genre:media:fictional_food",
+            "name": "Food",
+            "type": "urn:tag:keyword:media"
+          }
+        ],
         "properties": {
           "description": "Otto Pell bakes one loaf and talks about flour the way other people talk about weather.",
-          "duration": 36,
-          "image": {
-            "url": ""
-          },
-          "popularity": 0.5,
-          "tags": [
-            {
-              "id": "urn:tag:keyword:media:fictional_repair",
-              "name": "Repair",
-              "type": "urn:tag:keyword:media"
-            }
-          ],
+          "episode_count": "48",
+          "content_rating": "clean",
+          "channel": "Sample Radio",
           "short_descriptions": [
             {
-              "value": "One loaf and a long rise."
+              "value": "One loaf and a long rise.",
+              "languages": [
+                "en"
+              ]
             }
-          ],
-          "creator": "Hosted by Otto Pell"
+          ]
         },
         "query": {
           "explainability": {
@@ -40,7 +42,8 @@
               }
             ]
           }
-        }
+        },
+        "x-long-chair-slug": "bread-tuesday"
       }
     ]
   },
@@ -50,7 +53,7 @@
       "warning": null,
       "entities": [
         {
-          "entity_id": "00000000-0000-4000-8000-000000000012",
+          "entity_id": "00000000-0000-4000-8000-000000000010",
           "score": 0.8
         }
       ]

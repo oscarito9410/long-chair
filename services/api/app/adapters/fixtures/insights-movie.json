@@ -1,5 +1,6 @@
 {
   "success": true,
+  "duration": 12,
   "results": {
     "entities": [
       {
@@ -7,27 +8,32 @@
         "entity_id": "00000000-0000-4000-8000-000000000001",
         "type": "urn:entity",
         "subtype": "urn:entity:movie",
-        "x-long-chair-slug": "north-window",
+        "popularity": 0.5,
+        "disambiguation": "2019, Ellis Maren",
+        "tags": [
+          {
+            "id": "urn:tag:keyword:media:fictional_repair",
+            "name": "Repair",
+            "type": "urn:tag:keyword:media"
+          }
+        ],
         "properties": {
           "description": "A woman spends a summer repairing a greenhouse that was never hers.",
           "duration": 108,
-          "image": {
-            "url": ""
-          },
-          "popularity": 0.5,
-          "tags": [
-            {
-              "id": "urn:tag:keyword:media:fictional_repair",
-              "name": "Repair",
-              "type": "urn:tag:keyword:media"
-            }
+          "content_rating": "PG",
+          "release_year": 2019,
+          "release_date": "2019-06-01",
+          "production_companies": [
+            "Ellis Maren"
           ],
           "short_descriptions": [
             {
-              "value": "A slow repair, told through weather and glass."
+              "value": "A slow repair, told through weather and glass.",
+              "languages": [
+                "en"
+              ]
             }
-          ],
-          "production_companies": ["Written and directed by Ellis Maren"]
+          ]
         },
         "query": {
           "explainability": {
@@ -40,6 +46,14 @@
               }
             ]
           }
+        },
+        "x-long-chair-slug": "north-window",
+        "external": {
+          "imdb": [
+            {
+              "id": "sample-imdb-north-window"
+            }
+          ]
         }
       },
       {
@@ -47,28 +61,32 @@
         "entity_id": "00000000-0000-4000-8000-000000000007",
         "type": "urn:entity",
         "subtype": "urn:entity:movie",
-        "x-long-chair-slug": "ward-clock",
+        "popularity": 0.5,
+        "disambiguation": "2018, a fictional crew",
+        "tags": [
+          {
+            "id": "urn:tag:keyword:media:fictional_illness",
+            "name": "Illness",
+            "type": "urn:tag:keyword:media",
+            "x-long-chair-theme-id": "illness"
+          }
+        ],
         "properties": {
           "description": "A night shift where Illness is the whole plot.",
           "duration": 90,
-          "image": {
-            "url": ""
-          },
-          "popularity": 0.5,
-          "tags": [
-            {
-              "id": "urn:tag:keyword:media:fictional_illness",
-              "name": "Illness",
-              "type": "urn:tag:keyword:media",
-              "x-long-chair-theme-id": "illness"
-            }
+          "content_rating": "PG-13",
+          "release_year": 2018,
+          "production_companies": [
+            "A fictional crew"
           ],
           "short_descriptions": [
             {
-              "value": "A shift that should stay out of the room."
+              "value": "A shift that should stay out of the room.",
+              "languages": [
+                "en"
+              ]
             }
-          ],
-          "production_companies": ["A film by a fictional crew"]
+          ]
         },
         "query": {
           "explainability": {
@@ -81,7 +99,8 @@
               }
             ]
           }
-        }
+        },
+        "x-long-chair-slug": "ward-clock"
       }
     ]
   },

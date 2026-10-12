@@ -19,6 +19,7 @@ This is the [Qloo Agentic Hackathon](https://qloo.devpost.com/) build. Judges us
 - A typed sample shelf. Length and tastes change what gets packed.
 - Region chips follow the device locale (Mexico, the United States, Brazil, Spain, the United Kingdom, India, or Global). No location permission. A Region control can override it.
 - Built-in themes are rules. A title is packed only when those rules verify clear. Compare shows the sample precision and recall. See [ADR 0009](docs/adr/0009-region-chips-and-theme-rules.md).
+- Lengths come from a catalog runtime, an episode or album length, or a page-count estimate. Cards open in Apple, Open Library, Spotify search, or Maps. Nothing plays in the app. See [ADR 0010](docs/adr/0010-qloo-wire-and-enrichment.md).
 - The sample is labeled. Nothing is sent in the review build. There is no account.
 - Theme filters are content preferences kept on the phone.
 - Liquid glass on iOS 26, with a blur fallback everywhere else.
@@ -77,6 +78,18 @@ uv run uvicorn app.api.main:app --host 127.0.0.1 --port 8099
 ```
 
 Health is `GET /v1/health`. The demo kit is `POST /v1/demo/plan` with `{}`. Default mode is `fake`, so this works with no Qloo key.
+
+Enrichment stays on the sample records unless `ENRICHMENT_MODE=live`. TMDB is used only when `TMDB_API_KEY` is set. `OPEN_LIBRARY=1` turns on the Open Library fallback. iTunes needs no key and is throttled. Spotify is a search link.
+
+The live scope check is skipped unless a key is present. It writes a shape report to `services/api/.qloo-live/`, which is gitignored. Do not commit those files.
+
+```bash
+cd services/api
+QLOO_API_KEY=... uv run python -m app.live.qloo_scope
+QLOO_API_KEY=... uv run pytest tests/live -q --override-ini=addopts=
+```
+
+Oscar's simulator pass is `docs/qa-checklist.md`.
 
 ### Install the web demo
 

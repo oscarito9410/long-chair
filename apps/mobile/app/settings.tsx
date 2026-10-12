@@ -1,4 +1,4 @@
-import { notMedicalAdvice, sampleShelfNote } from "@long-chair/core";
+import { justWatchCredit, notMedicalAdvice, sampleShelfNote, tmdbCredit } from "@long-chair/core";
 import { StyleSheet, Text } from "react-native";
 
 import { GlassSurface } from "../src/components/glass/GlassSurface";
@@ -38,6 +38,8 @@ export default function SettingsScreen() {
       <Note text={sampleUntilLive} tint={palette.seaglass} />
       <Note text={onDeviceNote} tint={palette.apricot} />
       <Note text={noAccountNote} tint={palette.wisteria} />
+      <Note text={tmdbCredit} tint={palette.honey} />
+      <Note text={justWatchCredit} tint={palette.seaglass} />
     </ScreenScaffold>
   );
 }

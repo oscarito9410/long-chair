@@ -1,6 +1,6 @@
 """Turn a domain kit into the HTTP model."""
 
-from app.api.schemas import ItemOut, PackedOut, PlaceOut, SessionKitOut, SlotOut, TopicOut
+from app.api.schemas import ItemOut, LinkOut, PackedOut, PlaceOut, SessionKitOut, SlotOut, TopicOut
 from app.domain.entities import SessionKit
 from app.domain.kinds import CatalogMode
 
@@ -35,6 +35,9 @@ def present_kit(kit: SessionKit, source: CatalogMode) -> SessionKitOut:
             because_of=list(item.because_of),
             avoided_theme_ids=list(item.avoided_theme_ids),
             duration_source=item.duration_source,
+            duration_note=item.duration_note,
+            links=[LinkOut(label=label, href=href) for label, href in item.links],
+            watch_providers=list(item.watch_providers),
         )
         for item in kit.items
     ]
@@ -51,6 +54,7 @@ def present_kit(kit: SessionKit, source: CatalogMode) -> SessionKitOut:
             walk_minutes=place.walk_minutes,
             open_until=place.open_until,
             price_label=place.price_label,
+            map_url=place.map_url,
         )
         for place in kit.places
     ]

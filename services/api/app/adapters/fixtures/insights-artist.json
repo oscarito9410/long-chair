@@ -1,33 +1,32 @@
 {
   "success": true,
+  "duration": 12,
   "results": {
     "entities": [
       {
-        "name": "Mira Solano at Cedar Hall",
+        "name": "Mira Solano",
         "entity_id": "00000000-0000-4000-8000-000000000005",
         "type": "urn:entity",
         "subtype": "urn:entity:artist",
-        "x-long-chair-slug": "cedar-hall",
+        "popularity": 0.5,
+        "disambiguation": "Vocal jazz",
+        "tags": [
+          {
+            "id": "urn:tag:genre:music:fictional_jazz",
+            "name": "Jazz",
+            "type": "urn:tag:keyword:media"
+          }
+        ],
         "properties": {
-          "description": "Nine songs and the sound of chairs. She talks once about the weather, then sings.",
-          "duration": 28,
-          "image": {
-            "url": ""
-          },
-          "popularity": 0.5,
-          "tags": [
-            {
-              "id": "urn:tag:keyword:media:fictional_repair",
-              "name": "Repair",
-              "type": "urn:tag:keyword:media"
-            }
-          ],
+          "short_description": "Warm vocal jazz in small rooms.",
           "short_descriptions": [
             {
-              "value": "A small hall and a warm voice."
+              "value": "A small hall and a warm voice.",
+              "languages": [
+                "en"
+              ]
             }
-          ],
-          "creator": "A live recording"
+          ]
         },
         "query": {
           "explainability": {
@@ -40,7 +39,8 @@
               }
             ]
           }
-        }
+        },
+        "x-long-chair-slug": "cedar-hall"
       }
     ]
   },
@@ -50,7 +50,7 @@
       "warning": null,
       "entities": [
         {
-          "entity_id": "00000000-0000-4000-8000-000000000013",
+          "entity_id": "00000000-0000-4000-8000-000000000010",
           "score": 0.8
         }
       ]

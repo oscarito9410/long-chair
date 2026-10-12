@@ -12,20 +12,23 @@ from app.ports.errors import CacheMiss
 PAPER = "00000000-0000-4000-8000-000000000010"
 SEARCH_BODY = {
     "success": True,
-    "results": {
-        "entities": [
-            {
-                "name": "The Paper Kite",
-                "entity_id": PAPER,
-                "type": "urn:entity",
-                "subtype": "urn:entity:movie",
-                "properties": {
-                    "description": "A slow road film about a repair",
-                    "short_descriptions": [{"value": "A slow road film about a repair"}],
-                },
-            }
-        ]
-    },
+    "duration": 4,
+    "results": [
+        {
+            "name": "The Paper Kite",
+            "entity_id": PAPER,
+            "type": "urn:entity",
+            "subtype": "urn:entity:movie",
+            "popularity": 0.2,
+            "tags": [],
+            "properties": {
+                "description": "A slow road film about a repair",
+                "short_descriptions": [
+                    {"value": "A slow road film about a repair", "languages": ["en"]}
+                ],
+            },
+        }
+    ],
 }
 
 

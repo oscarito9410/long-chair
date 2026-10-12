@@ -5,6 +5,7 @@ from collections.abc import Sequence
 from dataclasses import replace
 
 from app.application.checker import rejects
+from app.application.enrich import EmptyEnrichment, apply_enrichment
 from app.application.plan_companion import plan_companion, scheduled_items
 from app.domain.draft import resolve_tastes, resolve_themes, validate_draft
 from app.domain.entities import (
@@ -18,6 +19,7 @@ from app.domain.entities import (
 from app.domain.errors import DraftError
 from app.domain.kinds import CONTENT_KINDS, Weekday
 from app.domain.packer import pack_session
+from app.ports.enrichment import EnrichmentPort
 from app.ports.llm import LlmPort
 from app.ports.models import InterestLink
 from app.ports.qloo import QlooPort
@@ -26,9 +28,15 @@ from app.ports.qloo import QlooPort
 class BuildSessionKit:
     """One plan. The catalog port is injected. A missing prose port keeps the template line."""
 
-    def __init__(self, qloo: QlooPort, llm: LlmPort | None = None) -> None:
+    def __init__(
+        self,
+        qloo: QlooPort,
+        llm: LlmPort | None = None,
+        enrichment: EnrichmentPort | None = None,
+    ) -> None:
         self._qloo = qloo
         self._llm = llm
+        self._enrichment = enrichment or EmptyEnrichment()
 
     async def execute(
         self,
@@ -47,7 +55,7 @@ class BuildSessionKit:
         links = await self._resolve(chosen)
         tags = await self._qloo.exclusion_tags(held)
         exclude_tag_ids = tuple(tag.qloo_tag_id for tag in tags)
-        items = await self._clean_items(links, exclude_tag_ids, held)
+        items = await self._enrich(await self._clean_items(links, exclude_tag_ids, held))
         packed = pack_session(items, draft)
         chosen_items = scheduled_items(packed, items)
         explained = await self._explain(chosen_items)
@@ -108,6 +116,12 @@ class BuildSessionKit:
         for batch in batches:
             items.extend(batch)
         return tuple(items)
+
+    async def _enrich(self, items: Sequence[CatalogItem]) -> tuple[CatalogItem, ...]:
+        extras = await asyncio.gather(*(self._enrichment.for_item(item) for item in items))
+        return tuple(
+            apply_enrichment(item, extra) for item, extra in zip(items, extras, strict=True)
+        )
 
     async def _explain(self, items: Sequence[CatalogItem]) -> tuple[CatalogItem, ...]:
         llm = self._llm

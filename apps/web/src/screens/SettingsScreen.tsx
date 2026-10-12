@@ -1,4 +1,4 @@
-import { notMedicalAdvice, sampleShelfNote } from "@long-chair/core";
+import { justWatchCredit, notMedicalAdvice, sampleShelfNote, tmdbCredit } from "@long-chair/core";
 import { controlClass } from "../components/glass/glass-styles.ts";
 import { paths } from "../routing/paths.ts";
 import { useSession } from "../state/SessionContext.tsx";
@@ -8,6 +8,8 @@ const notes = [
   "Sample shelf until a live catalog is connected.",
   "Tastes and themes you set aside stay on this phone. This build does not send them.",
   "Long Chair works without an account. There is nothing to sign in to.",
+  tmdbCredit,
+  justWatchCredit,
 ] as const;
 
 export function SettingsScreen() {

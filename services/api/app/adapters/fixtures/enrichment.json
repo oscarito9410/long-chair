@@ -1,0 +1,66 @@
+{
+  "note": "Fictional sample enrichment. Not a live iTunes, TMDB, or Open Library response.",
+  "items": {
+    "00000000-0000-4000-8000-000000000004": {
+      "minutes": 36,
+      "durationSource": "confirmed",
+      "durationNote": "Episode length. Sample record.",
+      "title": "Slow Kitchen Radio: Bread on a Tuesday",
+      "links": [
+        {
+          "label": "Open in Apple Podcasts",
+          "href": "https://podcasts.apple.com/search?term=Slow%20Kitchen%20Radio&media=podcast"
+        }
+      ]
+    },
+    "00000000-0000-4000-8000-000000000005": {
+      "minutes": 28,
+      "durationSource": "confirmed",
+      "durationNote": "Album length. Sample record.",
+      "title": "Mira Solano at Cedar Hall",
+      "links": [
+        {
+          "label": "Open in Apple Music",
+          "href": "https://music.apple.com/search?term=Mira%20Solano"
+        },
+        {
+          "label": "Search in Spotify",
+          "href": "https://open.spotify.com/search/Mira%20Solano"
+        }
+      ]
+    },
+    "00000000-0000-4000-8000-000000000001": {
+      "durationNote": "Runtime.",
+      "watchProviders": [
+        "Sample cinema"
+      ],
+      "links": [
+        {
+          "label": "Open in Apple TV",
+          "href": "https://tv.apple.com/search?term=North%20Window"
+        }
+      ]
+    },
+    "00000000-0000-4000-8000-000000000003": {
+      "title": "Harbor Lights: The Blue Buoy",
+      "durationNote": "Episode runtime.",
+      "watchProviders": [
+        "Sample cinema"
+      ],
+      "links": [
+        {
+          "label": "Open in Apple TV",
+          "href": "https://tv.apple.com/search?term=Harbor%20Lights"
+        }
+      ]
+    },
+    "00000000-0000-4000-8000-000000000006": {
+      "links": [
+        {
+          "label": "Open in Open Library",
+          "href": "https://openlibrary.org/search?q=Market%20Morning"
+        }
+      ]
+    }
+  }
+}

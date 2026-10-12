@@ -63,6 +63,39 @@ describe("ThemeVerifier", () => {
     expect(miss?.evidence[0]?.confidence).toBe("low");
   });
 
+  it("reads theme tags from the entity root of a realistic response", async () => {
+    const fetchImpl = () =>
+      Promise.resolve(
+        new Response(
+          JSON.stringify({
+            success: true,
+            duration: 8,
+            results: {
+              entities: [
+                {
+                  name: "Ward Clock",
+                  tags: [
+                    {
+                      id: "urn:tag:keyword:media:fictional_illness",
+                      name: "Illness",
+                      type: "urn:tag:keyword:media",
+                    },
+                  ],
+                  properties: {
+                    description: "A night shift.",
+                    tags: [{ id: "urn:tag:keyword:media:buried", name: "Buried" }],
+                  },
+                },
+              ],
+            },
+          }),
+          { status: 200 },
+        ),
+      );
+    const tags = await createHttpQlooTagSource({ apiKey: "example-key", fetchImpl }).tagsFor("ward-clock");
+    expect(tags?.map((tag) => tag.name)).toEqual(["Illness"]);
+  });
+
   it("maps a fixture tag payload when the Qloo key is present", async () => {
     const source = createHttpQlooTagSource({
       apiKey: "example-key",

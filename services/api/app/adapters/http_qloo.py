@@ -5,7 +5,7 @@ from collections.abc import Sequence
 
 import httpx
 
-from app.adapters.documents import InsightsDocument
+from app.adapters.documents import InsightsDocument, SearchDocument
 from app.adapters.mapper import map_insights, map_places, map_search, map_tags
 from app.adapters.queries import insights_params, place_params, search_params, tag_params
 from app.adapters.validation import validate_insights, validate_places, validate_search
@@ -42,16 +42,20 @@ class HttpQlooAdapter:
         """Search by title. An empty entity list is a real miss."""
 
         validate_search(query, kind)
-        document = await self._get(SEARCH_PATH, search_params(query, kind))
-        return map_search(document, kind)
+        document = SearchDocument.model_validate_json(
+            await self._get_body(SEARCH_PATH, search_params(query, kind))
+        )
+        return map_search(document.results, kind)
 
     async def exclusion_tags(self, themes: Sequence[AvoidTheme]) -> Sequence[TagHit]:
         """Resolve each theme label. The tag query parameter name is unconfirmed."""
 
         found: list[TagHit] = []
         for theme in themes:
-            document = await self._get(TAGS_PATH, tag_params(theme.label))
-            found.extend(hit for hit in map_tags(document) if hit.theme_id == theme.id)
+            document = InsightsDocument.model_validate_json(
+                await self._get_body(TAGS_PATH, tag_params(theme.label))
+            )
+            found.extend(hit for hit in map_tags(document.results.tags) if hit.theme_id == theme.id)
         return tuple(found)
 
     async def insights(
@@ -65,8 +69,8 @@ class HttpQlooAdapter:
 
         validate_insights(kind, interests, exclude_tag_ids, exclude_entity_ids)
         params = insights_params(kind, interests, exclude_tag_ids, exclude_entity_ids)
-        document = await self._get(INSIGHTS_PATH, params)
-        return map_insights(document, kind, interests)
+        document = InsightsDocument.model_validate_json(await self._get_body(INSIGHTS_PATH, params))
+        return map_insights(document.results.entities, kind, interests)
 
     async def places(
         self,
@@ -79,10 +83,10 @@ class HttpQlooAdapter:
 
         validate_places(locality, weekday, interests, tag_ids)
         params = place_params(locality, weekday, interests, tag_ids)
-        document = await self._get(INSIGHTS_PATH, params)
-        return map_places(document)
+        document = InsightsDocument.model_validate_json(await self._get_body(INSIGHTS_PATH, params))
+        return map_places(document.results.entities)
 
-    async def _get(self, path: str, params: Sequence[tuple[str, str]]) -> InsightsDocument:
+    async def _get_body(self, path: str, params: Sequence[tuple[str, str]]) -> bytes:
         if not self._api_key.strip():
             raise QlooTransportError("The catalog key is not configured.")
         response = await self._send(path, params)
@@ -90,7 +94,7 @@ class HttpQlooAdapter:
             raise QlooTransportError("The catalog key was refused.")
         if response.status_code != HTTP_OK:
             raise QlooTransportError("The catalog did not answer.")
-        return InsightsDocument.model_validate_json(response.content)
+        return response.content
 
     async def _send(self, path: str, params: Sequence[tuple[str, str]]) -> httpx.Response:
         delay = FIRST_BACKOFF_SECONDS

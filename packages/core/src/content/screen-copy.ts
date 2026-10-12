@@ -20,6 +20,13 @@ export const evidenceSampleNote = "Sample evidence. Not a live catalog check.";
 
 export const regionMenuLabel = "Region";
 
+export const tmdbCredit =
+  "This product uses the TMDB API but is not endorsed or certified by TMDB.";
+
+export const justWatchCredit = "Watch provider data is credited to JustWatch.";
+
+export const sampleWatchNote = "Sample watch note. Not a live listing.";
+
 export const themesNote = "Only if it helps. You can change this anytime.";
 
 export const itemThemeCheck = "No illness, hospital, or cancer themes.";

@@ -3,9 +3,11 @@
 import os
 from pathlib import Path
 
+from app.adapters.enrichment import FakeEnrichment, HttpEnrichment
 from app.adapters.fake_qloo import FakeQlooAdapter
 from app.adapters.file_cache import FileCache
 from app.adapters.recording import RecordingQlooAdapter
+from app.ports.enrichment import EnrichmentPort
 from app.ports.qloo import QlooPort
 
 MODES = frozenset({"fake", "live", "replay"})
@@ -19,6 +21,17 @@ def cache_dir() -> Path:
     if configured:
         return Path(configured)
     return Path(__file__).resolve().parents[2] / ".qloo-cache"
+
+
+def build_enrichment() -> EnrichmentPort:
+    """Fake sample lengths unless ENRICHMENT_MODE=live. TMDB stays off without a key."""
+
+    if os.environ.get("ENRICHMENT_MODE") != "live":
+        return FakeEnrichment()
+    return HttpEnrichment(
+        tmdb_api_key=os.environ.get("TMDB_API_KEY", ""),
+        open_library=os.environ.get("OPEN_LIBRARY") == "1",
+    )
 
 
 def build_qloo(mode: str) -> QlooPort:

@@ -50,6 +50,9 @@ class CatalogItem:
     because_of: tuple[str, ...]
     avoided_theme_ids: tuple[str, ...]
     duration_source: DurationSource
+    duration_note: str = ""
+    links: tuple[tuple[str, str], ...] = ()
+    watch_providers: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -92,6 +95,7 @@ class NearbyPlace:
     walk_minutes: int
     open_until: str
     price_label: str
+    map_url: str = ""
 
 
 @dataclass(frozen=True, slots=True)

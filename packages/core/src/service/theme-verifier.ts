@@ -35,6 +35,45 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
+function namedTag(row: unknown): NamedTag | null {
+  if (!isRecord(row) || typeof row.name !== "string") {
+    return null;
+  }
+  const id = typeof row.id === "string" ? row.id : typeof row.tag_id === "string" ? row.tag_id : "";
+  if (!id) {
+    return null;
+  }
+  return { id, name: row.name };
+}
+
+function tagsOf(value: unknown): NamedTag[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+  return value.flatMap((row) => {
+    const tag = namedTag(row);
+    return tag ? [tag] : [];
+  });
+}
+
+export function tagsFromQlooBody(body: unknown): readonly NamedTag[] | null {
+  if (!isRecord(body)) {
+    return null;
+  }
+  const results = isRecord(body.results) ? body.results : null;
+  const entities = results && Array.isArray(results.entities) ? results.entities : [];
+  const fromEntities = entities.flatMap((entity) => (isRecord(entity) ? tagsOf(entity.tags) : []));
+  if (fromEntities.length > 0) {
+    return fromEntities;
+  }
+  const fromTagSearch = results ? tagsOf(results.tags) : [];
+  if (fromTagSearch.length > 0) {
+    return fromTagSearch;
+  }
+  const direct = tagsOf(body.tags);
+  return direct.length > 0 ? direct : [];
+}
+
 export function createFixtureTagSource(table: Readonly<Record<string, readonly NamedTag[] | null>>): TagSource {
   return {
     tagsFor(itemId) {
@@ -78,16 +117,7 @@ export function createHttpQlooTagSource({ apiKey, fetchImpl = fetch }: KeyedFetc
         return null;
       }
       const body: unknown = await response.json();
-      if (!isRecord(body) || !Array.isArray(body.tags)) {
-        return null;
-      }
-      const tags: NamedTag[] = [];
-      for (const row of body.tags) {
-        if (isRecord(row) && typeof row.id === "string" && typeof row.name === "string") {
-          tags.push({ id: row.id, name: row.name });
-        }
-      }
-      return tags;
+      return tagsFromQlooBody(body);
     },
   };
 }

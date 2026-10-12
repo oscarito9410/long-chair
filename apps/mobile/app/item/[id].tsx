@@ -6,12 +6,14 @@ import {
   explainItem,
   formatHoursMinutes,
   itemById,
+  justWatchCredit,
   matchingSeedNames,
+  sampleWatchNote,
   whyItPassed,
 } from "@long-chair/core";
 import type { CatalogItem, CustomTheme, SessionDraft, ThemeVerdict } from "@long-chair/core";
 import { useLocalSearchParams } from "expo-router";
-import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { Linking, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CoverArt } from "../../src/components/art/CoverArt";
@@ -125,7 +127,30 @@ function ItemBody({ itemId }: { itemId: string }) {
       </Text>
       <Text style={styles.copy}>{item.maker}</Text>
       <Text style={styles.copy}>{formatHoursMinutes(item.minutes)}</Text>
+      {item.durationNote ? <Text style={styles.copy}>{item.durationNote}</Text> : null}
       {because ? <Text style={styles.copy}>{`Because you love ${because}.`}</Text> : null}
+      {item.links?.map((link) => (
+        <Pressable
+          key={link.href}
+          accessibilityRole="button"
+          onPress={() => {
+            void Linking.openURL(link.href);
+          }}
+        >
+          <Text style={styles.copy}>{link.label}</Text>
+        </Pressable>
+      ))}
+      {item.watchProviders && item.watchProviders.length > 0 ? (
+        <View>
+          <Text style={styles.copy}>{sampleWatchNote}</Text>
+          {item.watchProviders.map((name) => (
+            <Text key={name} style={styles.copy}>
+              {name}
+            </Text>
+          ))}
+          <Text style={styles.copy}>{justWatchCredit}</Text>
+        </View>
+      ) : null}
       <Pressable
         accessibilityRole="button"
         onPress={() => {

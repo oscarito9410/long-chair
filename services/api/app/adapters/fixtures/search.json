@@ -1,115 +1,251 @@
 {
   "success": true,
-  "results": {
-    "entities": [
-      {
-        "name": "The Paper Kite",
-        "entity_id": "00000000-0000-4000-8000-000000000010",
-        "type": "urn:entity",
-        "subtype": "urn:entity:movie",
-        "properties": {
-          "description": "A slow road film about a repair",
-          "short_descriptions": [
+  "duration": 6,
+  "results": [
+    {
+      "name": "The Paper Kite",
+      "entity_id": "00000000-0000-4000-8000-000000000010",
+      "type": "urn:entity",
+      "subtype": "urn:entity:movie",
+      "popularity": 0.5,
+      "disambiguation": "Sample film",
+      "tags": [],
+      "properties": {
+        "description": "A slow road film about a repair",
+        "short_descriptions": [
+          {
+            "value": "A slow road film about a repair",
+            "languages": [
+              "en"
+            ]
+          }
+        ]
+      },
+      "query": {
+        "explainability": {
+          "x-long-chair-confidence": "unconfirmed",
+          "warning": null,
+          "entities": [
             {
-              "value": "A slow road film about a repair"
+              "entity_id": "00000000-0000-4000-8000-000000000010",
+              "score": 0.8
             }
           ]
-        }
-      },
-      {
-        "name": "Harbor Lights",
-        "entity_id": "00000000-0000-4000-8000-000000000011",
-        "type": "urn:entity",
-        "subtype": "urn:entity:tv_show",
-        "properties": {
-          "description": "A coastal mystery, told quietly",
-          "short_descriptions": [
-            {
-              "value": "A coastal mystery, told quietly"
-            }
-          ]
-        }
-      },
-      {
-        "name": "Slow Kitchen Radio",
-        "entity_id": "00000000-0000-4000-8000-000000000012",
-        "type": "urn:entity",
-        "subtype": "urn:entity:podcast",
-        "properties": {
-          "description": "One recipe, and no rush",
-          "short_descriptions": [
-            {
-              "value": "One recipe, and no rush"
-            }
-          ]
-        }
-      },
-      {
-        "name": "Mira Solano",
-        "entity_id": "00000000-0000-4000-8000-000000000013",
-        "type": "urn:entity",
-        "subtype": "urn:entity:artist",
-        "properties": {
-          "description": "Warm vocal jazz in small rooms",
-          "short_descriptions": [
-            {
-              "value": "Warm vocal jazz in small rooms"
-            }
-          ]
-        }
-      },
-      {
-        "name": "Salt and Windowlight",
-        "entity_id": "00000000-0000-4000-8000-000000000014",
-        "type": "urn:entity",
-        "subtype": "urn:entity:book",
-        "properties": {
-          "description": "Essays on kitchens and weather",
-          "short_descriptions": [
-            {
-              "value": "Essays on kitchens and weather"
-            }
-          ]
-        }
-      },
-      {
-        "name": "Sunday Engines",
-        "entity_id": "00000000-0000-4000-8000-000000000015",
-        "type": "urn:entity",
-        "subtype": "urn:entity:movie",
-        "properties": {
-          "description": "A gentle film about small trains",
-          "short_descriptions": [
-            {
-              "value": "A gentle film about small trains"
-            }
-          ]
-        }
-      },
-      {
-        "name": "Soccer",
-        "entity_id": "00000000-0000-4000-8000-0000000000a1",
-        "type": "urn:entity",
-        "subtype": "urn:entity:book",
-        "x-long-chair-slug": "soccer",
-        "properties": {
-          "description": "The sport, from five-a-side to a final",
-          "x-long-chair-taste-kind": "tag",
-          "x-long-chair-aliases": ["futbol", "fútbol", "football"]
-        }
-      },
-      {
-        "name": "Anime",
-        "entity_id": "00000000-0000-4000-8000-0000000000a2",
-        "type": "urn:entity",
-        "subtype": "urn:entity:tv_show",
-        "x-long-chair-slug": "anime",
-        "properties": {
-          "description": "Series and films from Japan",
-          "x-long-chair-taste-kind": "tag",
-          "x-long-chair-aliases": ["anime", "animé"]
         }
       }
-    ]
-  }
+    },
+    {
+      "name": "Harbor Lights",
+      "entity_id": "00000000-0000-4000-8000-000000000011",
+      "type": "urn:entity",
+      "subtype": "urn:entity:tv_show",
+      "popularity": 0.5,
+      "disambiguation": "",
+      "tags": [],
+      "properties": {
+        "description": "A coastal mystery, told quietly",
+        "short_descriptions": [
+          {
+            "value": "A coastal mystery, told quietly",
+            "languages": [
+              "en"
+            ]
+          }
+        ]
+      },
+      "query": {
+        "explainability": {
+          "x-long-chair-confidence": "unconfirmed",
+          "warning": null,
+          "entities": [
+            {
+              "entity_id": "00000000-0000-4000-8000-000000000010",
+              "score": 0.8
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Slow Kitchen Radio",
+      "entity_id": "00000000-0000-4000-8000-000000000012",
+      "type": "urn:entity",
+      "subtype": "urn:entity:podcast",
+      "popularity": 0.5,
+      "disambiguation": "",
+      "tags": [],
+      "properties": {
+        "description": "One recipe, and no rush",
+        "episode_count": "48",
+        "short_descriptions": [
+          {
+            "value": "One recipe, and no rush",
+            "languages": [
+              "en"
+            ]
+          }
+        ]
+      },
+      "query": {
+        "explainability": {
+          "x-long-chair-confidence": "unconfirmed",
+          "warning": null,
+          "entities": [
+            {
+              "entity_id": "00000000-0000-4000-8000-000000000010",
+              "score": 0.8
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Mira Solano",
+      "entity_id": "00000000-0000-4000-8000-000000000013",
+      "type": "urn:entity",
+      "subtype": "urn:entity:artist",
+      "popularity": 0.5,
+      "disambiguation": "",
+      "tags": [],
+      "properties": {
+        "short_description": "Warm vocal jazz in small rooms",
+        "short_descriptions": [
+          {
+            "value": "Warm vocal jazz in small rooms",
+            "languages": [
+              "en"
+            ]
+          }
+        ]
+      },
+      "query": {
+        "explainability": {
+          "x-long-chair-confidence": "unconfirmed",
+          "warning": null,
+          "entities": [
+            {
+              "entity_id": "00000000-0000-4000-8000-000000000010",
+              "score": 0.8
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Salt and Windowlight",
+      "entity_id": "00000000-0000-4000-8000-000000000014",
+      "type": "urn:entity",
+      "subtype": "urn:entity:book",
+      "popularity": 0.5,
+      "disambiguation": "",
+      "tags": [],
+      "properties": {
+        "description": "Essays on kitchens and weather",
+        "page_count": 180,
+        "short_descriptions": [
+          {
+            "value": "Essays on kitchens and weather",
+            "languages": [
+              "en"
+            ]
+          }
+        ]
+      },
+      "query": {
+        "explainability": {
+          "x-long-chair-confidence": "unconfirmed",
+          "warning": null,
+          "entities": [
+            {
+              "entity_id": "00000000-0000-4000-8000-000000000010",
+              "score": 0.8
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Sunday Engines",
+      "entity_id": "00000000-0000-4000-8000-000000000015",
+      "type": "urn:entity",
+      "subtype": "urn:entity:movie",
+      "popularity": 0.5,
+      "disambiguation": "",
+      "tags": [],
+      "properties": {
+        "description": "A gentle film about small trains",
+        "short_descriptions": [
+          {
+            "value": "A gentle film about small trains",
+            "languages": [
+              "en"
+            ]
+          }
+        ]
+      },
+      "query": {
+        "explainability": {
+          "x-long-chair-confidence": "unconfirmed",
+          "warning": null,
+          "entities": [
+            {
+              "entity_id": "00000000-0000-4000-8000-000000000010",
+              "score": 0.8
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Soccer",
+      "entity_id": "00000000-0000-4000-8000-0000000000a1",
+      "type": "urn:entity",
+      "subtype": "urn:entity:book",
+      "x-long-chair-slug": "soccer",
+      "popularity": 0.4,
+      "tags": [],
+      "properties": {
+        "description": "The sport, from five-a-side to a final",
+        "x-long-chair-taste-kind": "tag",
+        "x-long-chair-aliases": [
+          "futbol",
+          "f\u00fatbol",
+          "football"
+        ],
+        "short_descriptions": [
+          {
+            "value": "The sport, from five-a-side to a final",
+            "languages": [
+              "en"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Anime",
+      "entity_id": "00000000-0000-4000-8000-0000000000a2",
+      "type": "urn:entity",
+      "subtype": "urn:entity:tv_show",
+      "x-long-chair-slug": "anime",
+      "popularity": 0.4,
+      "tags": [],
+      "properties": {
+        "description": "Series and films from Japan",
+        "x-long-chair-taste-kind": "tag",
+        "x-long-chair-aliases": [
+          "anime",
+          "anim\u00e9"
+        ],
+        "short_descriptions": [
+          {
+            "value": "Series and films from Japan",
+            "languages": [
+              "en"
+            ]
+          }
+        ]
+      }
+    }
+  ]
 }

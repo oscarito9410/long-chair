@@ -73,8 +73,15 @@ class PackedOut(BaseModel):
     open_minutes: int = Field(alias="openMinutes")
 
 
+class LinkOut(BaseModel):
+    """A deep link. The app opens it. It does not play the piece."""
+
+    label: str
+    href: str
+
+
 class ItemOut(BaseModel):
-    """A scheduled piece. `durationSource` is confirmed only for movie lengths from the catalog."""
+    """A scheduled piece. `durationSource` is confirmed or estimated."""
 
     model_config = ConfigDict(populate_by_name=True)
 
@@ -90,6 +97,9 @@ class ItemOut(BaseModel):
     because_of: list[str] = Field(alias="becauseOf")
     avoided_theme_ids: list[str] = Field(alias="avoidedThemeIds")
     duration_source: str = Field(alias="durationSource")
+    duration_note: str = Field(default="", alias="durationNote")
+    links: list[LinkOut] = Field(default_factory=list)
+    watch_providers: list[str] = Field(default_factory=list, alias="watchProviders")
 
 
 class TopicOut(BaseModel):
@@ -115,6 +125,7 @@ class PlaceOut(BaseModel):
     walk_minutes: int = Field(alias="walkMinutes")
     open_until: str = Field(alias="openUntil")
     price_label: str = Field(alias="priceLabel")
+    map_url: str = Field(default="", alias="mapUrl")
 
 
 class SessionKitOut(BaseModel):

@@ -12,6 +12,8 @@ import {
   explainItem,
   formatHoursMinutes,
   itemById,
+  justWatchCredit,
+  sampleWatchNote,
   matchingSeedNames,
   whyItPassed,
 } from "@long-chair/core";
@@ -86,7 +88,24 @@ function ItemBody({ item, draft }: { item: CatalogItem; draft: SessionDraft }) {
       </h1>
       <p className="text-lg">{item.maker}</p>
       <p className="text-lg">{formatHoursMinutes(item.minutes)}</p>
+      {item.durationNote ? <p className="text-base">{item.durationNote}</p> : null}
       {because ? <BecauseChip name={because} /> : null}
+      {item.links?.map((link) => (
+        <a key={link.href} className="theme-add-button" href={link.href}>
+          {link.label}
+        </a>
+      ))}
+      {item.watchProviders && item.watchProviders.length > 0 ? (
+        <div>
+          <p className="text-base">{sampleWatchNote}</p>
+          <ul className="evidence-list">
+            {item.watchProviders.map((name) => (
+              <li key={name}>{name}</li>
+            ))}
+          </ul>
+          <p className="text-base">{justWatchCredit}</p>
+        </div>
+      ) : null}
       <button
         type="button"
         className="theme-add-button"

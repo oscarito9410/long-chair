@@ -1,7 +1,7 @@
 import { guideById, guideHeader, nearbyPlaces, topicsForSeeds } from "@long-chair/core";
 import type { CompanionTopic, NearbyPlace } from "@long-chair/core";
 import { memo } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { CharacterMark } from "../../src/components/art/CharacterMark";
 import { GlassChip } from "../../src/components/chrome/GlassChip";
@@ -70,6 +70,18 @@ const PlaceCard = memo(function PlaceCard({ place }: { place: NearbyPlace }) {
       </View>
       <Text style={styles.cardTitle}>{place.name}</Text>
       <Text style={styles.body}>{place.offer}</Text>
+      <Text style={styles.body}>{`${place.walkMinutes} min walk`}</Text>
+      {place.openUntil ? <Text style={styles.body}>{`Open until ${place.openUntil}`}</Text> : null}
+      {place.mapUrl ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => {
+            void Linking.openURL(place.mapUrl ?? "");
+          }}
+        >
+          <Text style={styles.body}>Open in Maps</Text>
+        </Pressable>
+      ) : null}
       <GlassChip label={place.priceLabel} tint={hue} />
     </WashCard>
   );

@@ -28,7 +28,13 @@ export function PlaceCard({ place }: { place: NearbyPlace }) {
         })}
       >
         <h3 className="text-2xl font-bold">{place.name}</h3>
-        <p className="text-lg font-bold">{place.walkMinutes} min walk · Open now</p>
+        <p className="text-lg font-bold">{place.walkMinutes} min walk</p>
+        {place.openUntil ? <p className="text-base">Open until {place.openUntil}</p> : null}
+        {place.mapUrl ? (
+          <a className="theme-add-button" href={place.mapUrl}>
+            Open in Maps
+          </a>
+        ) : null}
       </div>
     </article>
   );

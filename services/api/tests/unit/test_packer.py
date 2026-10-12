@@ -28,7 +28,7 @@ def _item(
         why="",
         because_of=(seed,),
         avoided_theme_ids=(),
-        duration_source="assumed",
+        duration_source="estimated",
     )
 
 

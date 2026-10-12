@@ -25,6 +25,13 @@ export type AvoidTheme = {
   detail: string;
 };
 
+export type DurationSource = "confirmed" | "estimated";
+
+export type ItemLink = {
+  label: string;
+  href: string;
+};
+
 export type CatalogItem = {
   id: string;
   kind: ContentKind;
@@ -36,6 +43,10 @@ export type CatalogItem = {
   why: string;
   becauseOf: readonly string[];
   avoidedThemeIds: readonly string[];
+  durationSource?: DurationSource;
+  durationNote?: string;
+  links?: readonly ItemLink[];
+  watchProviders?: readonly string[];
 };
 
 export type SessionDraft = {
@@ -75,6 +86,7 @@ export type NearbyPlace = {
   walkMinutes: number;
   openUntil: string;
   priceLabel: string;
+  mapUrl?: string;
 };
 
 export type AgentStep = {

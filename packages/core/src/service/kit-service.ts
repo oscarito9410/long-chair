@@ -78,6 +78,38 @@ function readNumber(record: Record<string, unknown>, key: string): number {
   return value;
 }
 
+function readText(record: Record<string, unknown>, key: string): string {
+  const value = record[key];
+  if (typeof value !== "string") {
+    throw new Error(`The session kit is missing ${key}.`);
+  }
+  return value;
+}
+
+function readOptionalText(record: Record<string, unknown>, key: string): string | undefined {
+  const value = record[key];
+  return typeof value === "string" && value.length > 0 ? value : undefined;
+}
+
+function readLinks(record: Record<string, unknown>): CatalogItem["links"] {
+  const value = record.links;
+  if (!Array.isArray(value)) {
+    return undefined;
+  }
+  const links: { label: string; href: string }[] = [];
+  for (const entry of value) {
+    if (!isRecord(entry)) {
+      continue;
+    }
+    const label = readOptionalText(entry, "label");
+    const href = readOptionalText(entry, "href");
+    if (label && href) {
+      links.push({ label, href });
+    }
+  }
+  return links.length > 0 ? links : undefined;
+}
+
 function readStringList(record: Record<string, unknown>, key: string): string[] {
   const value = record[key];
   if (!Array.isArray(value)) {
@@ -135,7 +167,25 @@ function mapItem(value: unknown): CatalogItem {
     why: readString(value, "why"),
     becauseOf: readStringList(value, "becauseOf"),
     avoidedThemeIds: readStringList(value, "avoidedThemeIds"),
+    durationSource: readDurationSource(value),
+    durationNote: readOptionalText(value, "durationNote"),
+    links: readLinks(value),
+    watchProviders: readOptionalList(value, "watchProviders"),
   };
+}
+
+function readDurationSource(record: Record<string, unknown>): CatalogItem["durationSource"] {
+  const value = record.durationSource;
+  return value === "confirmed" || value === "estimated" ? value : undefined;
+}
+
+function readOptionalList(record: Record<string, unknown>, key: string): string[] | undefined {
+  const value = record[key];
+  if (!Array.isArray(value)) {
+    return undefined;
+  }
+  const list = value.filter((entry): entry is string => typeof entry === "string" && entry.length > 0);
+  return list.length > 0 ? list : undefined;
 }
 
 function mapPlan(payload: unknown): SessionPlan {
@@ -200,8 +250,9 @@ function mapPlan(payload: unknown): SessionPlan {
         name: readString(place, "name"),
         offer: readString(place, "offer"),
         walkMinutes: readNumber(place, "walkMinutes"),
-        openUntil: readString(place, "openUntil"),
+        openUntil: readText(place, "openUntil"),
         priceLabel: readString(place, "priceLabel"),
+        mapUrl: readOptionalText(place, "mapUrl"),
       };
     }),
     source: sourceValue as PlanSource,

@@ -35,6 +35,7 @@ uploads
 .env.*
 !.env.example
 .qloo-cache/
+services/api/.qloo-live/
 
 # Python
 .venv/

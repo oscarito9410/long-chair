@@ -4,7 +4,7 @@ import unicodedata
 from collections.abc import Sequence
 from pathlib import Path
 
-from app.adapters.documents import InsightsDocument
+from app.adapters.documents import InsightsDocument, SearchDocument
 from app.adapters.mapper import map_insights, map_places, map_search, map_tags
 from app.adapters.validation import validate_insights, validate_places, validate_search
 from app.domain.entities import AvoidTheme, CatalogItem, NearbyPlace
@@ -32,9 +32,9 @@ class FakeQlooAdapter:
         """Return the fixture hit whose name matches `query`, or an empty sequence."""
 
         validate_search(query, kind)
-        document = self._read("search.json")
+        document = self._read_search("search.json")
         needle = _folded(query)
-        hits = [hit for hit in map_search(document, kind) if _matches(hit, needle)]
+        hits = [hit for hit in map_search(document.results, kind) if _matches(hit, needle)]
         return tuple(hits)
 
     async def exclusion_tags(self, themes: Sequence[AvoidTheme]) -> Sequence[TagHit]:
@@ -42,7 +42,7 @@ class FakeQlooAdapter:
 
         wanted = {theme.id for theme in themes}
         document = self._read("tags.json")
-        return tuple(hit for hit in map_tags(document) if hit.theme_id in wanted)
+        return tuple(hit for hit in map_tags(document.results.tags) if hit.theme_id in wanted)
 
     async def insights(
         self,
@@ -61,12 +61,9 @@ class FakeQlooAdapter:
             entity
             for entity in document.results.entities
             if entity.entity_id not in blocked_ids
-            and not blocked_tags.intersection(tag.id for tag in entity.properties.tags)
+            and not blocked_tags.intersection(tag.id for tag in entity.tags)
         ]
-        filtered = document.model_copy(
-            update={"results": document.results.model_copy(update={"entities": kept})}
-        )
-        return map_insights(filtered, kind, interests)
+        return map_insights(kept, kind, interests)
 
     async def places(
         self,
@@ -79,7 +76,11 @@ class FakeQlooAdapter:
 
         validate_places(locality, weekday, interests, tag_ids)
         document = self._read("insights-place.json")
-        return map_places(document)
+        return map_places(document.results.entities)
+
+    def _read_search(self, name: str) -> SearchDocument:
+        path = self._fixture_dir / name
+        return SearchDocument.model_validate_json(path.read_text(encoding="utf-8"))
 
     def _read(self, name: str) -> InsightsDocument:
         path = self._fixture_dir / name

@@ -62,12 +62,12 @@ Base URL: `https://hackathon.api.qloo.com`. Header: `X-Api-Key: {QLOO_API_KEY}`.
 
 | Method           | HTTP                                                   |
 | ---------------- | ------------------------------------------------------ |
-| `search`         | `GET /search?query={text}&type=urn:entity:{kind}`      |
+| `search`         | `GET /search?query={text}&types=urn:entity:{kind}`     |
 | `insights`       | `GET /v2/insights` with the query parameters below     |
 | `places`         | `GET /v2/insights` with `filter.type=urn:entity:place` |
 | `exclusion_tags` | `GET /v2/tags`                                         |
 
-`/search` is the path from Qloo's public hackathon instructions (a Devpost staff note with a working curl). `/v2/insights` is the documented Insights route. `/v2/tags` is the path the public SDK uses against the hackathon host. The tag route's query-parameter names were not in the Insights reference we read. They are unconfirmed. See the table at the end. The first live call either confirms them or the adapter gets a one-line change. The port method does not change.
+`/search` is the path from Qloo's public hackathon instructions (a Devpost staff note with a working curl). `/v2/insights` is the documented Insights route. `/v2/tags` takes `filter.query`. Entity tags, popularity, disambiguation, and external ids sit beside `properties`, not inside it. Search `results` is a list. See ADR 0010.
 
 Insights query string for a content type:
 

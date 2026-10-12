@@ -1,5 +1,6 @@
 {
   "success": true,
+  "duration": 9,
   "results": {
     "entities": [
       {
@@ -7,42 +8,111 @@
         "entity_id": "00000000-0000-4000-8000-000000000021",
         "type": "urn:entity",
         "subtype": "urn:entity:place",
-        "x-long-chair-slug": "linen-rye",
+        "popularity": 0.5,
+        "disambiguation": "",
+        "tags": [
+          {
+            "id": "urn:tag:category:place:bakery",
+            "name": "Bakery",
+            "type": "urn:tag:category:place"
+          }
+        ],
         "properties": {
           "description": "Soup, brown bread, and a quiet corner",
-          "x-long-chair-kind": "bakery",
-          "x-long-chair-walk-minutes": 6,
-          "x-long-chair-open-until": "4:30 pm",
-          "x-long-chair-price-label": "Light meal, low price"
-        }
+          "lat": 40.00431674,
+          "lon": -74.0,
+          "price_level": 1,
+          "address": "1 Sample Lane",
+          "neighborhood": "Westbridge",
+          "x-long-chair-kind": "bakery"
+        },
+        "query": {
+          "explainability": {
+            "x-long-chair-confidence": "unconfirmed",
+            "warning": null,
+            "entities": [
+              {
+                "entity_id": "00000000-0000-4000-8000-000000000010",
+                "score": 0.8
+              }
+            ]
+          }
+        },
+        "x-long-chair-slug": "linen-rye"
       },
       {
         "name": "Cedar Spoon",
         "entity_id": "00000000-0000-4000-8000-000000000022",
         "type": "urn:entity",
         "subtype": "urn:entity:place",
-        "x-long-chair-slug": "cedar-spoon",
+        "popularity": 0.5,
+        "disambiguation": "",
+        "tags": [
+          {
+            "id": "urn:tag:category:place:kitchen",
+            "name": "Kitchen",
+            "type": "urn:tag:category:place"
+          }
+        ],
         "properties": {
           "description": "Broth and rice, and the room stays low",
-          "x-long-chair-kind": "kitchen",
-          "x-long-chair-walk-minutes": 9,
-          "x-long-chair-open-until": "6:00 pm",
-          "x-long-chair-price-label": "Light meal, low price"
-        }
+          "lat": 40.00647512,
+          "lon": -74.0,
+          "price_level": 1,
+          "address": "2 Sample Lane",
+          "neighborhood": "Westbridge",
+          "x-long-chair-kind": "kitchen"
+        },
+        "query": {
+          "explainability": {
+            "x-long-chair-confidence": "unconfirmed",
+            "warning": null,
+            "entities": [
+              {
+                "entity_id": "00000000-0000-4000-8000-000000000010",
+                "score": 0.8
+              }
+            ]
+          }
+        },
+        "x-long-chair-slug": "cedar-spoon"
       },
       {
         "name": "Little Harbor Coffee",
         "entity_id": "00000000-0000-4000-8000-000000000023",
         "type": "urn:entity",
         "subtype": "urn:entity:place",
-        "x-long-chair-slug": "little-harbor",
+        "popularity": 0.5,
+        "disambiguation": "",
+        "tags": [
+          {
+            "id": "urn:tag:category:place:coffee",
+            "name": "Coffee",
+            "type": "urn:tag:category:place"
+          }
+        ],
         "properties": {
           "description": "Tea, and something small if that is enough",
-          "x-long-chair-kind": "coffee",
-          "x-long-chair-walk-minutes": 4,
-          "x-long-chair-open-until": "5:00 pm",
-          "x-long-chair-price-label": "Light meal, low price"
-        }
+          "lat": 40.00287783,
+          "lon": -74.0,
+          "price_level": 1,
+          "address": "3 Sample Lane",
+          "neighborhood": "Westbridge",
+          "x-long-chair-kind": "coffee"
+        },
+        "query": {
+          "explainability": {
+            "x-long-chair-confidence": "unconfirmed",
+            "warning": null,
+            "entities": [
+              {
+                "entity_id": "00000000-0000-4000-8000-000000000010",
+                "score": 0.8
+              }
+            ]
+          }
+        },
+        "x-long-chair-slug": "little-harbor"
       }
     ]
   }

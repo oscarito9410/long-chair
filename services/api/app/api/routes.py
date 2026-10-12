@@ -27,6 +27,7 @@ from app.domain.entities import SessionDraft
 from app.domain.errors import DraftError
 from app.domain.kinds import CONTENT_KINDS, WEEKDAYS, Weekday
 from app.domain.limits import LOCALITY_MAX_CHARS
+from app.ports.enrichment import EnrichmentPort
 from app.ports.errors import CacheMiss, QlooTransportError, QlooValidationError
 from app.ports.models import TasteHit
 from app.ports.qloo import QlooPort
@@ -53,7 +54,7 @@ class SessionNotFoundError(Exception):
     """A plan was asked for a session id this process does not have."""
 
 
-def register_routes(app: FastAPI, qloo: QlooPort) -> None:
+def register_routes(app: FastAPI, qloo: QlooPort, enrichment: EnrichmentPort) -> None:
     """Attach the kit routes. `qloo` is the process-wide catalog adapter."""
 
     sessions: dict[str, tuple[SessionDraft, str, Weekday | None]] = {}
@@ -64,7 +65,7 @@ def register_routes(app: FastAPI, qloo: QlooPort) -> None:
 
     @app.post("/v1/demo/plan", response_model=SessionKitOut)
     async def demo_plan(_body: DemoIn | None = None) -> SessionKitOut:
-        kit = await BuildSessionKit(qloo).execute(
+        kit = await BuildSessionKit(qloo, enrichment=enrichment).execute(
             DEMO_DRAFT,
             TASTES,
             THEMES,
@@ -92,7 +93,7 @@ def register_routes(app: FastAPI, qloo: QlooPort) -> None:
         if stored is None:
             raise SessionNotFoundError
         draft, locality, weekday = stored
-        kit = await BuildSessionKit(qloo).execute(
+        kit = await BuildSessionKit(qloo, enrichment=enrichment).execute(
             draft,
             TASTES,
             THEMES,

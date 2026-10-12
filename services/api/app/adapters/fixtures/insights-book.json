@@ -1,5 +1,6 @@
 {
   "success": true,
+  "duration": 12,
   "results": {
     "entities": [
       {
@@ -7,27 +8,28 @@
         "entity_id": "00000000-0000-4000-8000-000000000006",
         "type": "urn:entity",
         "subtype": "urn:entity:book",
-        "x-long-chair-slug": "market-morning",
+        "popularity": 0.5,
+        "disambiguation": "2021, Ruth Adeyemi",
+        "tags": [
+          {
+            "id": "urn:tag:genre:media:fictional_essay",
+            "name": "Essay",
+            "type": "urn:tag:keyword:media"
+          }
+        ],
         "properties": {
           "description": "A walk to a market before the shutters are fully up. Nothing is urgent.",
-          "duration": 24,
-          "image": {
-            "url": ""
-          },
-          "popularity": 0.5,
-          "tags": [
-            {
-              "id": "urn:tag:keyword:media:fictional_repair",
-              "name": "Repair",
-              "type": "urn:tag:keyword:media"
-            }
-          ],
+          "page_count": 24,
+          "publication_year": 2021,
+          "publisher": "Ruth Adeyemi",
           "short_descriptions": [
             {
-              "value": "Light on a counter."
+              "value": "Light on a counter.",
+              "languages": [
+                "en"
+              ]
             }
-          ],
-          "creator": "An essay by Ruth Adeyemi"
+          ]
         },
         "query": {
           "explainability": {
@@ -40,6 +42,14 @@
               }
             ]
           }
+        },
+        "x-long-chair-slug": "market-morning",
+        "external": {
+          "isbn13": [
+            {
+              "id": "sample-isbn-market-morning"
+            }
+          ]
         }
       }
     ]
@@ -50,7 +60,7 @@
       "warning": null,
       "entities": [
         {
-          "entity_id": "00000000-0000-4000-8000-000000000014",
+          "entity_id": "00000000-0000-4000-8000-000000000010",
           "score": 0.8
         }
       ]

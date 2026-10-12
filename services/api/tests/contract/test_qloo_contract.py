@@ -101,6 +101,40 @@ async def test_http_requests_explainability() -> None:
     assert "feature.explainability=true" in seen["url"]
 
 
+@pytest.mark.asyncio
+async def test_http_search_sends_types_and_reads_a_result_list() -> None:
+    seen: dict[str, str] = {}
+
+    def record(request: httpx.Request) -> httpx.Response:
+        seen["url"] = str(request.url)
+        return httpx.Response(
+            200,
+            json={
+                "success": True,
+                "duration": 2,
+                "results": [
+                    {
+                        "name": "The Paper Kite",
+                        "entity_id": PAPER,
+                        "subtype": "urn:entity:movie",
+                        "tags": [],
+                        "properties": {"description": "A slow road film"},
+                    }
+                ],
+            },
+        )
+
+    transport = httpx.MockTransport(record)
+    async with httpx.AsyncClient(transport=transport, base_url="https://example.com") as client:
+        hits = await HttpQlooAdapter(api_key="example-key", client=client).search(
+            "The Paper Kite",
+            "movie",
+        )
+    assert hits[0].qloo_entity_id == PAPER
+    assert "types=urn" in seen["url"]
+    assert "type=" not in seen["url"].split("?", maxsplit=1)[-1].replace("types=", "")
+
+
 def test_fixtures_are_fictional_and_mark_unconfirmed_keys() -> None:
     note = (FIXTURE_DIR / "CONFIDENCE.md").read_text(encoding="utf-8")
     assert "unconfirmed" in note.casefold()

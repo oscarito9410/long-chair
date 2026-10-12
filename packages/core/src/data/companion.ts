@@ -1,3 +1,4 @@
+import { mapSearchUrl } from "./duration-facts.ts";
 import { tasteDisplayName } from "./taste-catalog.ts";
 import type { CompanionTopic, NearbyPlace } from "./types.ts";
 
@@ -5,7 +6,7 @@ export const companionSetting = {
   placeName: "Westbridge Infusion Center",
   when: "this afternoon",
   disclaimer:
-    "These places are fictional. They are drawn near a fictional center and shown as open for the sample afternoon.",
+    "These places are fictional. Walk minutes are a sample distance. Closing times are not shown.",
 } as const;
 
 export const companionTopics: readonly CompanionTopic[] = [
@@ -79,8 +80,9 @@ export const nearbyPlaces: readonly NearbyPlace[] = [
     name: "Linen & Rye",
     offer: "Soup, brown bread, and a quiet corner",
     walkMinutes: 6,
-    openUntil: "4:30 pm",
+    openUntil: "",
     priceLabel: "Light meal, low price",
+    mapUrl: mapSearchUrl("Linen & Rye"),
   },
   {
     id: "cedar-spoon",
@@ -88,8 +90,9 @@ export const nearbyPlaces: readonly NearbyPlace[] = [
     name: "Cedar Spoon",
     offer: "Broth and rice, and the room stays low",
     walkMinutes: 9,
-    openUntil: "6:00 pm",
+    openUntil: "",
     priceLabel: "Light meal, low price",
+    mapUrl: mapSearchUrl("Cedar Spoon"),
   },
   {
     id: "little-harbor",
@@ -97,7 +100,8 @@ export const nearbyPlaces: readonly NearbyPlace[] = [
     name: "Little Harbor Coffee",
     offer: "Tea, and something small if that is enough",
     walkMinutes: 4,
-    openUntil: "5:00 pm",
+    openUntil: "",
     priceLabel: "Light meal, low price",
+    mapUrl: mapSearchUrl("Little Harbor Coffee"),
   },
 ];
