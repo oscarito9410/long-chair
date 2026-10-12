@@ -12,14 +12,14 @@ The prototype already shows that story. The hackathon build replaces the fiction
 
 ## Decisions
 
-| Topic          | Choice                                                        | Where                                            |
-| -------------- | ------------------------------------------------------------- | ------------------------------------------------ |
-| Backend        | Python, FastAPI                                               | [ADR 0001](../adr/0001-backend-fastapi.md)       |
-| Language model | Optional, prose only, off by default                          | [ADR 0002](../adr/0002-llm-optional.md)          |
-| Hosting        | Static web app plus a small always-on API with a private disk | [ADR 0003](../adr/0003-hosting.md)               |
-| Repo layout    | Monorepo. Vite app at the root, API in `services/api`         | [ADR 0004](../adr/0004-monorepo.md)              |
-| Client         | Responsive web app. Swift is post-hackathon only              | [ADR 0007](../adr/0007-responsive-web-client.md) |
-| Qloo access    | `QlooPort`, three adapters, shared contract tests             | [qloo-port.md](qloo-port.md)                     |
+| Topic          | Choice                                                        | Where                                                                          |
+| -------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Backend        | Python, FastAPI                                               | [ADR 0001](../adr/0001-backend-fastapi.md)                                     |
+| Language model | Optional, off by default; agent tool loop in ADR 0011         | [ADR 0002](../adr/0002-llm-optional.md), [ADR 0011](../adr/0011-agent-loop.md) |
+| Hosting        | Static web app plus a small always-on API with a private disk | [ADR 0003](../adr/0003-hosting.md)                                             |
+| Repo layout    | Monorepo. Vite app at the root, API in `services/api`         | [ADR 0004](../adr/0004-monorepo.md)                                            |
+| Client         | Responsive web app. Swift is post-hackathon only              | [ADR 0007](../adr/0007-responsive-web-client.md)                               |
+| Qloo access    | `QlooPort`, three adapters, shared contract tests             | [qloo-port.md](qloo-port.md)                                                   |
 
 ## System context
 
@@ -160,6 +160,21 @@ Places are another insights call:
 
 The locality is something the visitor or the demo config typed. It is not read from a medical record, and it is not a hospital chart. The prototype's old infusion-center line stays out of the product.
 
+### Optional native tool exploration
+
+`POST /v1/kit/agent` is a separate strategy behind `LlmPort`; existing deterministic
+routes keep the pipeline above. The model selects search/insight actions and can
+ask for `verify_themes`, `durations`, `places`, and `enrich`. Server state owns
+selected tastes, avoid rules, locality, weekday, and mapped item records.
+
+The owned Python loop bounds actions, turns, and wall time. In-flight I/O is
+cancelled on timeout. Finalization always runs the existing Python checker again,
+enriches as needed, and packs the verified records. Empty pools use a separately
+bounded deterministic fallback. No model key returns that deterministic kit and
+an empty trace. Trace contains counts, status, and milliseconds; it does not dump
+arguments, Qloo bodies, or model text. [ADR 0011](../adr/0011-agent-loop.md) explains
+how this extends ADR 0002 while preserving optionality and privacy.
+
 ## Sequences
 
 ### Plan a session
@@ -263,11 +278,11 @@ Server-only fields, not sent to the browser as a dump of Qloo:
 
 `CatalogItem.minutes` mapping:
 
-| Kind                                   | Duration source                                                                                                                                                                               |
-| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `movie`, `tv_show`                     | `properties.duration` when the catalog sends it. Source `confirmed`. TV placement is still checked by the live scope script.                                                                 |
-| `podcast`, `artist`                    | No catalog duration. iTunes supplies an episode or album length, source `confirmed`, or the packer keeps an estimated fallback.                                                              |
-| `book`                                 | `page_count` times one minute per page. Source `estimated`.                                                                                                                                  |
+| Kind                | Duration source                                                                                                                 |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `movie`, `tv_show`  | `properties.duration` when the catalog sends it. Source `confirmed`. TV placement is still checked by the live scope script.    |
+| `podcast`, `artist` | No catalog duration. iTunes supplies an episode or album length, source `confirmed`, or the packer keeps an estimated fallback. |
+| `book`              | `page_count` times one minute per page. Source `estimated`.                                                                     |
 
 `CatalogItem.rank` is the position Qloo returned. A separate affinity field was not in the onboarding sample. Do not invent one. `popularity` is on the entity, beside `properties`, and is not the same thing as rank.
 

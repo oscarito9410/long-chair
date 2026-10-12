@@ -10,6 +10,13 @@ The iPhone app is `apps/mobile` (Expo SDK 57, expo-router). Android uses the sam
 
 The session API lives in `services/api`. It is hexagonal: domain, application, ports, adapters, and the HTTP layer. `BuildSessionKit` resolves tastes, asks for insights with exclusion tags, checks once, packs the chair, and returns explanations plus a companion plan. `FakeQlooAdapter` is the default. `HttpQlooAdapter` and `RecordingQlooAdapter` stay behind `QlooPort`.
 
+`POST /v1/kit/agent` adds optional native tool calling behind `LlmPort`. Its owned
+loop lives in `app/application/agent`; tools use existing Qloo/enrichment ports and
+the checker/packer. The server rechecks after exploration, including fallback.
+No model key keeps the deterministic kit and an empty trace. See
+[ADR 0011](docs/adr/0011-agent-loop.md) and `specs/005-agent-loop/quickstart.md`.
+Tests inject `FakeLlm`; paid live calls require approval plus explicit opt-in.
+
 The mobile app talks to that API only through `KitService` when `EXPO_PUBLIC_API_URL` is set. The Qloo key never goes in the app. The review build leaves the variable unset and packs fixtures on the device. Store categories are Entertainment and Lifestyle. Copy must not claim treatment or a health outcome. "Not medical advice" stays on onboarding and in Settings. A test in `apps/mobile/src/medical-claims.test.ts` fails if the banned phrases appear.
 
 `check-dep` returned caution for `expo@57.0.27` and `react-native-reanimated@4.5.1` because other versions have advisories. These pins do not. They are the Expo SDK 57 set.

@@ -89,6 +89,50 @@ QLOO_API_KEY=... uv run python -m app.live.qloo_scope
 QLOO_API_KEY=... uv run pytest tests/live -q --override-ini=addopts=
 ```
 
+### Optional agent kit
+
+`POST /v1/kit/agent` accepts the same draft, locality, and weekday body as
+`POST /v1/sessions`. It returns `packed`, `items`, `topics`, `places`, and `source`,
+plus `trace` and `termination`. Without a model key it uses the deterministic
+builder and returns `trace: []`.
+
+Set `LLM_API_KEY` (or `OPENAI_API_KEY`) and an explicit `LLM_MODEL` to enable native
+tool calling. `LLM_BASE_URL` defaults to `https://api.openai.com/v1` and can point at
+an OpenAI-compatible Chat Completions endpoint. Qloo and enrichment modes remain
+fake by default, so the agent needs no Qloo key for a fictional run.
+
+The server owns theme exclusions and always rechecks the final candidates. The
+model cannot add item records, replace themes, or edit lengths. Default budgets
+are eight tool calls/eight model turns, 20 seconds of exploration, and 10 seconds
+for verified finalization/fallback. Server settings are `AGENT_MAX_STEPS` (1-32),
+`AGENT_TIMEOUT_SECONDS` (positive, at most 120), and
+`AGENT_FINALIZE_TIMEOUT_SECONDS` (positive, at most 60).
+
+Trace entries expose `step`, `tool`, `argsSummary`, `resultCount`, `latencyMs`, and
+`status`. Argument summaries contain field names and counts only. Termination is
+`completed`, `step_limit`, `time_limit`, `provider_error`, or `no_key`. The existing
+503 error envelope is returned if finalization cannot finish.
+
+From `services/api`, run the fictional comparison without keys or network:
+
+```bash
+uv run python -m app.live.agent_metrics
+```
+
+It prints verifier pass rate, duration fit, type diversity, steps, and latency for
+agent, deterministic, and LLM-only strategies. The default LLM-only row is a
+scripted selection with an intentionally avoided fictional title; it is an
+example of scoring, not a live result or a claim that one strategy is better.
+`--live` requires `RUN_LIVE_AGENT=1`, `QLOO_API_KEY`, `LLM_API_KEY`, and `LLM_MODEL`.
+Only opt in after approval to spend on calls. The live model-only baseline selects
+from deterministic verified catalog titles without tools; it does not receive raw
+Qloo documents. The script prints aggregate measures only. Live tests are skipped
+unless the same opt-in and both keys exist.
+
+See [ADR 0011](docs/adr/0011-agent-loop.md) and the
+[agent validation guide](specs/005-agent-loop/quickstart.md) for request examples,
+configuration, and tests.
+
 Oscar's simulator pass is `docs/qa-checklist.md`.
 
 ### Install the web demo

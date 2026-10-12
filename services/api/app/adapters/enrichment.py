@@ -12,6 +12,7 @@ import httpx
 from app.domain.entities import CatalogItem
 from app.domain.kinds import ContentKind, DurationSource
 from app.ports.enrichment import Enrichment
+from app.ports.errors import EnrichmentTransportError
 
 FIXTURE_PATH = Path(__file__).resolve().parent / "fixtures" / "enrichment.json"
 ITUNES_SEARCH = "https://itunes.apple.com/search"
@@ -58,7 +59,10 @@ class HttpEnrichment:
         cached = self._cache.get(item.qloo_entity_id)
         if cached is not None:
             return cached
-        extra = await self._lookup(item)
+        try:
+            extra = await self._lookup(item)
+        except (httpx.HTTPError, ValueError) as exc:
+            raise EnrichmentTransportError() from exc
         self._cache[item.qloo_entity_id] = extra
         return extra
 

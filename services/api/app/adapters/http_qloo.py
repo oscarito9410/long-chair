@@ -4,6 +4,7 @@ import asyncio
 from collections.abc import Sequence
 
 import httpx
+from pydantic import BaseModel, ValidationError
 
 from app.adapters.documents import InsightsDocument, SearchDocument
 from app.adapters.mapper import map_insights, map_places, map_search, map_tags
@@ -42,8 +43,8 @@ class HttpQlooAdapter:
         """Search by title. An empty entity list is a real miss."""
 
         validate_search(query, kind)
-        document = SearchDocument.model_validate_json(
-            await self._get_body(SEARCH_PATH, search_params(query, kind))
+        document = _decode(
+            SearchDocument, await self._get_body(SEARCH_PATH, search_params(query, kind))
         )
         return map_search(document.results, kind)
 
@@ -52,8 +53,8 @@ class HttpQlooAdapter:
 
         found: list[TagHit] = []
         for theme in themes:
-            document = InsightsDocument.model_validate_json(
-                await self._get_body(TAGS_PATH, tag_params(theme.label))
+            document = _decode(
+                InsightsDocument, await self._get_body(TAGS_PATH, tag_params(theme.label))
             )
             found.extend(hit for hit in map_tags(document.results.tags) if hit.theme_id == theme.id)
         return tuple(found)
@@ -69,7 +70,7 @@ class HttpQlooAdapter:
 
         validate_insights(kind, interests, exclude_tag_ids, exclude_entity_ids)
         params = insights_params(kind, interests, exclude_tag_ids, exclude_entity_ids)
-        document = InsightsDocument.model_validate_json(await self._get_body(INSIGHTS_PATH, params))
+        document = _decode(InsightsDocument, await self._get_body(INSIGHTS_PATH, params))
         return map_insights(document.results.entities, kind, interests)
 
     async def places(
@@ -83,7 +84,7 @@ class HttpQlooAdapter:
 
         validate_places(locality, weekday, interests, tag_ids)
         params = place_params(locality, weekday, interests, tag_ids)
-        document = InsightsDocument.model_validate_json(await self._get_body(INSIGHTS_PATH, params))
+        document = _decode(InsightsDocument, await self._get_body(INSIGHTS_PATH, params))
         return map_places(document.results.entities)
 
     async def _get_body(self, path: str, params: Sequence[tuple[str, str]]) -> bytes:
@@ -114,3 +115,12 @@ class HttpQlooAdapter:
                 continue
             return response
         raise QlooTransportError("The catalog did not answer.")
+
+
+def _decode[Document: BaseModel](model: type[Document], body: bytes) -> Document:
+    """Convert provider schema errors into a safe port failure the agent can recover from."""
+
+    try:
+        return model.model_validate_json(body)
+    except ValidationError as exc:
+        raise QlooTransportError("The catalog returned an invalid document.") from exc
