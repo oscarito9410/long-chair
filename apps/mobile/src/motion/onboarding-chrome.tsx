@@ -9,6 +9,7 @@ export type OnboardingStore = {
   primaryHaptic: HapticWeight;
   linkLabel?: string;
   footerNote?: string;
+  status?: string;
 };
 
 type Handlers = {
@@ -45,6 +46,7 @@ export function useOnboardingChrome(input: {
   linkLabel?: string;
   onLink?: () => void;
   footerNote?: string;
+  status?: string;
 }): void {
   const chrome = useContext(ChromeContext);
   if (!chrome) {
@@ -58,18 +60,19 @@ export function useOnboardingChrome(input: {
   useLayoutEffect(() => {
     handlersRef.current = { onPrimary: input.onPrimary, onLink: input.onLink };
   });
-  const { primary, linkLabel, footerNote } = input;
+  const { primary, linkLabel, footerNote, status } = input;
   useLayoutEffect(() => {
     setStore((previous) =>
       previous.primary === primary &&
       previous.primaryDisabled === primaryDisabled &&
       previous.primaryHaptic === primaryHaptic &&
       previous.linkLabel === linkLabel &&
-      previous.footerNote === footerNote
+      previous.footerNote === footerNote &&
+      previous.status === status
         ? previous
-        : { primary, primaryDisabled, primaryHaptic, linkLabel, footerNote },
+        : { primary, primaryDisabled, primaryHaptic, linkLabel, footerNote, status },
     );
-  }, [footerNote, linkLabel, primary, primaryDisabled, primaryHaptic, setStore]);
+  }, [footerNote, linkLabel, primary, primaryDisabled, primaryHaptic, setStore, status]);
 }
 
 export function useOnboardingStore(): ChromeContextValue {

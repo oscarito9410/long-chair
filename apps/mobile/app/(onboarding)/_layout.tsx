@@ -1,7 +1,8 @@
-import { ONBOARDING_DOT_COUNT, themesLede, themesNote } from "@long-chair/core";
+import { ONBOARDING_DOT_COUNT, themesLede } from "@long-chair/core";
 import { router, Slot, usePathname } from "expo-router";
 import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
+import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg";
 import Animated, {
   Keyframe,
   useAnimatedStyle,
@@ -12,6 +13,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { AppIcon } from "../../src/components/chrome/AppIcon";
 import { PillButton } from "../../src/components/chrome/PillButton";
+import { RoomGuardian } from "../../src/components/chrome/RoomGuardian";
 import { StepTitle } from "../../src/components/chrome/StepTitle";
 import {
   buildingTitle,
@@ -22,10 +24,7 @@ import {
   loveTitle,
 } from "../../src/copy/phrases";
 import { PressableScale } from "../../src/motion/PressableScale";
-import {
-  OnboardingChromeProvider,
-  useOnboardingStore,
-} from "../../src/motion/onboarding-chrome";
+import { OnboardingChromeProvider, useOnboardingStore } from "../../src/motion/onboarding-chrome";
 import { useReducedMotion } from "../../src/motion/use-reduced-motion";
 import {
   FONT_BODY,
@@ -36,6 +35,8 @@ import {
   SPACE_8,
   TARGET,
 } from "../../src/theme/palette";
+
+const THEME_FADE = 24;
 
 const SLIDE_PX = 24;
 const SLIDE_MS = 280;
@@ -49,7 +50,7 @@ const frames = [
     path: "/themes",
     title: THEMES_TITLE,
     lede: themesLede,
-    note: themesNote,
+    note: undefined,
     mark: THEMES_MARK,
     step: 2,
     back: "/chair",
@@ -116,12 +117,22 @@ function OnboardingFrame() {
         entering={reduced ? undefined : slideIn(direction)}
         style={styles.body}
       >
-        <ScrollView contentContainerStyle={styles.scroll}>
-          {hideTitle ? null : (
+        <ScrollView
+          contentContainerStyle={[styles.scroll, meta.path === "/themes" && styles.themeScroll]}
+        >
+          {hideTitle ? null : meta.path === "/themes" ? (
+            <View style={styles.themeHead}>
+              <RoomGuardian />
+              <View style={styles.themeCopy}>
+                <StepTitle title={meta.title} lede={lede} mark={mark} />
+              </View>
+            </View>
+          ) : (
             <StepTitle title={meta.title} lede={lede} note={note} mark={mark} />
           )}
           <Slot />
         </ScrollView>
+        {meta.path === "/themes" ? <ListFade /> : null}
       </Animated.View>
       <OnboardingDock bottom={Math.max(insets.bottom, SPACE_16)} />
     </View>
@@ -168,6 +179,22 @@ function Progress({ step, back }: { step: number; back: FrameMeta["back"] }) {
   );
 }
 
+function ListFade() {
+  return (
+    <View pointerEvents="none" style={styles.fade}>
+      <Svg width="100%" height={THEME_FADE}>
+        <Defs>
+          <LinearGradient id="theme-fade" x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0" stopColor={palette.page} stopOpacity={0} />
+            <Stop offset="1" stopColor={palette.page} stopOpacity={1} />
+          </LinearGradient>
+        </Defs>
+        <Rect width="100%" height={THEME_FADE} fill="url(#theme-fade)" />
+      </Svg>
+    </View>
+  );
+}
+
 function OnboardingDock({ bottom }: { bottom: number }) {
   const { store, handlersRef } = useOnboardingStore();
   if (store.primary.length === 0) {
@@ -175,6 +202,7 @@ function OnboardingDock({ bottom }: { bottom: number }) {
   }
   return (
     <View style={[styles.dock, { paddingBottom: bottom }]}>
+      {store.status ? <Text style={styles.status}>{store.status}</Text> : null}
       <PillButton
         label={store.primary}
         disabled={store.primaryDisabled}
@@ -203,6 +231,9 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: "transparent" },
   body: { flex: 1 },
   scroll: { paddingHorizontal: SPACE_24, gap: SPACE_16, paddingBottom: SPACE_24 },
+  themeScroll: { gap: SPACE_8, paddingBottom: THEME_FADE },
+  themeHead: { flexDirection: "row", alignItems: "center", gap: SPACE_8 },
+  themeCopy: { flex: 1 },
   progress: {
     flexDirection: "row",
     alignItems: "center",
@@ -220,6 +251,13 @@ const styles = StyleSheet.create({
   },
   fill: { height: 8, borderRadius: 8, backgroundColor: palette.ink },
   dock: { paddingHorizontal: SPACE_24, gap: SPACE_8, paddingTop: SPACE_8 },
+  status: {
+    textAlign: "center",
+    fontFamily: "Nunito_700Bold",
+    fontSize: FONT_SECONDARY,
+    color: palette.ink,
+  },
+  fade: { position: "absolute", left: 0, right: 0, bottom: 0, height: THEME_FADE },
   link: {
     minHeight: TARGET,
     textAlign: "center",

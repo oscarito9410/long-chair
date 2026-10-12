@@ -39,6 +39,19 @@ describe("recovery boundary", () => {
   });
 });
 
+describe("avoid themes screen", () => {
+  it("uses switches and object icons, not character faces", () => {
+    const screen = source("app/(onboarding)/themes.tsx");
+    expect(screen).toContain("<Switch");
+    expect(screen).toContain('accessibilityRole="switch"');
+    expect(screen).toContain("themeSwitchLabel");
+    expect(screen).toContain("somethingElseLabel");
+    expect(screen).toContain("keptOutSummary");
+    expect(screen).not.toContain("themeCharacter");
+    expect(screen).not.toContain("CharacterMark");
+  });
+});
+
 describe("expression gallery", () => {
   it("leaves the route only in dev builds", () => {
     const route = source("app/expressions.tsx");

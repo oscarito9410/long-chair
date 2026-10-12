@@ -6,15 +6,22 @@ import {
   evidenceSampleNote,
   itemThemeCheck,
   loveLede,
+  keptOutSummary,
+  themesContinue,
   themesLede,
   themesNote,
+  themeSwitchLabel,
   whyItPassed,
 } from "./screen-copy.ts";
 
 describe("screen copy", () => {
   it("uses the shorter themes line", () => {
-    expect(themesLede).toBe("All five start on. Turn any off, or add your own.");
-    expect(themesNote).toBe("Only if it helps. You can change this anytime.");
+    expect(themesLede).toBe("We'll keep these out of your kit. Switch off any you're okay with.");
+    expect(themesNote).toBe("You can change this anytime.");
+    expect(themesContinue).toBe("Keep these and continue");
+    expect(keptOutSummary(4, 5)).toBe("4 of 5 kept out");
+    expect(themeSwitchLabel("Hospitals", false)).toBe("Hospitals, allowed");
+    expect(themeSwitchLabel("Hospitals", true)).toBe("Hospitals, kept out");
     expect(loveLede).toBe("Pick three or more, or search for anything.");
     expect(whyItPassed).toBe("Why it passed");
     expect(evidenceSampleNote).toContain("Sample evidence");
