@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Character } from "../components/art/Character.tsx";
 import { useTickle } from "../hooks/use-tickle.ts";
 import { QuestionFrame } from "../components/chrome/QuestionFrame.tsx";
+import { GlassButton } from "../components/glass/GlassButton.tsx";
 import { glassClass } from "../components/glass/glass-styles.ts";
 import { Icon } from "../components/ui/Icon.tsx";
 import { ONBOARDING_DOT_COUNT, onboardingProgress } from "../content/onboarding.ts";
@@ -30,9 +31,9 @@ export function CompanyScreen() {
       secondaryHref={paths.building}
       progress={{ ...onboardingProgress.company, total: ONBOARDING_DOT_COUNT }}
     >
-      <button type="button" className="visually-hidden" onClick={force}>
+      <GlassButton tone="quiet" onClick={force}>
         Tickle
-      </button>
+      </GlassButton>
       <div className="guide-grid">
         {guides.map((choice) => {
           const selected = choice.id === guide.id;
