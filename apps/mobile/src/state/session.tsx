@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import { demoDraft, openingDraft, toggleId, toggleTaste } from "@long-chair/core";
+import { addCustomTheme, customThemesOf, demoDraft, openingDraft, toggleId, toggleTaste } from "@long-chair/core";
 import type { SessionDraft } from "@long-chair/core";
 
 type SessionContextValue = {
@@ -11,6 +11,8 @@ type SessionContextValue = {
   setCompanion: (id: string) => void;
   beginOnboarding: () => void;
   setSeeds: (ids: readonly string[]) => void;
+  addTheme: (label: string) => void;
+  removeTheme: (id: string) => void;
   reset: () => void;
 };
 
@@ -35,7 +37,24 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         setDraft((current) => ({ ...current, companionId: id }));
       },
       beginOnboarding: () => {
-        setDraft((current) => ({ ...current, seedIds: [] }));
+        setDraft((current) => ({
+          ...current,
+          seedIds: [],
+          avoidIds: openingDraft.avoidIds,
+          customThemes: [],
+        }));
+      },
+      addTheme: (label) => {
+        setDraft((current) => ({
+          ...current,
+          customThemes: addCustomTheme(customThemesOf(current.customThemes), label),
+        }));
+      },
+      removeTheme: (id) => {
+        setDraft((current) => ({
+          ...current,
+          customThemes: customThemesOf(current.customThemes).filter((theme) => theme.id !== id),
+        }));
       },
       setSeeds: (ids) => {
         setDraft((current) => ({ ...current, seedIds: [...ids] }));

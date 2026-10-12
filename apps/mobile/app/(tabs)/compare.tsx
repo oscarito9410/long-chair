@@ -1,5 +1,6 @@
 import {
   compareBroughtLabels,
+  sampleThemeScoreLine,
   FALLBACK_COMPARE_ID,
   itemById,
   matchingSeedNames,
@@ -72,6 +73,7 @@ export default function CompareScreen() {
       <Text accessibilityRole="header" style={styles.title}>
         {compareTitle}
       </Text>
+      <Text style={styles.body}>{sampleThemeScoreLine()}</Text>
       <WashCard style={styles.card} tint={palette.wisteria}>
         <View style={styles.meta}>
           <IconWell hue="wisteria" name="split" size={TARGET} />

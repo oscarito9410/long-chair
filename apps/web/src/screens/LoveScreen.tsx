@@ -3,6 +3,9 @@ import {
   canContinueTastes,
   loveFooterMeta,
   loveLede,
+  regionCodes,
+  regionMenuLabel,
+  regionNames,
   sampleKitInstead,
   tasteContinueLabel,
   tasteDisplayName,
@@ -12,6 +15,7 @@ import { TastePicker } from "../components/taste/TastePicker.tsx";
 import { Icon } from "../components/ui/Icon.tsx";
 import { paths } from "../routing/paths.ts";
 import { useSession } from "../state/SessionContext.tsx";
+import { useRegionGroups } from "../state/use-region.ts";
 
 const FOOTER_FALLBACK = 180;
 const LOVE_STEP = "1 of 4";
@@ -137,6 +141,7 @@ function LoveFooter({
 
 export function LoveScreen() {
   const { draft, setSeeds, reset } = useSession();
+  const region = useRegionGroups();
   const [footerHeight, setFooterNode] = useBoxHeight(FOOTER_FALLBACK);
   const [notice, setNotice] = useState("");
   const count = draft.seedIds.length;
@@ -153,7 +158,36 @@ export function LoveScreen() {
   return (
     <div className="love-step" data-screen="love">
       <LoveHeader />
-      <TastePicker selectedIds={draft.seedIds} footerClearance={footerHeight} onApply={apply} />
+      <TastePicker
+        selectedIds={draft.seedIds}
+        footerClearance={footerHeight}
+        onApply={apply}
+        groups={region.groups}
+        regionName={region.regionName}
+        onOpenRegion={() => {
+          region.setOpen(true);
+        }}
+      />
+      {region.open ? (
+        <div className="region-sheet" role="dialog" aria-label={regionMenuLabel}>
+          <ul className="region-list">
+            {regionCodes.map((code) => (
+              <li key={code}>
+                <button
+                  type="button"
+                  className="region-option"
+                  aria-pressed={code === region.region}
+                  onClick={() => {
+                    region.choose(code);
+                  }}
+                >
+                  {regionNames[code]}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
       <LoveFooter
         label={tasteContinueLabel(count)}
         ready={ready}

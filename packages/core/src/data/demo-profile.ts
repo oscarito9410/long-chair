@@ -17,5 +17,10 @@ export const demoDraft: SessionDraft = {
   companionId: "pebble",
 };
 
-/** Onboarding starts with an empty shelf so the love step has to ask. */
-export const openingDraft: SessionDraft = { ...demoDraft, seedIds: [] };
+/** Onboarding starts with an empty shelf and every default theme held out. */
+export const openingDraft: SessionDraft = {
+  ...demoDraft,
+  seedIds: [],
+  avoidIds: avoidThemes.map((theme) => theme.id),
+  customThemes: [],
+};

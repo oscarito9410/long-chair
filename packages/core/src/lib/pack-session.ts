@@ -1,5 +1,7 @@
 import { catalog } from "../data/catalog.ts";
+import { customThemesOf } from "../data/theme-signals.ts";
 import type { CatalogItem, ContentKind, PackedSession, SessionDraft } from "../data/types.ts";
+import { admissionFor, cautionThemeIdsFor } from "../service/theme-verifier.ts";
 
 /** Show an unscheduled pause only when the gap is long enough to notice. */
 export const PAUSE_NOTICE_MINUTES = 8;
@@ -64,13 +66,8 @@ function shapeFor(minutes: number): readonly SlotRequest[] {
   return match ? match.slots : [];
 }
 
-function allowsThemes(item: CatalogItem, avoided: ReadonlySet<string>): boolean {
-  for (const id of avoided) {
-    if (!item.avoidedThemeIds.includes(id)) {
-      return false;
-    }
-  }
-  return true;
+function allowsThemes(item: CatalogItem, draft: SessionDraft): boolean {
+  return admissionFor(item, draft.avoidIds, customThemesOf(draft.customThemes)) !== "block";
 }
 
 function pickForSlot(
@@ -78,14 +75,14 @@ function pickForSlot(
   remaining: number,
   used: ReadonlySet<string>,
   selected: ReadonlySet<string>,
-  avoided: ReadonlySet<string>,
+  draft: SessionDraft,
 ): CatalogItem | undefined {
   const cap = Math.min(slot.maxMinutes, remaining);
   const candidates = catalog.filter((item) => {
     if (item.kind !== slot.kind || used.has(item.id) || item.minutes > cap) {
       return false;
     }
-    if (!allowsThemes(item, avoided)) {
+    if (!allowsThemes(item, draft)) {
       return false;
     }
     return tasteScore(item, selected) > 0;
@@ -96,13 +93,12 @@ function pickForSlot(
 
 export function packSession(draft: SessionDraft): PackedSession {
   const selected = new Set(draft.seedIds);
-  const avoided = new Set(draft.avoidIds);
   const used = new Set<string>();
   const chosen: CatalogItem[] = [];
   let remaining = draft.durationMinutes;
 
   for (const slot of shapeFor(draft.durationMinutes)) {
-    const item = pickForSlot(slot, remaining, used, selected, avoided);
+    const item = pickForSlot(slot, remaining, used, selected, draft);
     if (!item) {
       continue;
     }
@@ -113,7 +109,7 @@ export function packSession(draft: SessionDraft): PackedSession {
 
   const extras = catalog
     .filter(
-      (item) => !used.has(item.id) && allowsThemes(item, avoided) && tasteScore(item, selected) > 0,
+      (item) => !used.has(item.id) && allowsThemes(item, draft) && tasteScore(item, selected) > 0,
     )
     .sort((a, b) => tasteScore(b, selected) - tasteScore(a, selected) || b.minutes - a.minutes);
 
@@ -135,6 +131,10 @@ export function packSession(draft: SessionDraft): PackedSession {
   const slots = chosen.map((item) => {
     const startMinute = cursor;
     cursor += item.minutes;
+    const cautionThemeIds = cautionThemeIdsFor(item, draft.avoidIds, customThemesOf(draft.customThemes));
+    if (cautionThemeIds.length > 0) {
+      return { itemId: item.id, startMinute, endMinute: cursor, cautionThemeIds };
+    }
     return { itemId: item.id, startMinute, endMinute: cursor };
   });
 

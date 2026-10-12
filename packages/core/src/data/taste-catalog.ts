@@ -132,6 +132,14 @@ const rows: readonly TasteRow[] = [
   ["salt-windowlight", "book", "Salt and Windowlight", "Essays on kitchens and weather", "windowlight", false],
   ["slow-kitchen", "podcast", "Slow Kitchen Radio", "One recipe, and no rush", "slow kitchen", false],
   ["sunday-engines", "film", "Sunday Engines", "A gentle film about small trains", "sunday engines", false],
+  ["sitcoms", "tag", "Sitcoms", "Half-hour comedies with a familiar room", "sitcom|comedias", false],
+  ["country", "tag", "Country", "Songs about roads, kitchens, and small towns", "country music|musica country", false],
+  ["nfl", "tag", "NFL", "American football, Sundays and a long season", "american football|futbol americano", false],
+  ["mlb", "tag", "MLB", "Baseball from spring training to a late inning", "baseball|beisbol", false],
+  ["samba", "tag", "Samba", "Rio rhythm, a chorus, and a long night", "samba", false],
+  ["flamenco", "tag", "Flamenco", "Guitar, palmas, and a voice that stays", "flamenco", false],
+  ["cricket", "tag", "Cricket", "A long match, tea, and one session at a time", "cricket", false],
+  ["bollywood", "tag", "Bollywood", "Songs, family, and a full evening", "bollywood|hindi cinema", false],
 ];
 
 function entityFromRow(row: TasteRow): TasteEntity {

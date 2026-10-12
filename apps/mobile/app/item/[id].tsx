@@ -1,4 +1,15 @@
-import { formatHoursMinutes, itemById, itemThemeCheck, matchingSeedNames } from "@long-chair/core";
+import { useState } from "react";
+import {
+  avoidThemes,
+  customThemesOf,
+  evidenceSampleNote,
+  explainItem,
+  formatHoursMinutes,
+  itemById,
+  matchingSeedNames,
+  whyItPassed,
+} from "@long-chair/core";
+import type { CatalogItem, CustomTheme, SessionDraft, ThemeVerdict } from "@long-chair/core";
 import { useLocalSearchParams } from "expo-router";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -50,11 +61,26 @@ export default function ItemRoute() {
   );
 }
 
+function verdictName(verdict: ThemeVerdict, custom: readonly CustomTheme[]): string {
+  const known = avoidThemes.find((theme) => theme.id === verdict.themeId);
+  const added = custom.find((theme) => theme.id === verdict.themeId);
+  return known?.label ?? added?.label ?? verdict.themeId;
+}
+
+function evidenceCopy(item: CatalogItem, draft: SessionDraft): string[] {
+  const custom = customThemesOf(draft.customThemes);
+  return explainItem(item, draft.avoidIds, custom).map((verdict) => {
+    const detail = verdict.evidence.map((entry) => entry.detail).join(" ");
+    return `${verdictName(verdict, custom)}: ${verdict.verdict}. ${detail}`;
+  });
+}
+
 function ItemBody({ itemId }: { itemId: string }) {
   const insets = useSafeAreaInsets();
   const { draft } = useSession();
   const item = itemById(itemId);
   const because = item ? matchingSeedNames(item, draft)[0] : undefined;
+  const [open, setOpen] = useState(false);
 
   if (!item) {
     return (
@@ -100,7 +126,32 @@ function ItemBody({ itemId }: { itemId: string }) {
       <Text style={styles.copy}>{item.maker}</Text>
       <Text style={styles.copy}>{formatHoursMinutes(item.minutes)}</Text>
       {because ? <Text style={styles.copy}>{`Because you love ${because}.`}</Text> : null}
-      <Text style={styles.copy}>{itemThemeCheck}</Text>
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => {
+          setOpen(true);
+        }}
+      >
+        <Text style={styles.copy}>{whyItPassed}</Text>
+      </Pressable>
+      {open ? (
+        <View>
+          <Text style={styles.copy}>{evidenceSampleNote}</Text>
+          {evidenceCopy(item, draft).map((line) => (
+            <Text key={line} style={styles.copy}>
+              {line}
+            </Text>
+          ))}
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => {
+              setOpen(false);
+            }}
+          >
+            <Text style={styles.copy}>Close</Text>
+          </Pressable>
+        </View>
+      ) : null}
     </View>
   );
 }

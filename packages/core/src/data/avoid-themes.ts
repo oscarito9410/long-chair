@@ -28,8 +28,3 @@ export const avoidThemes: readonly AvoidTheme[] = [
   },
 ];
 
-const clearedThemeIds = avoidThemes.map((theme) => theme.id);
-
-export function clearedThemes(): readonly string[] {
-  return clearedThemeIds;
-}

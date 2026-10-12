@@ -8,12 +8,12 @@ import {
   groupMoreCount,
   previewGroupTastes,
   tasteDisplayName,
-  tasteGroups,
   tasteSearchPlaceholder,
   TASTE_MAX,
   toggleTaste,
 } from "@long-chair/core";
 import type { Hue, TasteEntity, TasteGroup } from "@long-chair/core";
+import { regionMenuLabel } from "@long-chair/core";
 import { Icon } from "../ui/Icon.tsx";
 import type { IconName } from "../ui/icon-names.ts";
 import { cn } from "../../lib/cn.ts";
@@ -210,10 +210,16 @@ export function TastePicker({
   selectedIds,
   footerClearance,
   onApply,
+  groups,
+  regionName,
+  onOpenRegion,
 }: {
   selectedIds: readonly string[];
   footerClearance: number;
   onApply: Apply;
+  groups: readonly TasteGroup[];
+  regionName: string;
+  onOpenRegion: () => void;
 }) {
   const port = useMemo(() => createFixtureTasteSearch(), []);
   const { query, setQuery, results, error } = useTasteQuery(port);
@@ -240,6 +246,9 @@ export function TastePicker({
         }}
       />
       <div className="love-groups" style={{ paddingBottom: footerClearance }}>
+        <button type="button" className="region-chip" onClick={onOpenRegion}>
+          {regionMenuLabel}: {regionName}
+        </button>
         {error ? (
           <p className="taste-empty" role="alert">
             {error}
@@ -257,7 +266,7 @@ export function TastePicker({
         ) : null}
         {searching ? null : (
           <div>
-            {tasteGroups.map((group) => (
+            {groups.map((group) => (
               <GroupBlock
                 key={group.id}
                 group={group}

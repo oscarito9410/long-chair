@@ -1,4 +1,4 @@
-export { avoidThemes, clearedThemes } from "./data/avoid-themes.ts";
+export { avoidThemes } from "./data/avoid-themes.ts";
 export { catalog, itemById } from "./data/catalog.ts";
 export type {
   AgentStep,
@@ -61,16 +61,21 @@ export type { TasteGroup, TasteGroupIcon } from "./data/taste-groups.ts";
 export { kindLabels, placeLabels } from "./content/kind-labels.ts";
 export { ONBOARDING_DOT_COUNT, onboardingStepIndex } from "./content/onboarding-steps.ts";
 export {
+  addThemeLabel,
+  addThemePlaceholder,
   buildingReadyLabel,
   buildingSkipLabel,
+  evidenceSampleNote,
   itemThemeCheck,
   loveFooterMeta,
   loveLede,
   notMedicalAdvice,
+  regionMenuLabel,
   sampleKitInstead,
   sampleShelfNote,
   themesLede,
   themesNote,
+  whyItPassed,
 } from "./content/screen-copy.ts";
 export { buildAgentSteps } from "./lib/build-agent-steps.ts";
 export { compareBroughtLabels } from "./lib/compare-brought.ts";
@@ -83,6 +88,8 @@ export {
   matchingSeedNames,
   plainThemeLabels,
 } from "./lib/match-taste.ts";
+export { evaluateGolden, sampleThemeScoreLine } from "./lib/theme-eval.ts";
+export type { ThemeScore, ThemeScorecard } from "./lib/theme-eval.ts";
 export { PAUSE_NOTICE_MINUTES, QUIET_FILL_RATIO, packSession } from "./lib/pack-session.ts";
 export { buildingLiveText, stepState } from "./lib/step-state.ts";
 export type { StepState } from "./lib/step-state.ts";
@@ -99,3 +106,38 @@ export {
   createTasteSearch,
 } from "./service/taste-search.ts";
 export type { TasteSearchPort, TasteSearchResult } from "./service/taste-search.ts";
+export {
+  createFakePopularitySeedProvider,
+  createHttpQlooTasteSeedProvider,
+  createStaticTasteSeedProvider,
+  createTasteSeedProvider,
+  groupsFromProviderSeeds,
+  rankSeeds,
+} from "./service/taste-seed-provider.ts";
+export type { PopularityHit, TasteSeedProvider } from "./service/taste-seed-provider.ts";
+export {
+  admissionFor,
+  cautionThemeIdsFor,
+  createFixtureKeywordSource,
+  createFixtureTagSource,
+  createFixtureWarningSource,
+  createHttpQlooTagSource,
+  createHttpTmdbKeywordSource,
+  createHttpWarningSource,
+  createThemeVerifier,
+  evidenceLines,
+  explainItem,
+} from "./service/theme-verifier.ts";
+export type {
+  KeywordSource,
+  PackAdmission,
+  TagSource,
+  ThemeVerifier,
+  WarningSource,
+} from "./service/theme-verifier.ts";
+export { groupsForRegion, groupsFromSeeds, outsideSeedCount, regionSeedList } from "./data/region-seeds.ts";
+export type { RegionSeed, TasteGroupId } from "./data/region-seeds.ts";
+export { isRegionCode, regionCodes, regionFromLocale, regionNames } from "./data/regions.ts";
+export type { RegionCode } from "./data/regions.ts";
+export { addCustomTheme, customThemeFromLabel, customThemesOf } from "./data/theme-signals.ts";
+export type { CustomTheme, Evidence, ThemeVerdict, Verdict } from "./data/theme-signals.ts";

@@ -8,7 +8,17 @@ export const sampleShelfNote = "Fictional sample \u00b7 nothing is sent";
 
 export const notMedicalAdvice = "Not medical advice";
 
-export const themesLede = "We left out three. Change any.";
+export const themesLede = "All five start on. Turn any off, or add your own.";
+
+export const addThemeLabel = "Add a theme";
+
+export const addThemePlaceholder = "A theme to hold out";
+
+export const whyItPassed = "Why it passed";
+
+export const evidenceSampleNote = "Sample evidence. Not a live catalog check.";
+
+export const regionMenuLabel = "Region";
 
 export const themesNote = "Only if it helps. You can change this anytime.";
 

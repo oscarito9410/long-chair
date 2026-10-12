@@ -1,14 +1,15 @@
-import { clearedThemes } from "./avoid-themes.ts";
+import { clearedThemeIdsFor } from "./theme-signals.ts";
 import type { CatalogItem } from "./types.ts";
 
-const safe = clearedThemes();
-const unsafeForIllness = safe.filter((id) => id !== "illness");
+function stamp(item: Omit<CatalogItem, "avoidedThemeIds">): CatalogItem {
+  return { ...item, avoidedThemeIds: clearedThemeIdsFor(item) };
+}
 
 /**
  * Fictional pieces tied to searched tastes. Ranks still mean "offer this first"
  * inside a kind when the minutes fit.
  */
-export const tasteShelf: readonly CatalogItem[] = [
+const recorded: Omit<CatalogItem, "avoidedThemeIds">[] = [
   {
     id: "lantern-episode",
     kind: "tv_show",
@@ -17,7 +18,6 @@ export const tasteShelf: readonly CatalogItem[] = [
     minutes: 24,
     rank: 1,
     becauseOf: ["anime", "studio-ghibli"],
-    avoidedThemeIds: safe,
     why: "An anime episode, because you asked for that shelf: one evening, a festival light, and no emergency.",
     synopsis:
       "Four friends hang paper lanterns before a town festival. The episode stays on the street, the string, and who holds the ladder.",
@@ -30,7 +30,6 @@ export const tasteShelf: readonly CatalogItem[] = [
     minutes: 22,
     rank: 0,
     becauseOf: ["anime"],
-    avoidedThemeIds: unsafeForIllness,
     why: "Another anime hour. This one is set in a clinic, so it stays off the shelf when illness is held out.",
     synopsis: "A clinic waiting room, drawn as an anime. We leave it out when that setting is not welcome.",
   },
@@ -42,7 +41,6 @@ export const tasteShelf: readonly CatalogItem[] = [
     minutes: 84,
     rank: 1,
     becauseOf: ["fitness", "soccer", "nba"],
-    avoidedThemeIds: safe,
     why: "A sports documentary, because training and the court are on your list.",
     synopsis:
       "A neighborhood court through one season. Players stretch, argue about the line, and stay for the last game of the night.",
@@ -55,7 +53,6 @@ export const tasteShelf: readonly CatalogItem[] = [
     minutes: 32,
     rank: 1,
     becauseOf: ["tech", "programming", "science"],
-    avoidedThemeIds: safe,
     why: "A tech podcast, because you picked how things are built.",
     synopsis:
       "One hour on a small radio kit: what the parts are called, and why a wire matters. There is no product to buy.",
@@ -68,7 +65,6 @@ export const tasteShelf: readonly CatalogItem[] = [
     minutes: 22,
     rank: 1,
     becauseOf: ["tech"],
-    avoidedThemeIds: safe,
     why: "A short technical essay for the minutes still open.",
     synopsis: "Adeyemi opens a radio and names each piece. The chapter ends when the dial finds a station.",
   },
@@ -80,7 +76,6 @@ export const tasteShelf: readonly CatalogItem[] = [
     minutes: 44,
     rank: 1,
     becauseOf: ["telenovela"],
-    avoidedThemeIds: safe,
     why: "A telenovela hour, because that is the evening shape you asked for.",
     synopsis:
       "Thursday in a shared courtyard. Someone returns a chair, someone starts a story, and the plot can wait until next week.",
@@ -93,7 +88,6 @@ export const tasteShelf: readonly CatalogItem[] = [
     minutes: 28,
     rank: 1,
     becauseOf: ["cooking", "baking"],
-    avoidedThemeIds: safe,
     why: "A cooking hour, because you wanted a recipe more than a plot.",
     synopsis: "Otto Pell cooks one skillet meal from a market bag. The episode is the sound of the pan.",
   },
@@ -105,7 +99,6 @@ export const tasteShelf: readonly CatalogItem[] = [
     minutes: 26,
     rank: 1,
     becauseOf: ["bad-bunny", "reggaeton", "latin-pop"],
-    avoidedThemeIds: safe,
     why: "A courtyard set in the lane of the music you picked.",
     synopsis: "Six songs and the sound of a neighbor's fan. The singer stays close to the microphone.",
   },
@@ -117,7 +110,6 @@ export const tasteShelf: readonly CatalogItem[] = [
     minutes: 30,
     rank: 1,
     becauseOf: ["classical", "jazz"],
-    avoidedThemeIds: safe,
     why: "A small-hall recording, because you asked for that kind of listening.",
     synopsis: "A quartet plays four movements and then packs the stands. The room is wooden and close.",
   },
@@ -129,7 +121,6 @@ export const tasteShelf: readonly CatalogItem[] = [
     minutes: 26,
     rank: 1,
     becauseOf: ["history", "travel"],
-    avoidedThemeIds: safe,
     why: "A history you can read in one sitting, tied to the road you picked.",
     synopsis: "Maren follows one highway through three towns and writes down who built each bend.",
   },
@@ -141,7 +132,6 @@ export const tasteShelf: readonly CatalogItem[] = [
     minutes: 92,
     rank: 1,
     becauseOf: ["travel", "rail-history"],
-    avoidedThemeIds: safe,
     why: "A travel film, because the route is the story you asked for.",
     synopsis: "A passenger train from the window seat. Stations arrive, and nobody is late on purpose.",
   },
@@ -153,8 +143,9 @@ export const tasteShelf: readonly CatalogItem[] = [
     minutes: 30,
     rank: 1,
     becauseOf: ["history", "travel"],
-    avoidedThemeIds: safe,
     why: "A history podcast for the open minutes, walked instead of lectured.",
     synopsis: "Pell reads a map aloud and stops at three names. Each one gets a short story.",
   },
 ];
+
+export const tasteShelf: readonly CatalogItem[] = recorded.map(stamp);

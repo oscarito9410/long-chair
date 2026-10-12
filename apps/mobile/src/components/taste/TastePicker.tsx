@@ -9,12 +9,12 @@ import {
   groupMoreCount,
   previewGroupTastes,
   tasteDisplayName,
-  tasteGroups,
   tasteSearchPlaceholder,
   TASTE_MAX,
   toggleTaste,
 } from "@long-chair/core";
 import type { Hue, TasteEntity, TasteGroup } from "@long-chair/core";
+import { regionMenuLabel } from "@long-chair/core";
 
 import { AppIcon } from "../chrome/AppIcon";
 import type { IconName } from "../chrome/icon-names";
@@ -230,10 +230,16 @@ export function TastePicker({
   selectedIds,
   footerClearance,
   onApply,
+  groups,
+  regionName,
+  onOpenRegion,
 }: {
   selectedIds: readonly string[];
   footerClearance: number;
   onApply: Apply;
+  groups: readonly TasteGroup[];
+  regionName: string;
+  onOpenRegion: () => void;
 }) {
   const port = useMemo(() => createTasteSearch(readApiUrl()), []);
   const { query, setQuery, results, error } = useTasteQuery(port);
@@ -277,13 +283,18 @@ export function TastePicker({
         contentContainerStyle={[styles.pad, { paddingBottom: footerClearance }]}
         keyboardShouldPersistTaps="handled"
       >
+        <PressableScale onPress={onOpenRegion} haptic="tick" accessibilityLabel={`${regionMenuLabel}: ${regionName}`}>
+          <View style={styles.regionChip}>
+            <Text style={styles.chipLabel}>{`${regionMenuLabel}: ${regionName}`}</Text>
+          </View>
+        </PressableScale>
         {error ? <Text style={styles.body}>{error}</Text> : null}
         {searching && !error ? (
           <Suggestions results={results} selectedIds={selectedIds} full={full} onToggle={(id) => apply(toggleTaste(selectedIds, id))} />
         ) : null}
         {searching ? null : (
           <View>
-            {tasteGroups.map((group) => (
+            {groups.map((group) => (
               <GroupBlock
                 key={group.id}
                 group={group}
@@ -387,6 +398,17 @@ const styles = StyleSheet.create({
     fontFamily: "Nunito_700Bold",
     fontSize: FONT_SECONDARY,
     color: palette.ink,
+  },
+  regionChip: {
+    alignSelf: "flex-start",
+    minHeight: CHIP_MIN,
+    marginBottom: SPACE_16,
+    borderRadius: RADIUS_PILL,
+    borderWidth: 1,
+    borderColor: palette.line,
+    backgroundColor: palette.card,
+    paddingHorizontal: SPACE_16,
+    justifyContent: "center",
   },
   body: {
     fontFamily: "Nunito_600SemiBold",

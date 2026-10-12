@@ -17,6 +17,8 @@ This is the [Qloo Agentic Hackathon](https://qloo.devpost.com/) build. Judges us
 
 - A full pass: welcome, one question at a time, an illustrated build, a ready stamp, a session kit, a piece sheet, a companion plan, and a plain-model contrast.
 - A typed sample shelf. Length and tastes change what gets packed.
+- Region chips follow the device locale (Mexico, the United States, Brazil, Spain, the United Kingdom, India, or Global). No location permission. A Region control can override it.
+- Built-in themes are rules. A title is packed only when those rules verify clear. Compare shows the sample precision and recall. See [ADR 0009](docs/adr/0009-region-chips-and-theme-rules.md).
 - The sample is labeled. Nothing is sent in the review build. There is no account.
 - Theme filters are content preferences kept on the phone.
 - Liquid glass on iOS 26, with a blur fallback everywhere else.

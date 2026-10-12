@@ -10,7 +10,7 @@ import { itemById } from "@long-chair/core";
 import { FALLBACK_COMPARE_ID, plainModelExample } from "@long-chair/core";
 import type { CatalogItem, PackedSession } from "@long-chair/core";
 import { usePackedSession } from "../hooks/use-packed-session.ts";
-import { compareBroughtLabels } from "@long-chair/core";
+import { compareBroughtLabels, sampleThemeScoreLine } from "@long-chair/core";
 import { matchingSeedNames, plainThemeLabels } from "@long-chair/core";
 import { useSession } from "../state/SessionContext.tsx";
 
@@ -38,6 +38,7 @@ export function CompareScreen() {
         caption="themes held back"
         title="What a plain model misses"
       />
+      <p className="text-base font-bold">{sampleThemeScoreLine()}</p>
       <div className="compare-grid">
         <PlainMiss />
         <KeptPanel item={kept} because={because} />

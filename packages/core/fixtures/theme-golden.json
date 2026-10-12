@@ -1,0 +1,821 @@
+{
+  "note": "Hand-labeled sample titles. Not live Qloo, TMDB, or Does the Dog Die records. Each row notes the sample sources used for the label.",
+  "titles": [
+    {
+      "id": "g-ill-1",
+      "title": "Sample illness one",
+      "synopsis": "The plot turns on a long illness.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "flagged",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-ill-2",
+      "title": "Sample illness two",
+      "synopsis": "She is sick and the day is rearranged.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "flagged",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-ill-3",
+      "title": "Sample illness three",
+      "synopsis": "A disease changes the household routine.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "flagged",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-ill-4",
+      "title": "Sample illness four",
+      "synopsis": "The diagnosis arrives by letter.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "flagged",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-ill-5",
+      "title": "Sample illness five",
+      "synopsis": "La enfermedad ocupa la cocina.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "flagged",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-ill-6",
+      "title": "Sample illness six",
+      "synopsis": "El enfermo espera en el patio.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "flagged",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-ill-7",
+      "title": "Sample illness seven",
+      "synopsis": "A quiet afternoon in a garden.",
+      "qlooTags": [
+        {
+          "id": "urn:tag:sample:illness",
+          "name": "medical drama"
+        }
+      ],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "flagged",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-ill-8",
+      "title": "Sample illness eight",
+      "synopsis": "Neighbors bring soup.",
+      "qlooTags": [],
+      "tmdbKeywords": [
+        "illness"
+      ],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "flagged",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-hos-1",
+      "title": "Sample hospital one",
+      "synopsis": "The story stays inside a hospital.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "flagged",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-hos-2",
+      "title": "Sample hospital two",
+      "synopsis": "A ward at night, and a window.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "flagged",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-hos-3",
+      "title": "Sample hospital three",
+      "synopsis": "They meet in a clinic hallway.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "flagged",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-hos-4",
+      "title": "Sample hospital four",
+      "synopsis": "La clinica cierra tarde.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "flagged",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-hos-5",
+      "title": "Sample hospital five",
+      "synopsis": "La sala de espera tiene una planta.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "flagged",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-hos-6",
+      "title": "Sample hospital six",
+      "synopsis": "A short walk home.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [
+        "hospital"
+      ],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "flagged",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-can-1",
+      "title": "Sample cancer one",
+      "synopsis": "Cancer is the plot of the season.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "flagged",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-can-2",
+      "title": "Sample cancer two",
+      "synopsis": "Chemotherapy sets the calendar.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "flagged",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-can-3",
+      "title": "Sample cancer three",
+      "synopsis": "A tumor scare organizes the week.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "flagged",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-can-4",
+      "title": "Sample cancer four",
+      "synopsis": "The oncologist is a main character.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "flagged",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-can-5",
+      "title": "Sample cancer five",
+      "synopsis": "La quimioterapia es el centro del capitulo.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "flagged",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-can-6",
+      "title": "Sample cancer six",
+      "synopsis": "Friends cook and talk.",
+      "qlooTags": [
+        {
+          "id": "urn:tag:sample:cancer",
+          "name": "cancer"
+        }
+      ],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "flagged",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-par-1",
+      "title": "Sample parent one",
+      "synopsis": "Her mother died before the trip.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "flagged",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-par-2",
+      "title": "Sample parent two",
+      "synopsis": "His father died in the first chapter.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "flagged",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-par-3",
+      "title": "Sample parent three",
+      "synopsis": "She lost her mother and kept the letters.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "flagged",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-par-4",
+      "title": "Sample parent four",
+      "synopsis": "He lost his father and the workshop.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "flagged",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-par-5",
+      "title": "Sample parent five",
+      "synopsis": "La muerte de la madre abre el relato.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "flagged",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-par-6",
+      "title": "Sample parent six",
+      "synopsis": "Un viaje largo.",
+      "qlooTags": [],
+      "tmdbKeywords": [
+        "muerte del padre"
+      ],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "flagged",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-gri-1",
+      "title": "Sample grief one",
+      "synopsis": "Grief is the thread of the hour.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "flagged"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-gri-2",
+      "title": "Sample grief two",
+      "synopsis": "Mourning fills the house.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "flagged"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-gri-3",
+      "title": "Sample grief three",
+      "synopsis": "El duelo dura todo el verano.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "flagged"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-gri-4",
+      "title": "Sample grief four",
+      "synopsis": "El luto cambia la mesa.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "flagged"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-gri-fn",
+      "title": "Sample grief miss",
+      "synopsis": "A sad goodbye on a station platform.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "flagged"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-gri-fp",
+      "title": "Sample ferry rite",
+      "synopsis": "The town holds a funeral for a retired ferry.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-clear-1",
+      "title": "Sample clear 1",
+      "synopsis": "Friends share a garden and stay for soup.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-clear-2",
+      "title": "Sample clear 2",
+      "synopsis": "A mapmaker names three apple lanes and walks home.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-clear-3",
+      "title": "Sample clear 3",
+      "synopsis": "Two neighbors repair a radio and listen to the weather.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-clear-4",
+      "title": "Sample clear 4",
+      "synopsis": "A baker opens early and saves the last roll.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-clear-5",
+      "title": "Sample clear 5",
+      "synopsis": "Children fold paper boats under a footbridge.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-clear-6",
+      "title": "Sample clear 6",
+      "synopsis": "A band rehearses four songs in a small hall.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-clear-7",
+      "title": "Sample clear 7",
+      "synopsis": "A ferry captain learns a shorter route along the coast.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-clear-8",
+      "title": "Sample clear 8",
+      "synopsis": "Players stay after practice to argue about the line.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-clear-9",
+      "title": "Sample clear 9",
+      "synopsis": "A cook writes a one-pan supper for a Tuesday.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-clear-10",
+      "title": "Sample clear 10",
+      "synopsis": "Travelers count trains from a quiet platform bench.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-clear-11",
+      "title": "Sample clear 11",
+      "synopsis": "A librarian reads the afternoon story and closes the shutters.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-clear-12",
+      "title": "Sample clear 12",
+      "synopsis": "Neighbors paint a mural and leave the brushes in a bucket.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-clear-13",
+      "title": "Sample clear 13",
+      "synopsis": "A cyclist rides the long way around the park.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-clear-14",
+      "title": "Sample clear 14",
+      "synopsis": "Siblings set a table for a birthday with no speeches.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-clear-15",
+      "title": "Sample clear 15",
+      "synopsis": "A potter finishes one bowl and starts the next.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-clear-16",
+      "title": "Sample clear 16",
+      "synopsis": "The night market sells oranges and folded newspapers.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-clear-17",
+      "title": "Sample clear 17",
+      "synopsis": "A choir practices the chorus and then has tea.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    },
+    {
+      "id": "g-clear-18",
+      "title": "Sample clear 18",
+      "synopsis": "A carpenter measures a window twice.",
+      "qlooTags": [],
+      "tmdbKeywords": [],
+      "contentWarnings": [],
+      "expected": {
+        "illness": "clear",
+        "hospitals": "clear",
+        "cancer": "clear",
+        "parent-death": "clear",
+        "grief": "clear"
+      },
+      "sample": true
+    }
+  ]
+}

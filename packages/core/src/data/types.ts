@@ -43,12 +43,14 @@ export type SessionDraft = {
   avoidIds: readonly string[];
   durationMinutes: number;
   companionId: string;
+  customThemes?: readonly { id: string; label: string }[];
 };
 
 export type PackedSlot = {
   itemId: string;
   startMinute: number;
   endMinute: number;
+  cautionThemeIds?: readonly string[];
 };
 
 export type PackedSession = {
