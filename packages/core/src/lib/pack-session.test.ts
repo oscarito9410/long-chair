@@ -38,7 +38,12 @@ describe("packSession", () => {
 
     expect(anime).toEqual(["court-lines", "lantern-episode", "signal-hour", "field-notes-item"]);
     expect(latin).toEqual(["courtyard-hour", "one-pan-item", "patio-session-item"]);
-    expect(travel).toEqual(["overland-item", "names-map-item", "small-hall-item", "south-road-item"]);
+    expect(travel).toEqual([
+      "overland-item",
+      "names-map-item",
+      "small-hall-item",
+      "south-road-item",
+    ]);
     expect(new Set([anime.join(), latin.join(), travel.join()]).size).toBe(3);
   });
 
@@ -55,7 +60,11 @@ describe("packSession", () => {
   });
 });
 
-function slotIds(seedIds: readonly string[], minutes = 240, avoidIds: readonly string[] = ["illness"]) {
+function slotIds(
+  seedIds: readonly string[],
+  minutes = 240,
+  avoidIds: readonly string[] = ["illness"],
+) {
   return packSession({
     seedIds,
     avoidIds,

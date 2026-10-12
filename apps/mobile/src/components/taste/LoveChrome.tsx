@@ -8,14 +8,7 @@ import { AppIcon } from "../chrome/AppIcon";
 import { StepTitle } from "../chrome/StepTitle";
 import { loveTitle } from "../../copy/phrases";
 import { PressableScale } from "../../motion/PressableScale";
-import {
-  FONT_BODY,
-  palette,
-  RADIUS_PILL,
-  SPACE_16,
-  SPACE_24,
-  SPACE_8,
-} from "../../theme/palette";
+import { FONT_BODY, palette, RADIUS_PILL, SPACE_16, SPACE_24, SPACE_8 } from "../../theme/palette";
 
 const BACK_HIT = 44;
 const DOT = 8;
@@ -81,7 +74,11 @@ export function LoveFooter({
       <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, SPACE_16) }]}>
         <BlurView intensity={28} tint="light" style={StyleSheet.absoluteFill} />
         <View style={styles.wash} />
-        <PressableScale onPress={onContinue} haptic={ready ? "press" : "tick"} accessibilityLabel={label}>
+        <PressableScale
+          onPress={onContinue}
+          haptic={ready ? "press" : "tick"}
+          accessibilityLabel={label}
+        >
           <View style={[styles.continue, ready ? styles.continueOn : styles.continueWait]}>
             <Text style={[styles.continueText, ready ? styles.continueInk : styles.continueMute]}>
               {label}

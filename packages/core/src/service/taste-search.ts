@@ -1,4 +1,9 @@
-import { searchTasteCatalog, tasteById, tasteKindIcons, tasteKinds } from "../data/taste-catalog.ts";
+import {
+  searchTasteCatalog,
+  tasteById,
+  tasteKindIcons,
+  tasteKinds,
+} from "../data/taste-catalog.ts";
 import type { TasteEntity, TasteKind } from "../data/taste-catalog.ts";
 import type { FetchLike, PlanSource } from "./kit-service.ts";
 
@@ -32,7 +37,10 @@ export function createFixtureTasteSearch(): TasteSearchPort {
   };
 }
 
-export function createHttpTasteSearch(apiUrl: string, fetchImpl: FetchLike = fetch): TasteSearchPort {
+export function createHttpTasteSearch(
+  apiUrl: string,
+  fetchImpl: FetchLike = fetch,
+): TasteSearchPort {
   const base = apiUrl.replace(/\/$/, "");
   return {
     async search(query) {

@@ -38,5 +38,10 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: "transparent" },
   gear: { alignItems: "flex-end", paddingRight: SPACE_16 },
   scroll: { flex: 1, backgroundColor: "transparent" },
-  page: { paddingHorizontal: SPACE_24, gap: SPACE_16, paddingTop: SPACE_8, paddingBottom: SPACE_24 },
+  page: {
+    paddingHorizontal: SPACE_24,
+    gap: SPACE_16,
+    paddingTop: SPACE_8,
+    paddingBottom: SPACE_24,
+  },
 });

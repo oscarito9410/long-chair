@@ -4,7 +4,11 @@ import { clearedThemeIdsFor } from "./theme-signals.ts";
 import type { CatalogItem } from "./types.ts";
 
 function stamp(item: Omit<CatalogItem, "avoidedThemeIds">): CatalogItem {
-  return { ...item, ...durationFactFor(item.kind, item.title), avoidedThemeIds: clearedThemeIdsFor(item) };
+  return {
+    ...item,
+    ...durationFactFor(item.kind, item.title),
+    avoidedThemeIds: clearedThemeIdsFor(item),
+  };
 }
 
 /**

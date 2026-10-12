@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import type { FetchLike } from "./kit-service.ts";
-import { createFixtureTasteSearch, createHttpTasteSearch, createTasteSearch } from "./taste-search.ts";
+import {
+  createFixtureTasteSearch,
+  createHttpTasteSearch,
+  createTasteSearch,
+} from "./taste-search.ts";
 
 describe("taste search", () => {
   it("reads the local shelf as a sample", async () => {
@@ -39,7 +43,14 @@ describe("taste search", () => {
         json: () =>
           Promise.resolve({
             source: "live",
-            results: [{ id: "orbital-radio", name: "Orbital Radio", kind: "podcast", detail: "A night show" }],
+            results: [
+              {
+                id: "orbital-radio",
+                name: "Orbital Radio",
+                kind: "podcast",
+                detail: "A night show",
+              },
+            ],
           }),
       });
     const found = await createHttpTasteSearch("http://api.test/", fetchImpl).search("orbital");
@@ -53,9 +64,10 @@ describe("taste search", () => {
   });
 
   it("refuses a failed response", async () => {
-    const fetchImpl: FetchLike = () => Promise.resolve({ ok: false, status: 503, json: () => Promise.resolve({}) });
-    await expect(createHttpTasteSearch("http://api.test", fetchImpl).search("anime")).rejects.toThrow(
-      /unavailable/,
-    );
+    const fetchImpl: FetchLike = () =>
+      Promise.resolve({ ok: false, status: 503, json: () => Promise.resolve({}) });
+    await expect(
+      createHttpTasteSearch("http://api.test", fetchImpl).search("anime"),
+    ).rejects.toThrow(/unavailable/);
   });
 });

@@ -131,7 +131,11 @@ export function packSession(draft: SessionDraft): PackedSession {
   const slots = chosen.map((item) => {
     const startMinute = cursor;
     cursor += item.minutes;
-    const cautionThemeIds = cautionThemeIdsFor(item, draft.avoidIds, customThemesOf(draft.customThemes));
+    const cautionThemeIds = cautionThemeIdsFor(
+      item,
+      draft.avoidIds,
+      customThemesOf(draft.customThemes),
+    );
     if (cautionThemeIds.length > 0) {
       return { itemId: item.id, startMinute, endMinute: cursor, cautionThemeIds };
     }

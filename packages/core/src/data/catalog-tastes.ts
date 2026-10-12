@@ -3,7 +3,11 @@ import { clearedThemeIdsFor } from "./theme-signals.ts";
 import type { CatalogItem } from "./types.ts";
 
 function stamp(item: Omit<CatalogItem, "avoidedThemeIds">): CatalogItem {
-  return { ...item, ...durationFactFor(item.kind, item.title), avoidedThemeIds: clearedThemeIdsFor(item) };
+  return {
+    ...item,
+    ...durationFactFor(item.kind, item.title),
+    avoidedThemeIds: clearedThemeIdsFor(item),
+  };
 }
 
 /**
@@ -32,7 +36,8 @@ const recorded: Omit<CatalogItem, "avoidedThemeIds">[] = [
     rank: 0,
     becauseOf: ["anime"],
     why: "Another anime hour. This one is set in a clinic, so it stays off the shelf when illness is held out.",
-    synopsis: "A clinic waiting room, drawn as an anime. We leave it out when that setting is not welcome.",
+    synopsis:
+      "A clinic waiting room, drawn as an anime. We leave it out when that setting is not welcome.",
   },
   {
     id: "court-lines",
@@ -67,7 +72,8 @@ const recorded: Omit<CatalogItem, "avoidedThemeIds">[] = [
     rank: 1,
     becauseOf: ["tech"],
     why: "A short technical essay for the minutes still open.",
-    synopsis: "Adeyemi opens a radio and names each piece. The chapter ends when the dial finds a station.",
+    synopsis:
+      "Adeyemi opens a radio and names each piece. The chapter ends when the dial finds a station.",
   },
   {
     id: "courtyard-hour",
@@ -90,7 +96,8 @@ const recorded: Omit<CatalogItem, "avoidedThemeIds">[] = [
     rank: 1,
     becauseOf: ["cooking", "baking"],
     why: "A cooking hour, because you wanted a recipe more than a plot.",
-    synopsis: "Otto Pell cooks one skillet meal from a market bag. The episode is the sound of the pan.",
+    synopsis:
+      "Otto Pell cooks one skillet meal from a market bag. The episode is the sound of the pan.",
   },
   {
     id: "patio-session-item",
@@ -101,7 +108,8 @@ const recorded: Omit<CatalogItem, "avoidedThemeIds">[] = [
     rank: 1,
     becauseOf: ["bad-bunny", "reggaeton", "latin-pop"],
     why: "A courtyard set in the lane of the music you picked.",
-    synopsis: "Six songs and the sound of a neighbor's fan. The singer stays close to the microphone.",
+    synopsis:
+      "Six songs and the sound of a neighbor's fan. The singer stays close to the microphone.",
   },
   {
     id: "small-hall-item",
@@ -112,7 +120,8 @@ const recorded: Omit<CatalogItem, "avoidedThemeIds">[] = [
     rank: 1,
     becauseOf: ["classical", "jazz"],
     why: "A small-hall recording, because you asked for that kind of listening.",
-    synopsis: "A quartet plays four movements and then packs the stands. The room is wooden and close.",
+    synopsis:
+      "A quartet plays four movements and then packs the stands. The room is wooden and close.",
   },
   {
     id: "south-road-item",
@@ -134,7 +143,8 @@ const recorded: Omit<CatalogItem, "avoidedThemeIds">[] = [
     rank: 1,
     becauseOf: ["travel", "rail-history"],
     why: "A travel film, because the route is the story you asked for.",
-    synopsis: "A passenger train from the window seat. Stations arrive, and nobody is late on purpose.",
+    synopsis:
+      "A passenger train from the window seat. Stations arrive, and nobody is late on purpose.",
   },
   {
     id: "names-map-item",

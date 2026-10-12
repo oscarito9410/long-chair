@@ -57,9 +57,7 @@ export function ChairDial({
       scheduleOnRN(onChange, next);
     })
     .onEnd(() => {
-      shown.value = reduced
-        ? last.value
-        : withSpring(last.value, { damping: 14, stiffness: 180 });
+      shown.value = reduced ? last.value : withSpring(last.value, { damping: 14, stiffness: 180 });
     });
 
   return (
@@ -109,13 +107,7 @@ export function ChairDial({
   );
 }
 
-function DialArc({
-  minutes,
-  shown,
-}: {
-  minutes: number;
-  shown: SharedValue<number>;
-}) {
+function DialArc({ minutes, shown }: { minutes: number; shown: SharedValue<number> }) {
   const circumference = 2 * Math.PI * RADIUS;
   const full = circumference * (DIAL_SWEEP / DIAL_TURN);
   const arcProps = useAnimatedProps(() => {

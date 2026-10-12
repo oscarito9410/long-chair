@@ -22,15 +22,11 @@
           "duration": 44,
           "content_rating": "TV-PG",
           "release_year": 2020,
-          "production_companies": [
-            "Nana Ibarra"
-          ],
+          "production_companies": ["Nana Ibarra"],
           "short_descriptions": [
             {
               "value": "One quiet clue on the water.",
-              "languages": [
-                "en"
-              ]
+              "languages": ["en"]
             }
           ]
         },

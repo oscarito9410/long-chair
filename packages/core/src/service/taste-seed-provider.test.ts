@@ -12,7 +12,9 @@ describe("TasteSeedProvider", () => {
   it("returns the static list when no key is present", async () => {
     const provider = createStaticTasteSeedProvider();
     const seeds = await provider.seedsFor("MX");
-    expect(seeds.map((seed) => seed.tasteId)).toEqual(regionSeedList("MX").map((seed) => seed.tasteId));
+    expect(seeds.map((seed) => seed.tasteId)).toEqual(
+      regionSeedList("MX").map((seed) => seed.tasteId),
+    );
   });
 
   it("ranks fixture popularity without dropping the outside chips", async () => {
@@ -58,6 +60,8 @@ describe("TasteSeedProvider", () => {
     });
     const ranked = await live.seedsFor("US");
     expect(ranked[0]?.tasteId).toBe("mlb");
-    expect(ranked.map((seed) => seed.tasteId)).toEqual(expect.arrayContaining(["nfl", "anime", "kpop"]));
+    expect(ranked.map((seed) => seed.tasteId)).toEqual(
+      expect.arrayContaining(["nfl", "anime", "kpop"]),
+    );
   });
 });

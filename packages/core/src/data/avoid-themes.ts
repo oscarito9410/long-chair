@@ -27,4 +27,3 @@ export const avoidThemes: readonly AvoidTheme[] = [
     detail: "Mourning as the main thread",
   },
 ];
-

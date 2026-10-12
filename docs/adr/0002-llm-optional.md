@@ -1,6 +1,7 @@
 # ADR 0002: The language model is optional and writes prose only
 
-- Status: accepted
+- Status: partially superseded by [ADR 0011](0011-agent-loop.md) for the agent endpoint.
+- The deterministic endpoints retain the decision below. Optionality, privacy, and server verification remain accepted.
 - Date: 2026-10-11
 
 ## Context

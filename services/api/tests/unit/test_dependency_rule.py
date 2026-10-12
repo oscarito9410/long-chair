@@ -26,6 +26,6 @@ def test_domain_imports_stay_inside_domain() -> None:
 
 def test_application_does_not_import_adapters_or_the_api() -> None:
     blocked = ("fastapi", "httpx", "app.adapters", "app.api")
-    for path in (ROOT / "application").glob("*.py"):
+    for path in (ROOT / "application").rglob("*.py"):
         for name in _imports(path):
             assert not name.startswith(blocked), f"{path.name} imports {name}"
