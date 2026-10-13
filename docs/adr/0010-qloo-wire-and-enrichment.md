@@ -1,6 +1,6 @@
 # ADR 0010: Qloo wire shape and enrichment
 
-**Status:** Accepted
+**Status:** Accepted; wire normalization extended by [ADR 0013](0013-qloo-live-shape.md)
 
 **Date:** 2026-10-12
 

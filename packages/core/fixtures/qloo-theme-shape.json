@@ -1,0 +1,98 @@
+[
+  {
+    "theme": "illness",
+    "tag": "urn:tag:genre:media:illness"
+  },
+  {
+    "theme": "illness",
+    "tag": "urn:tag:theme:qloo:terminal_illness"
+  },
+  {
+    "theme": "hospitals",
+    "tag": "urn:tag:keyword:media:hospital"
+  },
+  {
+    "theme": "hospitals",
+    "tag": "urn:tag:setting:qloo:hospital"
+  },
+  {
+    "theme": "cancer",
+    "tag": "urn:tag:theme:qloo:cancer"
+  },
+  {
+    "theme": "cancer",
+    "tag": "urn:tag:keyword:qloo:cancer"
+  },
+  {
+    "theme": "parent-death",
+    "tag": "urn:tag:keyword:media:death_of_parent"
+  },
+  {
+    "theme": "parent-death",
+    "tag": "urn:tag:archetype:qloo:the_dying_parent"
+  },
+  {
+    "theme": "parent-death",
+    "tag": "urn:tag:theme:qloo:parental_grief"
+  },
+  {
+    "theme": "grief",
+    "tag": "urn:tag:theme:qloo:grief"
+  },
+  {
+    "theme": "grief",
+    "tag": "urn:tag:keyword:media:grief"
+  },
+  {
+    "theme": "illness",
+    "tag": "urn:tag:genre:media:illness_synthetic"
+  },
+  {
+    "theme": "illness",
+    "tag": "urn:tag:theme:qloo:terminal_illness_synthetic"
+  },
+  {
+    "theme": "hospitals",
+    "tag": "urn:tag:keyword:media:hospital_synthetic"
+  },
+  {
+    "theme": "hospitals",
+    "tag": "urn:tag:setting:qloo:hospital_synthetic"
+  },
+  {
+    "theme": "cancer",
+    "tag": "urn:tag:theme:qloo:cancer_synthetic"
+  },
+  {
+    "theme": "cancer",
+    "tag": "urn:tag:keyword:qloo:cancer_synthetic"
+  },
+  {
+    "theme": "parent-death",
+    "tag": "urn:tag:keyword:media:death_of_synthetic"
+  },
+  {
+    "theme": "parent-death",
+    "tag": "urn:tag:archetype:qloo:the_dying_parent_synthetic"
+  },
+  {
+    "theme": "parent-death",
+    "tag": "urn:tag:theme:qloo:parental_grief_synthetic"
+  },
+  {
+    "theme": "grief",
+    "tag": "urn:tag:theme:qloo:grief_synthetic"
+  },
+  {
+    "theme": "grief",
+    "tag": "urn:tag:keyword:media:grief_synthetic"
+  },
+  {
+    "theme": "hospitals",
+    "tag": "urn:tag:keyword:media:hospital_visit"
+  },
+  {
+    "theme": "parent-death",
+    "tag": "urn:tag:keyword:media:death_of_grandmother"
+  }
+]

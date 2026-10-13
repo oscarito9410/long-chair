@@ -10,24 +10,24 @@
 
 ## US1 - Catalog normalization
 
-- [ ] T004 Add synthetic six-kind shape regressions in services/api/tests/unit.
-- [ ] T005 Normalize documents and map place metadata in services/api/app/adapters.
-- [ ] T006 Test explainability thresholds, external precedence and nullable fields.
+- [x] T004 Add synthetic six-kind shape regressions in services/api/tests/unit.
+- [x] T005 Normalize documents and map place metadata in services/api/app/adapters.
+- [x] T006 Test explainability thresholds, external precedence and nullable fields.
 
 ## US2 - Theme verification
 
-- [ ] T007 Test and extend issue-listed ids and bounded families in backend/core rules.
-- [ ] T008 Send semantic media tag parameters and verify exclusion request behavior.
+- [x] T007 Test and extend issue-listed ids and bounded families in backend/core rules.
+- [x] T008 Send semantic media tag parameters and verify exclusion request behavior.
 
 ## US3 - Errors and scope
 
-- [ ] T009 Add typed provider errors and mocked status/envelope/retry tests.
-- [ ] T010 Repair scope signal, pacing, backoff and shape-only output; mock full run.
+- [x] T009 Add typed provider errors and mocked status/envelope/retry tests.
+- [x] T010 Repair scope signal, pacing, backoff and shape-only output; mock full run.
 
 ## Completion
 
-- [ ] T011 Write ADR 0013 and quickstart with provenance and validation evidence.
-- [ ] T012 Run required API and aggregate JS checks, informational scans, diff review.
+- [x] T011 Write ADR 0013 and quickstart with provenance and validation evidence.
+- [x] T012 Run required API and aggregate JS checks, informational scans, diff review.
 - [ ] T013 Commit, push feature branch, open draft PR using template and Closes #11.
 
 ## Dependencies

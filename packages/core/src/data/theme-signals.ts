@@ -82,8 +82,11 @@ function containsFolded(haystack: string, needle: string): boolean {
 
 function tagHit(rule: ThemeRule, tags: readonly NamedTag[]): string | undefined {
   for (const tag of tags) {
-    if (rule.tagIds.includes(tag.id)) {
-      return tag.name;
+    if (
+      rule.tagIds.includes(tag.id) ||
+      rule.tagPrefixes.some((prefix) => tag.id.startsWith(prefix) && tag.id.length > prefix.length)
+    ) {
+      return tag.name || tag.id;
     }
     if (rule.tagNames.some((name) => containsFolded(tag.name, name))) {
       return tag.name;
