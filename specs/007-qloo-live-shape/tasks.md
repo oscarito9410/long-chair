@@ -28,9 +28,14 @@
 
 - [x] T011 Write ADR 0013 and quickstart with provenance and validation evidence.
 - [x] T012 Run required API and aggregate JS checks, informational scans, diff review.
-- [ ] T013 Commit, push feature branch, open draft PR using template and Closes #11.
+- [x] T013 Commit, push feature branch, open draft PR using template and Closes #11.
 
 ## Dependencies
 
 T003 precedes all implementation. Tests precede their fixes. US2 uses US1's normalized
 entity; US3 can be tested independently. Completion follows all three stories.
+
+## Delivery
+
+Draft PR: https://github.com/oscarito9410/long-chair/pull/12.
+Live acceptance remains unchecked; see quickstart.md. Stop for review.
