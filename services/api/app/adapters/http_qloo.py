@@ -8,7 +8,9 @@ from pydantic import BaseModel, ValidationError
 
 from app.adapters.documents import InsightsDocument, SearchDocument
 from app.adapters.mapper import map_insights, map_places, map_search, map_tags
+from app.adapters.provider_errors import response_error
 from app.adapters.queries import insights_params, place_params, search_params, tag_params
+from app.adapters.theme_tags import TAG_TO_THEME
 from app.adapters.validation import validate_insights, validate_places, validate_search
 from app.domain.entities import AvoidTheme, CatalogItem, NearbyPlace
 from app.domain.kinds import ContentKind
@@ -21,8 +23,6 @@ INSIGHTS_PATH = "/v2/insights"
 TAGS_PATH = "/v2/tags"
 HTTP_OK = 200
 HTTP_TOO_MANY = 429
-HTTP_UNAUTHORIZED = 401
-HTTP_FORBIDDEN = 403
 MAX_ATTEMPTS = 3
 FIRST_BACKOFF_SECONDS = 0.25
 BACKOFF_FACTOR = 2
@@ -49,10 +49,18 @@ class HttpQlooAdapter:
         return map_search(document.results, kind)
 
     async def exclusion_tags(self, themes: Sequence[AvoidTheme]) -> Sequence[TagHit]:
-        """Resolve each theme label. The tag query parameter name is unconfirmed."""
+        """Known built-ins use stable ids; custom labels use semantic media tag search."""
 
         found: list[TagHit] = []
         for theme in themes:
+            known = [
+                TagHit(theme_id=theme.id, qloo_tag_id=tag, name=theme.label)
+                for tag, theme_id in TAG_TO_THEME.items()
+                if theme_id == theme.id and "fictional_" not in tag
+            ]
+            if known:
+                found.extend(known)
+                continue
             document = _decode(
                 InsightsDocument, await self._get_body(TAGS_PATH, tag_params(theme.label))
             )
@@ -91,10 +99,8 @@ class HttpQlooAdapter:
         if not self._api_key.strip():
             raise QlooTransportError("The catalog key is not configured.")
         response = await self._send(path, params)
-        if response.status_code in {HTTP_UNAUTHORIZED, HTTP_FORBIDDEN}:
-            raise QlooTransportError("The catalog key was refused.")
         if response.status_code != HTTP_OK:
-            raise QlooTransportError("The catalog did not answer.")
+            raise response_error(response, self._api_key)
         return response.content
 
     async def _send(self, path: str, params: Sequence[tuple[str, str]]) -> httpx.Response:

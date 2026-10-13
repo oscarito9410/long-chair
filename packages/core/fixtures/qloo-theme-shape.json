@@ -1,0 +1,138 @@
+[
+  {
+    "theme": "illness",
+    "tag": "urn:tag:genre:media:illness"
+  },
+  {
+    "theme": "illness",
+    "tag": "urn:tag:theme:qloo:terminal_illness"
+  },
+  {
+    "theme": "hospitals",
+    "tag": "urn:tag:keyword:media:hospital"
+  },
+  {
+    "theme": "hospitals",
+    "tag": "urn:tag:setting:qloo:hospital"
+  },
+  {
+    "theme": "cancer",
+    "tag": "urn:tag:theme:qloo:cancer"
+  },
+  {
+    "theme": "cancer",
+    "tag": "urn:tag:keyword:qloo:cancer"
+  },
+  {
+    "theme": "parent-death",
+    "tag": "urn:tag:keyword:media:death_of_parent"
+  },
+  {
+    "theme": "parent-death",
+    "tag": "urn:tag:keyword:media:death_of_parents"
+  },
+  {
+    "theme": "parent-death",
+    "tag": "urn:tag:keyword:media:death_of_mother"
+  },
+  {
+    "theme": "parent-death",
+    "tag": "urn:tag:keyword:media:death_of_father"
+  },
+  {
+    "theme": "parent-death",
+    "tag": "urn:tag:archetype:qloo:the_dying_parent"
+  },
+  {
+    "theme": "parent-death",
+    "tag": "urn:tag:theme:qloo:parental_grief"
+  },
+  {
+    "theme": "grief",
+    "tag": "urn:tag:theme:qloo:grief"
+  },
+  {
+    "theme": "grief",
+    "tag": "urn:tag:keyword:media:grief"
+  },
+  {
+    "theme": "grief",
+    "tag": "urn:tag:keyword:media:death"
+  },
+  {
+    "theme": "grief",
+    "tag": "urn:tag:theme:qloo:death_and_remembrance"
+  },
+  {
+    "theme": "illness",
+    "tag": "urn:tag:genre:media:illness_synthetic"
+  },
+  {
+    "theme": "illness",
+    "tag": "urn:tag:theme:qloo:terminal_illness_synthetic"
+  },
+  {
+    "theme": "hospitals",
+    "tag": "urn:tag:keyword:media:hospital_synthetic"
+  },
+  {
+    "theme": "hospitals",
+    "tag": "urn:tag:setting:qloo:hospital_synthetic"
+  },
+  {
+    "theme": "cancer",
+    "tag": "urn:tag:theme:qloo:cancer_synthetic"
+  },
+  {
+    "theme": "cancer",
+    "tag": "urn:tag:keyword:qloo:cancer_synthetic"
+  },
+  {
+    "theme": "grief",
+    "tag": "urn:tag:keyword:media:death_of_synthetic"
+  },
+  {
+    "theme": "parent-death",
+    "tag": "urn:tag:keyword:media:death_of_parent_synthetic"
+  },
+  {
+    "theme": "parent-death",
+    "tag": "urn:tag:keyword:media:death_of_parents_synthetic"
+  },
+  {
+    "theme": "parent-death",
+    "tag": "urn:tag:keyword:media:death_of_mother_synthetic"
+  },
+  {
+    "theme": "parent-death",
+    "tag": "urn:tag:keyword:media:death_of_father_synthetic"
+  },
+  {
+    "theme": "parent-death",
+    "tag": "urn:tag:archetype:qloo:the_dying_parent_synthetic"
+  },
+  {
+    "theme": "parent-death",
+    "tag": "urn:tag:theme:qloo:parental_grief_synthetic"
+  },
+  {
+    "theme": "grief",
+    "tag": "urn:tag:theme:qloo:grief_synthetic"
+  },
+  {
+    "theme": "grief",
+    "tag": "urn:tag:keyword:media:grief_synthetic"
+  },
+  {
+    "theme": "hospitals",
+    "tag": "urn:tag:keyword:media:hospital_visit"
+  },
+  {
+    "theme": "grief",
+    "tag": "urn:tag:keyword:media:death_of_grandmother"
+  },
+  {
+    "theme": "grief",
+    "tag": "urn:tag:keyword:media:death_of_friend"
+  }
+]

@@ -127,7 +127,11 @@ def search_params(query: str, kind: ContentKind) -> list[tuple[str, str]]:
 def tag_params(label: str) -> list[tuple[str, str]]:
     """Tag lookup. The text parameter is `filter.query`."""
 
-    params = [(TAGS_QUERY_KEY, label)]
+    params = [
+        (TAGS_QUERY_KEY, label),
+        ("feature.semantic_search", "true"),
+        ("filter.tag.types", "urn:tag:keyword:media"),
+    ]
     require_allowed("tags", params)
     return params
 

@@ -5,10 +5,13 @@ from pathlib import Path
 
 import pytest
 
-pytestmark = pytest.mark.skipif(
-    not os.environ.get("QLOO_API_KEY"),
-    reason="live catalog scope stays off unless QLOO_API_KEY is set",
-)
+pytestmark = [
+    pytest.mark.live,
+    pytest.mark.skipif(
+        not os.environ.get("QLOO_API_KEY"),
+        reason="live catalog scope stays off unless QLOO_API_KEY is set",
+    ),
+]
 
 
 @pytest.mark.asyncio

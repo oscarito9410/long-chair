@@ -3,7 +3,9 @@
 import logging
 from collections.abc import Sequence
 
-from app.adapters.documents import EntityRecord, Explainability, TagRecord
+from app.adapters.documents import EntityRecord, TagRecord
+from app.adapters.query_documents import Explainability
+from app.adapters.theme_tags import theme_for_tag
 from app.domain.entities import CatalogItem, NearbyPlace
 from app.domain.kinds import ContentKind, DurationSource, PlaceKind
 from app.domain.limits import (
@@ -57,14 +59,6 @@ ASSUMED_MINUTES: dict[ContentKind, int] = {
 
 CONFIRMED_DURATION_KINDS = frozenset({"movie", "tv_show"})
 
-TAG_TO_THEME: dict[str, str] = {
-    "urn:tag:keyword:media:fictional_illness": "illness",
-    "urn:tag:keyword:media:fictional_hospitals": "hospitals",
-    "urn:tag:keyword:media:fictional_cancer": "cancer",
-    "urn:tag:keyword:media:fictional_parent_death": "parent-death",
-    "urn:tag:keyword:media:fictional_grief": "grief",
-}
-
 
 def map_search(entities: Sequence[EntityRecord], kind: ContentKind) -> tuple[TasteHit, ...]:
     """Search hits of `kind`. Other subtypes are dropped."""
@@ -88,11 +82,11 @@ def map_search(entities: Sequence[EntityRecord], kind: ContentKind) -> tuple[Tas
 
 
 def map_tags(tags: Sequence[TagRecord]) -> tuple[TagHit, ...]:
-    """Tags that carry our theme id annotation or a known fictional tag id."""
+    """Tags that carry our theme id annotation or a recognized tag id or family."""
 
     hits: list[TagHit] = []
     for tag in tags:
-        theme_id = tag.theme_id or TAG_TO_THEME.get(tag.id)
+        theme_id = tag.theme_id or theme_for_tag(tag.id)
         if theme_id is None or not tag.id:
             continue
         hits.append(TagHit(theme_id=theme_id, qloo_tag_id=tag.id, name=tag.name))
@@ -190,7 +184,7 @@ def _maker(kind: ContentKind, entity: EntityRecord) -> str:
 def _themes(tags: Sequence[TagRecord]) -> tuple[str, ...]:
     found: list[str] = []
     for tag in tags:
-        theme_id = tag.theme_id or TAG_TO_THEME.get(tag.id)
+        theme_id = tag.theme_id or theme_for_tag(tag.id)
         if theme_id is not None and theme_id not in found:
             found.append(theme_id)
     return tuple(found)
@@ -213,7 +207,7 @@ def _because_of(entity: EntityRecord, links: Sequence[InterestLink]) -> tuple[st
             link = by_entity.get(score.entity_id)
             if link is not None and link.seed_id not in chosen:
                 chosen.append(link.seed_id)
-    if chosen:
+    if any("entities" in block.model_fields_set for block in _explain_blocks(entity)):
         return tuple(chosen)
     return tuple(link.seed_id for link in links)
 
@@ -259,8 +253,16 @@ def _place(
     origin_lat: float,
     origin_lon: float,
 ) -> NearbyPlace:
-    lat = entity.properties.lat
-    lon = entity.properties.lon
+    coordinates = next(
+        (
+            point
+            for point in (entity.location, entity.properties.geocode)
+            if point is not None and point.latitude is not None and point.longitude is not None
+        ),
+        None,
+    )
+    lat = coordinates.latitude if coordinates else entity.properties.lat
+    lon = coordinates.longitude if coordinates else entity.properties.lon
     minutes = 1 if lat is None or lon is None else walk_minutes(lat, lon, origin_lat, origin_lon)
     level = entity.properties.price_level
     price = PRICE_BY_LEVEL.get(level, PRICE_LABEL) if level is not None else PRICE_LABEL
@@ -272,5 +274,11 @@ def _place(
         walk_minutes=minutes,
         open_until="",
         price_label=price,
+        address=entity.properties.address,
+        hours=tuple(
+            (day, tuple(period.label() for period in periods))
+            for day, periods in (entity.properties.hours or {}).items()
+        ),
+        rating=entity.properties.business_rating,
         map_url=f"{MAPS_SEARCH}{entity.name.replace(' ', '+')}",
     )

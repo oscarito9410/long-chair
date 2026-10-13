@@ -1,5 +1,7 @@
 """Failures raised at the catalog boundary. Adapters share these types."""
 
+from http import HTTPStatus
+
 
 class PortError(Exception):
     """Base for catalog and cache failures."""
@@ -36,3 +38,37 @@ class EnrichmentTransportError(PortError):
 
     def __init__(self) -> None:
         super().__init__("enrichment_unavailable", "The enrichment source did not answer.")
+
+
+class QlooProviderError(QlooTransportError):
+    """Provider rejection. Diagnostic text stays internal, never in the API envelope."""
+
+    status_code: int
+
+    def __init__(self, provider_message: str) -> None:
+        self.provider_message = provider_message
+        super().__init__("The catalog could not complete the request.")
+
+
+class QlooBadRequestError(QlooProviderError):
+    """The provider rejected a sent query, distinct from local validation."""
+
+    status_code = HTTPStatus.BAD_REQUEST
+
+
+class QlooAuthenticationError(QlooProviderError):
+    """The provider could not authenticate the key."""
+
+    status_code = HTTPStatus.UNAUTHORIZED
+
+
+class QlooAuthorizationError(QlooProviderError):
+    """The provider refused access to this resource."""
+
+    status_code = HTTPStatus.FORBIDDEN
+
+
+class QlooRateLimitError(QlooProviderError):
+    """The provider still limited the request after bounded retries."""
+
+    status_code = HTTPStatus.TOO_MANY_REQUESTS

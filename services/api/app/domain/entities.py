@@ -96,6 +96,9 @@ class NearbyPlace:
     open_until: str
     price_label: str
     map_url: str = ""
+    address: str = ""
+    hours: tuple[tuple[str, tuple[str, ...]], ...] = ()
+    rating: float | None = None
 
 
 @dataclass(frozen=True, slots=True)

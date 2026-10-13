@@ -17,13 +17,22 @@ A live response belongs in `services/api/.qloo-live/`, which is gitignored.
 - `GET /v2/tags` takes `filter.query`. Tag records from taste analysis use `tag_id`.
   Entity tags use `id`. The model accepts both.
 
+## Issue #11 shape observations
+
+The issue records omitted search success, nullable text, empty artist duration,
+integer episode_count, search types, nested search external ids, root insights
+external lists, query.affinity, query.measurements, and
+query.explainability.signal.interests.entities. New tests use invented values for
+these shapes. They are not live recordings. Place location/properties.geocode are
+normalized; old lat/lon fields remain only for fixture compatibility.
+
 ## Documented, still checked by the live scope script
 
 - Where affinity sits (`query.affinity` is the likely place; the flattened schema calls it `affinity`).
 - Whether `properties.duration` arrives for a TV show.
-- Whether podcast `episode_count` is a string and book `page_count` is a number.
+- Additional page_count variants beyond the existing numeric fixture.
 - Which external id families appear for podcast, artist, and book.
-- The exact explainability object.
+- Additional explainability fields beyond issue #11.
 - Which exclude-tags operator removes a known hit.
 - Whether streaming-service tags are global or by country.
 - Place hours fields and place coverage for Mexico City.
@@ -32,12 +41,20 @@ A live response belongs in `services/api/.qloo-live/`, which is gitignored.
 
 - `x-long-chair-slug`, `x-long-chair-theme-id`, `x-long-chair-taste-kind`, `x-long-chair-aliases`.
 - `x-long-chair-kind` on a place, used only when a category tag is missing.
-- `query.explainability` is unconfirmed. `x-long-chair-confidence` marks it. The prose says the object exists, and no public JSON sample shows the keys.
+- Older fixture `query.explainability.entities` is an unconfirmed legacy shape. The
+  issue #11 signal.interests.entities shape is now explicitly tested.
 - `enrichment.json` is a sample iTunes, TMDB, and Open Library stand-in. It is not a catalog body.
 
 ## Left off on purpose
 
 - Podcast episode duration, artist concert duration, and book `duration`. Those are not catalog fields.
 - `properties.creator`.
-- Place closing times. Walk minutes are computed from `lat` and `lon`.
+- Place closing times. Walk minutes prefer location or geocode; lat/lon is legacy.
 - Any host on qloo.com, and any title from the public onboarding sample.
+
+## Review shape corrections
+
+Synthetic regressions also cover daily hours lists of opens/closes or closed objects,
+list/object explainability and invalid optional rows. Generic death tags map to grief;
+parent-death requires a parent relation. These corrections use review descriptions,
+not copied Qloo responses or results from an implementation-agent live run.

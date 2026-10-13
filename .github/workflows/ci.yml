@@ -256,7 +256,7 @@ jobs:
         working-directory: services/api
         env:
           QLOO_API_KEY: ${{ secrets.QLOO_API_KEY }}
-        run: uv run pytest tests/contract/test_qloo_contract.py -k test_live_search_is_opt_in --override-ini=addopts= -q
+        run: uv run pytest tests/contract/test_qloo_contract.py -k test_live_search_is_opt_in --run-live --override-ini=addopts= -q
 
   ci:
     name: CI result

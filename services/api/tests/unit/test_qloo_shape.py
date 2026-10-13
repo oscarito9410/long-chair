@@ -106,7 +106,9 @@ def test_outgoing_params_stay_on_the_allowlist() -> None:
     assert ("types", "urn:entity:movie") in search
     assert all(key != "type" for key, _value in search)
     tags = tag_params("Grief")
-    assert tags == [("filter.query", "Grief")]
+    assert ("filter.query", "Grief") in tags
+    assert ("feature.semantic_search", "true") in tags
+    assert ("filter.tag.types", "urn:tag:keyword:media") in tags
     with pytest.raises(QlooValidationError):
         require_allowed("search", [("type", "urn:entity:movie")])
 

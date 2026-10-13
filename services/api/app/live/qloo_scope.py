@@ -7,15 +7,23 @@ Writes a shape report. It does not save response bodies. Run it only with a key:
 
 import asyncio
 import os
+from http import HTTPStatus
 from pathlib import Path
 from typing import Any
 
 import httpx
 
+from app.adapters.provider_errors import response_error
+from app.adapters.queries import tag_params
+
+REQUEST_INTERVAL_SECONDS = 0.25
+MAX_ATTEMPTS = 3
+BACKOFF_FACTOR = 2
+
 HOST = "https://hackathon.api.qloo.com"
 REPORT_DIR = Path(__file__).resolve().parents[2] / ".qloo-live"
 SAMPLE_MOVIE = "Everything Everywhere All at Once"
-CDMX = "19.4326,-99.1332"
+CDMX = "POINT(-99.1332 19.4326)"
 TAG_QUERIES = ("cancer", "hospital", "grief", "terminal illness", "death of a parent")
 CONTENT_TYPES = (
     "urn:entity:movie",
@@ -30,10 +38,8 @@ CONTENT_TYPES = (
 def report_dir() -> Path:
     """Gitignored folder for the readable report."""
 
-    configured = os.environ.get("QLOO_LIVE_DIR")
-    if configured:
-        return Path(configured)
-    return REPORT_DIR
+    configured = os.environ.get("QLOO_LIVE_DIR", "").strip()
+    return Path(configured).expanduser() if configured else REPORT_DIR
 
 
 async def run_scope(api_key: str, destination: Path) -> str:
@@ -43,23 +49,32 @@ async def run_scope(api_key: str, destination: Path) -> str:
     lines = ["# Qloo scope report", "", "Shapes only. Response bodies are not saved.", ""]
     headers = {"X-Api-Key": api_key}
     async with httpx.AsyncClient(base_url=HOST, headers=headers, timeout=20) as client:
-        movie = await _get(client, "/v2/insights", {"filter.type": "urn:entity:movie", "take": "1"})
-        lines.extend(_duration_and_affinity(movie))
-        lines.extend(await _types(client))
-        lines.extend(
-            _search_shape(
-                await _get(
-                    client,
-                    "/search",
-                    {"query": SAMPLE_MOVIE, "types": "urn:entity:movie", "take": "1"},
-                )
-            )
+        search = await _get(
+            client,
+            "/search",
+            {"query": SAMPLE_MOVIE, "types": "urn:entity:movie", "take": "1"},
         )
+        signal = _entity(search).get("entity_id")
+        if not isinstance(signal, str) or not signal:
+            raise RuntimeError("Scope search returned no signal entity; insights were not sent.")
+        movie = await _get(
+            client,
+            "/v2/insights",
+            {
+                "filter.type": "urn:entity:movie",
+                "take": "1",
+                "signal.interests.entities": signal,
+                "feature.explainability": "true",
+            },
+        )
+        lines.extend(_duration_and_affinity(movie))
+        lines.extend(await _types(client, signal))
+        lines.extend(_search_shape(search))
         lines.extend(await _tag_queries(client))
         lines.extend(await _exclude_operators(client, movie))
         lines.extend(_explainability(movie))
         lines.extend(_streaming(movie))
-        lines.extend(await _places(client))
+        lines.extend(await _places(client, signal))
         lines.extend(_backfill(movie))
         lines.append("")
         lines.append("Rate-limit headers, when the host sends them, are copied as names only.")
@@ -69,12 +84,28 @@ async def run_scope(api_key: str, destination: Path) -> str:
 
 
 async def _get(client: httpx.AsyncClient, path: str, params: dict[str, str]) -> dict[str, Any]:
-    response = await client.get(path, params=params)
+    response = await _paced_get(client, path, params)
     payload = response.json() if response.content else {}
     body = payload if isinstance(payload, dict) else {}
     body["_status"] = response.status_code
     body["_header_names"] = sorted(response.headers.keys())
     return body
+
+
+async def _paced_get(
+    client: httpx.AsyncClient, path: str, params: dict[str, str]
+) -> httpx.Response:
+    delay = REQUEST_INTERVAL_SECONDS
+    for attempt in range(MAX_ATTEMPTS):
+        await asyncio.sleep(delay)
+        response = await client.get(path, params=params)
+        if response.status_code == HTTPStatus.TOO_MANY_REQUESTS and attempt + 1 < MAX_ATTEMPTS:
+            delay *= BACKOFF_FACTOR
+            continue
+        if response.status_code != HTTPStatus.OK:
+            raise response_error(response, client.headers.get("X-Api-Key", ""))
+        return response
+    raise RuntimeError("Scope retry budget exhausted.")
 
 
 def _entity(payload: dict[str, Any]) -> dict[str, Any]:
@@ -104,10 +135,14 @@ def _duration_and_affinity(payload: dict[str, Any]) -> list[str]:
     ]
 
 
-async def _types(client: httpx.AsyncClient) -> list[str]:
+async def _types(client: httpx.AsyncClient, signal: str) -> list[str]:
     lines = ["## 2-5. Fields by type", ""]
     for subtype in CONTENT_TYPES:
-        payload = await _get(client, "/v2/insights", {"filter.type": subtype, "take": "1"})
+        payload = await _get(
+            client,
+            "/v2/insights",
+            {"filter.type": subtype, "take": "1", "signal.interests.entities": signal},
+        )
         entity = _entity(payload)
         props = entity.get("properties") if isinstance(entity.get("properties"), dict) else {}
         external = entity.get("external") if isinstance(entity.get("external"), dict) else {}
@@ -146,7 +181,7 @@ async def _tag_queries(client: httpx.AsyncClient) -> list[str]:
             payload = await _get(
                 client,
                 "/v2/tags",
-                {"filter.query": label, "feature.semantic_search": semantic, "take": "5"},
+                {**dict(tag_params(label)), "feature.semantic_search": semantic, "take": "5"},
             )
             tags = _tag_rows(payload)
             ident = (
@@ -156,10 +191,9 @@ async def _tag_queries(client: httpx.AsyncClient) -> list[str]:
                 if any("id" in row for row in tags)
                 else "neither"
             )
-            ids = [str(row.get("tag_id") or row.get("id") or "") for row in tags]
             status = payload.get("_status")
             lines.append(f"- {label} semantic={semantic} status={status} id-field={ident}")
-            lines.append(f"  ids={ids}")
+            lines.append(f"  count={len(tags)}")
     lines.append("")
     return lines
 
@@ -239,17 +273,17 @@ def _streaming(payload: dict[str, Any]) -> list[str]:
     return [
         "## 10. Streaming-service tags",
         f"- count on the first movie: {len(services)}",
-        f"- names: {services}",
         "",
     ]
 
 
-async def _places(client: httpx.AsyncClient) -> list[str]:
+async def _places(client: httpx.AsyncClient, signal: str) -> list[str]:
     payload = await _get(
         client,
         "/v2/insights",
         {
             "filter.type": "urn:entity:place",
+            "signal.interests.entities": signal,
             "filter.location": CDMX,
             "filter.location.radius": "2000",
             "sort_by": "distance",

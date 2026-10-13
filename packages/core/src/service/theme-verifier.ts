@@ -42,14 +42,14 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function namedTag(row: unknown): NamedTag | null {
-  if (!isRecord(row) || typeof row.name !== "string") {
+  if (!isRecord(row)) {
     return null;
   }
   const id = typeof row.id === "string" ? row.id : typeof row.tag_id === "string" ? row.tag_id : "";
   if (!id) {
     return null;
   }
-  return { id, name: row.name };
+  return { id, name: typeof row.name === "string" ? row.name : "" };
 }
 
 function tagsOf(value: unknown): NamedTag[] {

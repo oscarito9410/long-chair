@@ -272,7 +272,9 @@ uv run mypy
 uv run pytest
 ```
 
-`pytest` includes the shared FakeQloo contract tests and fails if coverage on `app/domain` and `app/application` is under 85 percent. The live HTTP test stays skipped unless `QLOO_API_KEY` is set.
+`pytest` includes the shared FakeQloo contract tests and fails if coverage on `app/domain` and `app/application` is under 85 percent. Live tests require the explicit `--run-live` pytest option as well as their key/env
+gates. Credentials alone do not authorize calls. Ordinary tests block real HTTP
+transports. The dedicated scheduled/manual live workflow supplies the option.
 
 ## Definition of done
 
