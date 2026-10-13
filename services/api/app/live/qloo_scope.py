@@ -23,7 +23,7 @@ BACKOFF_FACTOR = 2
 HOST = "https://hackathon.api.qloo.com"
 REPORT_DIR = Path(__file__).resolve().parents[2] / ".qloo-live"
 SAMPLE_MOVIE = "Everything Everywhere All at Once"
-CDMX = "19.4326,-99.1332"
+CDMX = "POINT(-99.1332 19.4326)"
 TAG_QUERIES = ("cancer", "hospital", "grief", "terminal illness", "death of a parent")
 CONTENT_TYPES = (
     "urn:entity:movie",
@@ -38,7 +38,8 @@ CONTENT_TYPES = (
 def report_dir() -> Path:
     """Gitignored folder for the readable report."""
 
-    return REPORT_DIR
+    configured = os.environ.get("QLOO_LIVE_DIR", "").strip()
+    return Path(configured).expanduser() if configured else REPORT_DIR
 
 
 async def run_scope(api_key: str, destination: Path) -> str:

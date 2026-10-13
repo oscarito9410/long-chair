@@ -12,7 +12,7 @@ export type ThemeRule = {
 
 /**
  * Catalog identifiers from issue #11 plus sample compatibility identifiers.
- * Families include the namespace and underscore boundary; death_of is conservative.
+ * Specific parent relations take precedence over the generic death/grief family.
  * Keywords cover English and Spanish synopsis text.
  */
 export const themeRules: readonly ThemeRule[] = [
@@ -50,11 +50,17 @@ export const themeRules: readonly ThemeRule[] = [
     tagIds: [
       "urn:tag:sample:parent-death",
       "urn:tag:keyword:media:death_of_parent",
+      "urn:tag:keyword:media:death_of_parents",
+      "urn:tag:keyword:media:death_of_mother",
+      "urn:tag:keyword:media:death_of_father",
       "urn:tag:archetype:qloo:the_dying_parent",
       "urn:tag:theme:qloo:parental_grief",
     ],
     tagPrefixes: [
-      "urn:tag:keyword:media:death_of_",
+      "urn:tag:keyword:media:death_of_parent_",
+      "urn:tag:keyword:media:death_of_parents_",
+      "urn:tag:keyword:media:death_of_mother_",
+      "urn:tag:keyword:media:death_of_father_",
       "urn:tag:archetype:qloo:the_dying_parent_",
       "urn:tag:theme:qloo:parental_grief_",
     ],
@@ -70,8 +76,18 @@ export const themeRules: readonly ThemeRule[] = [
   },
   {
     id: "grief",
-    tagIds: ["urn:tag:sample:grief", "urn:tag:theme:qloo:grief", "urn:tag:keyword:media:grief"],
-    tagPrefixes: ["urn:tag:theme:qloo:grief_", "urn:tag:keyword:media:grief_"],
+    tagIds: [
+      "urn:tag:sample:grief",
+      "urn:tag:theme:qloo:grief",
+      "urn:tag:keyword:media:grief",
+      "urn:tag:keyword:media:death",
+      "urn:tag:theme:qloo:death_and_remembrance",
+    ],
+    tagPrefixes: [
+      "urn:tag:theme:qloo:grief_",
+      "urn:tag:keyword:media:grief_",
+      "urn:tag:keyword:media:death_of_",
+    ],
     tagNames: ["grief", "mourning"],
     keywords: ["grief", "mourning", "funeral", "duelo", "luto"],
   },
@@ -79,4 +95,14 @@ export const themeRules: readonly ThemeRule[] = [
 
 export function themeRuleById(id: string): ThemeRule | undefined {
   return themeRules.find((rule) => rule.id === id);
+}
+
+/** Exact identifiers win, then the most specific namespace-bound family. */
+export function themeRuleForTag(tagId: string): ThemeRule | undefined {
+  const exact = themeRules.find((rule) => rule.tagIds.includes(tagId));
+  if (exact) return exact;
+  return themeRules
+    .flatMap((rule) => rule.tagPrefixes.map((prefix) => ({ rule, prefix })))
+    .filter(({ prefix }) => tagId.startsWith(prefix) && tagId.length > prefix.length)
+    .sort((a, b) => b.prefix.length - a.prefix.length)[0]?.rule;
 }

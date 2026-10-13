@@ -73,8 +73,8 @@ remain adapter-local JSON. Non-numeric duration is unavailable, not zero. Root e
 ids take precedence over duplicate nested providers. Missing explainability preserves
 the established fallback; an explicitly empty score list does not invent attribution.
 Family matching is scoped to media/qloo tag namespaces and underscore boundaries.
-The death_of family intentionally blocks broader bereavement under parent-death, as
-requested by the issue. Real-host zero-error behavior requires a separately authorized
+Generic death_of tags map to grief; only explicit parent relations map to
+parent-death, following the review correction. Real-host zero-error behavior requires a separately authorized
 live run and cannot be proven by mocked tests.
 
 ## Review corrections (2026-10-13)

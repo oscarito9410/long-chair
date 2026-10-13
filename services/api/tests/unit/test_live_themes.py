@@ -41,3 +41,18 @@ def test_live_tag_shapes_survive_mapping(case):
 )
 def test_families_do_not_match_unrelated_namespaces_or_prefixes(tag):
     assert theme_for_tag(tag) is None
+
+
+def test_shared_corpus_covers_every_production_tag_and_family():
+    from app.adapters.theme_tags import TAG_FAMILIES, TAG_TO_THEME
+
+    tags = {case["tag"] for case in CASES}
+    assert {tag for tag in TAG_TO_THEME if "fictional_" not in tag} <= tags
+    assert {prefix + "synthetic" for prefix in TAG_FAMILIES} <= tags
+
+
+def test_generic_bereavement_does_not_claim_a_parent_relation():
+    assert theme_for_tag("urn:tag:keyword:media:death_of_grandmother") == "grief"
+    assert theme_for_tag("urn:tag:keyword:media:death_of_friend") == "grief"
+    assert theme_for_tag("urn:tag:keyword:media:death_of_mother") == "parent-death"
+    assert theme_for_tag("urn:tag:keyword:media:death_of_father_synthetic") == "parent-death"

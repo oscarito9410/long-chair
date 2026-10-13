@@ -148,6 +148,7 @@ def test_fixtures_are_fictional_and_mark_unconfirmed_keys() -> None:
         json.loads(blob)
 
 
+@pytest.mark.live
 @pytest.mark.skipif(
     not os.environ.get("QLOO_API_KEY"),
     reason="live catalog checks stay off this machine unless a key is set",

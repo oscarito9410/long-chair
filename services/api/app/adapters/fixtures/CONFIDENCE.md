@@ -51,3 +51,10 @@ normalized; old lat/lon fields remain only for fixture compatibility.
 - `properties.creator`.
 - Place closing times. Walk minutes prefer location or geocode; lat/lon is legacy.
 - Any host on qloo.com, and any title from the public onboarding sample.
+
+## Review shape corrections
+
+Synthetic regressions also cover daily hours lists of opens/closes or closed objects,
+list/object explainability and invalid optional rows. Generic death tags map to grief;
+parent-death requires a parent relation. These corrections use review descriptions,
+not copied Qloo responses or results from an implementation-agent live run.

@@ -1,5 +1,5 @@
 import { foldTasteText } from "./taste-catalog.ts";
-import { builtInThemeIds, themeRuleById } from "./theme-rules.ts";
+import { builtInThemeIds, themeRuleById, themeRuleForTag } from "./theme-rules.ts";
 import type { ThemeRule } from "./theme-rules.ts";
 
 export const verdicts = ["clear", "flagged", "unverified"] as const;
@@ -82,10 +82,7 @@ function containsFolded(haystack: string, needle: string): boolean {
 
 function tagHit(rule: ThemeRule, tags: readonly NamedTag[]): string | undefined {
   for (const tag of tags) {
-    if (
-      rule.tagIds.includes(tag.id) ||
-      rule.tagPrefixes.some((prefix) => tag.id.startsWith(prefix) && tag.id.length > prefix.length)
-    ) {
+    if (themeRuleForTag(tag.id)?.id === rule.id) {
       return tag.name || tag.id;
     }
     if (rule.tagNames.some((name) => containsFolded(tag.name, name))) {

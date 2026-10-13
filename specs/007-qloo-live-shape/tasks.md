@@ -42,8 +42,8 @@ Live acceptance remains unchecked; see quickstart.md. Stop for review.
 
 ## Review corrections
 
-- [ ] R001 Guard live tests with explicit CLI opt-in and block ordinary HTTP I/O.
-- [ ] R002 Add DailyHours object variants and tolerant explanation normalization.
-- [ ] R003 Fix scope WKT coordinates, verify named locality behavior, restore output override.
-- [ ] R004 Correct bereavement families and strengthen Python/TypeScript parity tests.
-- [ ] R005 Update ADR/spec/run guidance, run offline checks, push new commits and update PR #12.
+- [x] R001 Guard live tests with explicit CLI opt-in and block ordinary HTTP I/O.
+- [x] R002 Add DailyHours object variants and tolerant explanation normalization.
+- [x] R003 Fix scope WKT coordinates, verify named locality behavior, restore output override.
+- [x] R004 Correct bereavement families and strengthen Python/TypeScript parity tests.
+- [x] R005 Update ADR/spec/run guidance, run offline checks, push new commits and update PR #12.

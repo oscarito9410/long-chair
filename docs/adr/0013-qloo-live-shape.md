@@ -19,17 +19,19 @@ EntityRecord. Root external providers override duplicate nested providers. Null 
 becomes an empty application string. Non-numeric duration becomes unavailable, and
 numeric episode_count remains an integer. Query affinity and JSON measurements stay
 adapter-local. Explainability reads signal.interests.entities; missing scores retain
-the seed fallback, while explicit empty or below-threshold scores do not attribute
-an item to every seed.
+the seed fallback, while explicit empty, malformed or below-threshold scores do not attribute
+an item to every seed. Object and list explanations are normalized independently;
+invalid optional rows cannot discard the enclosing insights entity.
 
 Coordinates prefer a complete root location, then properties.geocode, then the old
-fixture lat/lon pair. NearbyPlace retains address, daily hours and rating. Hours can
-be one display string or a list per day; no closing time is inferred without a local
+fixture lat/lon pair. NearbyPlace retains address, daily hours and rating. DailyHours parses opens/closes intervals and explicit closed=true entries in daily
+lists, retaining legacy display-string compatibility; no closing time is inferred without a local
 date/time context. The public place response remains unchanged.
 
 Use issue-listed identifiers plus namespace-bound underscore families in the existing
-backend mapping and core theme verifier. The death_of family conservatively includes
-other bereavement, as required by the issue. Keep legacy fixture tags. A shared
+backend mapping and core theme verifier. Generic death_of families and death/death_and_remembrance tags map to grief.
+Explicit parent, parents, mother and father relations map to parent-death. Exact
+identifiers win, then the longest bounded family prefix. Keep legacy fixture tags. A shared
 synthetic conformance corpus tests both language implementations; runtime code stays
 native to each independently packaged service. The existing checker remains the
 final admission decision. Known built-ins send stable exact exclusion ids without a
@@ -44,9 +46,14 @@ bodies do not escape through the API error handler. Retry count remains bounded.
 The scope script resolves a search signal first, adds it to every insights call,
 spaces requests by at least 0.25 seconds, and backs off on 429. Exhausted retries or
 other HTTP failures stop the run instead of producing a successful-looking report.
-No unsupported video_game insights call is added. The CLI writes only to its fixed,
-gitignored .qloo-live directory. Reports contain shapes and counts, not tag ids,
+No unsupported video_game insights call is added. Scope location uses WKT POINT(longitude latitude); named locality requests keep
+filter.location.query. The CLI defaults to the gitignored .qloo-live directory and
+restores the QLOO_LIVE_DIR override for a private report location. Reports contain shapes and counts, not tag ids,
 streaming names, descriptions, credentials, or response bodies.
+
+Pytest requires --run-live for marked external tests in addition to existing key/env
+gates. Ordinary tests block real HTTP transports; mock and ASGI transports still work.
+The scheduled/manual live contract workflow explicitly opts in.
 
 ## Consequences
 

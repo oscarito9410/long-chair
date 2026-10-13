@@ -8,15 +8,15 @@ Unconfirmed keys stay in fixtures/CONFIDENCE.md.
 import math
 
 from pydantic import (
-    AliasChoices,
     BaseModel,
     ConfigDict,
     Field,
-    JsonValue,
     field_validator,
     model_validator,
 )
 
+from app.adapters.place_documents import Coordinates, DailyHours
+from app.adapters.query_documents import QueryBlock
 from app.adapters.wire_values import NullableTextModel, normalize_entity
 
 
@@ -56,36 +56,6 @@ class TagRecord(NullableTextModel):
         return folded
 
 
-class ExplainEntity(BaseModel):
-    """One signal entity score from the provider query explanation."""
-
-    model_config = ConfigDict(extra="allow")
-
-    entity_id: str
-    score: float
-
-
-class Explainability(BaseModel):
-    """Scores from 0 to 1. `warning` is set when the catalog could not explain."""
-
-    model_config = ConfigDict(extra="allow")
-
-    warning: str | None = None
-    entities: list[ExplainEntity] = Field(
-        default_factory=list, validation_alias=AliasChoices("signal.interests.entities", "entities")
-    )
-
-
-class QueryBlock(BaseModel):
-    """Per-entity query scores and provider measurements, kept inside the adapter."""
-
-    model_config = ConfigDict(extra="allow")
-
-    explainability: Explainability | None = None
-    affinity: float | None = None
-    measurements: JsonValue = None
-
-
 class ImageRef(NullableTextModel):
     """`properties.image.url` on the wire."""
 
@@ -106,15 +76,6 @@ class ExternalRef(NullableTextModel):
     def numeric_identifier(cls, value: object) -> object:
         """Numeric provider ids are identifiers, not quantities."""
         return str(value) if isinstance(value, int) and not isinstance(value, bool) else value
-
-
-class Coordinates(BaseModel):
-    """Coordinates provided by location or properties.geocode."""
-
-    latitude: float | None = Field(default=None, validation_alias=AliasChoices("latitude", "lat"))
-    longitude: float | None = Field(
-        default=None, validation_alias=AliasChoices("longitude", "lon", "lng")
-    )
 
 
 class EntityProperties(NullableTextModel):
@@ -140,7 +101,7 @@ class EntityProperties(NullableTextModel):
     city: str = ""
     neighborhood: str = ""
     geocode: Coordinates | None = None
-    hours: dict[str, list[str]] | None = None
+    hours: dict[str, list[DailyHours]] | None = None
     lat: float | None = None
     lon: float | None = None
     price_level: int | None = None
@@ -153,10 +114,13 @@ class EntityProperties(NullableTextModel):
     @field_validator("hours", mode="before")
     @classmethod
     def daily_hours(cls, value: object) -> object:
-        """Accept one display interval or several per day, without inventing closing times."""
+        """Wrap legacy strings and normalize missing daily schedules."""
         if not isinstance(value, dict):
             return value
-        return {day: [hours] if isinstance(hours, str) else hours for day, hours in value.items()}
+        return {
+            day: [hours] if isinstance(hours, str) else [] if hours is None else hours
+            for day, hours in value.items()
+        }
 
     @field_validator("duration", mode="before")
     @classmethod

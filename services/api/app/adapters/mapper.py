@@ -3,7 +3,8 @@
 import logging
 from collections.abc import Sequence
 
-from app.adapters.documents import EntityRecord, Explainability, TagRecord
+from app.adapters.documents import EntityRecord, TagRecord
+from app.adapters.query_documents import Explainability
 from app.adapters.theme_tags import theme_for_tag
 from app.domain.entities import CatalogItem, NearbyPlace
 from app.domain.kinds import ContentKind, DurationSource, PlaceKind
@@ -275,7 +276,8 @@ def _place(
         price_label=price,
         address=entity.properties.address,
         hours=tuple(
-            (day, tuple(periods)) for day, periods in (entity.properties.hours or {}).items()
+            (day, tuple(period.label() for period in periods))
+            for day, periods in (entity.properties.hours or {}).items()
         ),
         rating=entity.properties.business_rating,
         map_url=f"{MAPS_SEARCH}{entity.name.replace(' ', '+')}",

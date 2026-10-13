@@ -28,14 +28,14 @@ npm run lint:slop
 ## Verified on 2026-10-13
 
 - API Ruff lint/format and strict mypy pass.
-- API pytest: 183 passed, 3 live tests skipped; domain/application coverage 98.15%.
+- API pytest: 214 passed, 3 live tests skipped; domain/application coverage 98.15%.
 - Aggregate JS: formatting, ESLint and all workspace typechecks pass.
-- Vitest: mobile 25, web 11, core 85 tests pass (121 total).
+- Vitest: mobile 25, web 11, core 96 tests pass (132 total).
 - Web production build passes. No native build, export, signing or deployment ran.
 - SlopMD and design scans completed; findings remain informational. Design grade A.
 - git diff --check passes; .qloo-live/scope-report.md is ignored.
 - Fictional values only: the shared tag corpus contains issue-listed vocabulary and
-  synthetic family variants, not real entity records. No API keys were used.
+  synthetic family variants, not real entity records. No real API keys were read or used.
 
 Existing tool warnings: Starlette testclient deprecation and mobile Vite config loader
 notice. Locked npm dependencies report audit findings; dependency upgrades are outside
@@ -51,7 +51,17 @@ uv run python -m app.live.qloo_scope
 ```
 
 It skips when QLOO_API_KEY is absent. With a key, it resolves a search signal, spaces
-requests by at least 0.25 seconds, backs off on 429, and writes scope-report.md only
-under the fixed gitignored .qloo-live directory. An HTTP error after retries fails the
+requests by at least 0.25 seconds, backs off on 429, and writes scope-report.md
+under the gitignored .qloo-live directory by default. QLOO_LIVE_DIR restores the
+optional private destination override. An HTTP error after retries fails the
 run. The zero-400/429 real-host acceptance item is unverified. Mock tests exercise the
 whole sequence, bounded retries, missing-signal refusal, and value-free reporting.
+
+## Offline review validation
+
+Ordinary pytest requires no keys and blocks real HTTP transports. Marked live tests
+require --run-live as well as the existing key/env gates; do not pass that option in
+an offline run. A credential-presence regression check selected only live tests with
+a synthetic sentinel credential and confirmed all were skipped without --run-live.
+The external reviewer's reported live results are not our test evidence. No new live
+or paid requests were made during this revision.

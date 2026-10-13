@@ -26,6 +26,9 @@ async def test_scope_resolves_signal_paces_and_writes_shapes_only(tmp_path, monk
         if request.url.path == "/v2/insights":
             assert request.url.params["signal.interests.entities"] == "synthetic-signal"
             assert "video_game" not in str(request.url)
+            if "filter.location" in request.url.params:
+                assert request.url.params["filter.location"] == "POINT(-99.1332 19.4326)"
+                assert "filter.location.query" not in request.url.params
         return httpx.Response(200, json={"results": {"entities": [entity], "tags": entity["tags"]}})
 
     async def sleep(delay):
@@ -82,3 +85,26 @@ async def test_empty_search_does_not_send_invalid_insights(tmp_path, monkeypatch
         await qloo_scope.run_scope("synthetic", tmp_path)
     assert len(requests) == 1
     assert not (tmp_path / "scope-report.md").exists()
+
+
+def test_scope_output_override_is_restored(tmp_path, monkeypatch):
+    monkeypatch.setenv("QLOO_LIVE_DIR", str(tmp_path))
+    assert qloo_scope.report_dir() == tmp_path
+    monkeypatch.delenv("QLOO_LIVE_DIR")
+    assert qloo_scope.report_dir() == qloo_scope.REPORT_DIR
+
+
+def test_place_query_keeps_named_locality_separate_from_coordinates():
+    from app.adapters.queries import place_params
+    from app.ports.models import InterestLink
+
+    params = dict(
+        place_params(
+            " Fictional Neighborhood ",
+            "monday",
+            [InterestLink("seed", "Paper", "synthetic-seed")],
+            [],
+        )
+    )
+    assert params["filter.location.query"] == "Fictional Neighborhood"
+    assert "filter.location" not in params

@@ -81,12 +81,16 @@ Health is `GET /v1/health`. The demo kit is `POST /v1/demo/plan` with `{}`. Defa
 
 Enrichment stays on the sample records unless `ENRICHMENT_MODE=live`. TMDB is used only when `TMDB_API_KEY` is set. `OPEN_LIBRARY=1` turns on the Open Library fallback. iTunes needs no key and is throttled. Spotify is a search link.
 
-The live scope check is skipped unless a key is present. It writes a shape report to `services/api/.qloo-live/`, which is gitignored. Do not commit those files.
+Pytest is offline by default, even when keys are present. Live tests additionally
+require `--run-live`; ordinary tests block real HTTP transports.
+
+The live scope check is skipped unless a key is present. It writes a shape report to `services/api/.qloo-live/`, which is gitignored. `QLOO_LIVE_DIR` can override the report directory; choose a
+private path outside tracked files. Do not commit those files.
 
 ```bash
 cd services/api
 QLOO_API_KEY=... uv run python -m app.live.qloo_scope
-QLOO_API_KEY=... uv run pytest tests/live -q --override-ini=addopts=
+QLOO_API_KEY=... uv run pytest tests/live --run-live -q --override-ini=addopts=
 ```
 
 ### Optional agent kit
