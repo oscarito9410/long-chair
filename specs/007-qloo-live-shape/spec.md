@@ -76,3 +76,21 @@ Family matching is scoped to media/qloo tag namespaces and underscore boundaries
 The death_of family intentionally blocks broader bereavement under parent-death, as
 requested by the issue. Real-host zero-error behavior requires a separately authorized
 live run and cannot be proven by mocked tests.
+
+## Review corrections (2026-10-13)
+
+- Parse daily hours as lists of objects with opens/closes or closed=true, preserving
+  legacy display strings without inferring an open-until time.
+- Explainability accepts object or list shapes. Invalid optional explanations must
+  never discard an insights entity; valid finite scores survive mixed lists.
+- Scope coordinates use WKT POINT(longitude latitude). Named locality queries retain
+  filter.location.query; no coordinate string is placed in that parameter.
+- Generic death_of families and death/death_and_remembrance tags map to grief.
+  Parent, mother, and father relations alone map to parent-death. Cross-language
+  parity must also assert absence of a parent-death flag for unrelated bereavement.
+- Restore QLOO_LIVE_DIR override; its contents remain private and outside commits.
+- Default pytest must remain offline even when credentials are present. Live tests
+  require explicit command-line opt-in in addition to their existing key/env gates.
+
+External reviewer results are not implementation-agent validation. No live calls or
+real response data may be used for this revision.

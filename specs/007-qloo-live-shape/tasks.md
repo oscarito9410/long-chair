@@ -39,3 +39,11 @@ entity; US3 can be tested independently. Completion follows all three stories.
 
 Draft PR: https://github.com/oscarito9410/long-chair/pull/12.
 Live acceptance remains unchecked; see quickstart.md. Stop for review.
+
+## Review corrections
+
+- [ ] R001 Guard live tests with explicit CLI opt-in and block ordinary HTTP I/O.
+- [ ] R002 Add DailyHours object variants and tolerant explanation normalization.
+- [ ] R003 Fix scope WKT coordinates, verify named locality behavior, restore output override.
+- [ ] R004 Correct bereavement families and strengthen Python/TypeScript parity tests.
+- [ ] R005 Update ADR/spec/run guidance, run offline checks, push new commits and update PR #12.
