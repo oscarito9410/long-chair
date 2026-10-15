@@ -16,7 +16,7 @@
     "@expo-google-fonts/nunito": "0.4.2",
     "@expo/metro-runtime": "57.0.16",
     "@long-chair/core": "0.1.0",
-    "@shopify/react-native-skia": "2.6.2",
+    "@shopify/react-native-skia": "2.14.0",
     "expo": "57.0.28",
     "expo-blur": "57.0.3",
     "expo-constants": "57.0.21",
